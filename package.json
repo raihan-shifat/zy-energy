@@ -1,0 +1,21 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@fullhuman/postcss-purgecss": "^8.0.0",
+        "@popperjs/core": "^2.11.6",
+        "axios": "^1.6.4",
+        "laravel-vite-plugin": "^1.0.0",
+        "sass": "^1.56.1",
+        "vite": "^5.0.0",
+        "vite-plugin-purgecss": "^0.2.13"
+    },
+    "dependencies": {
+        "datatables.net": "^2.2.1",
+        "datatables.net-dt": "^2.2.1"
+    }
+}

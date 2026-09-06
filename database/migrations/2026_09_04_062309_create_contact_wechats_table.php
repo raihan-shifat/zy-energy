@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('contact_wechats', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->comment('Display name for the WeChat contact');
+            $table->string('wechat_id')->nullable()->comment('WeChat ID');
+            $table->string('qr_code')->nullable()->comment('Path to the QR code image');
+            $table->text('description')->nullable()->comment('Short description');
+            $table->string('purpose')->nullable()->comment('Purpose/Department (e.g., Business Inquiries, After-Sales Support)');
+            $table->unsignedInteger('sort_order')->default(0)->comment('Display order');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('contact_wechats');
+    }
+};
