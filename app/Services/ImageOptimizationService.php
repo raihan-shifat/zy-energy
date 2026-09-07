@@ -135,15 +135,15 @@ class ImageOptimizationService
             $webpPath = $this->getWebpPath($originalPath, $suffix);
             
             if ($webpPath && Storage::disk('public')->exists($webpPath)) {
-                $webpSources[] = Storage::url($webpPath) . " {$size['width']}w";
+                $webpSources[] = asset('storage/' . $webpPath) . " {$size['width']}w";
             }
         }
 
         // Fallback JPEG for original
         $fallbackJpg = $this->getFallbackJpgPath($originalPath);
         $fallbackUrl = $fallbackJpg && Storage::disk('public')->exists($fallbackJpg) 
-            ? Storage::url($fallbackJpg) 
-            : Storage::url($originalPath);
+            ? asset('storage/' . $fallbackJpg) 
+            : asset('storage/' . $originalPath);
 
         $srcset = implode(', ', $webpSources);
         $src = $fallbackUrl;
@@ -198,18 +198,18 @@ class ImageOptimizationService
     public function getResponsiveUrl(string $originalPath, string $sizeKey = 'small'): string
     {
         if (!$originalPath || !isset(self::RESPONSIVE_SIZES[$sizeKey])) {
-            return $originalPath ? Storage::url($originalPath) : asset('default.jpg');
+            return $originalPath ? asset('storage/' . $originalPath) : asset('default.jpg');
         }
 
         $suffix = self::RESPONSIVE_SIZES[$sizeKey]['suffix'];
         $webpPath = $this->getWebpPath($originalPath, $suffix);
         
         if ($webpPath && Storage::disk('public')->exists($webpPath)) {
-            return Storage::url($webpPath);
+            return asset('storage/' . $webpPath);
         }
 
         // Fallback to original
-        return Storage::url($originalPath);
+        return asset('storage/' . $originalPath);
     }
 
     /**
