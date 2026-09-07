@@ -101,13 +101,20 @@
                     <div class="col-6 col-md-3 mb-4">
                         <div class="cat-card h-100">
                             <a href="{{ route('category.show', $category->slug) }}" class="text-decoration-none d-block h-100">
+                                @php
+                                    $catImg = (string) localized_translation_value($category->translations, 'image_url', '');
+                                    $catHasImg = $catImg !== '' && $catImg !== 'default.jpg'
+                                        && \Illuminate\Support\Facades\Storage::disk('public')->exists($catImg);
+                                @endphp
                                 <div class="catcard-img">
-                                    {!! getResponsiveImageHtml(optional($category->translation)->image_url ?? 'default.jpg', [
-                                        'alt' => $catName,
-                                        'class' => 'img-fluid',
-                                        'sizes' => '(max-width: 480px) 100vw, (max-width: 768px) 50vw, 25vw',
-                                        'loading' => 'lazy',
-                                    ]) !!}
+                                    @if ($catHasImg)
+                                        <img src="{{ asset('storage/' . ltrim($catImg, '/')) }}"
+                                             alt="{{ $catName }}" class="img-fluid" loading="lazy">
+                                    @else
+                                        <div class="catcard-img-placeholder">
+                                            <i class="fa-regular fa-image"></i>
+                                        </div>
+                                    @endif
                                 </div>
                                 <h3 class="mt-3 mb-0 text-center">{{ $catName }}</h3>
                                 @if (!empty($category->types))

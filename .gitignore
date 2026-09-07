@@ -23,6 +23,9 @@
 /DEPLOYMENT_GUIDE.md
 /0
 /storage/*.pdf
+
+# Database dumps (contain user data / password hashes - never commit)
+/*.sql
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
