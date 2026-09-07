@@ -1,2 +1,37 @@
+# By default nothing under storage/app/public is tracked. This keeps
+# database dumps portable (image_url columns store only relative paths).
+# However a DB import does NOT move the binary files, so images that are
+# part of the site content (products, categories, banners, news, logos,
+# certification files, etc.) are tracked in git so a fresh deployment
+# (git pull + php artisan storage:link) restores them.
+#
+# Admin/user-generated uploads (quotations, quotation line images) remain
+# ignored - those are re-uploaded through the admin panel, not deployed.
+
 *
 !.gitignore
+
+!products/
+!products/**
+!categories/
+!categories/**
+!banners/
+!banners/**
+!banner_images/
+!banner_images/**
+!news/
+!news/**
+!site/
+!site/**
+!certifications/
+!certifications/**
+!pages/
+!pages/**
+!brands/
+!brands/**
+!contact/
+!contact/**
+!social/
+!social/**
+!admin_profiles/
+!admin_profiles/**
