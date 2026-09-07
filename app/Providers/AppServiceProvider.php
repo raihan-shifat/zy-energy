@@ -64,5 +64,31 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
+
+        $this->configureAppUrl();
+    }
+
+    /**
+     * Keep every generated URL (asset(), secure_asset(), Storage::url())
+     * aligned with config('app.url') so images/links never fall back to the
+     * raw server IP or an http scheme when the site is served over https.
+     *
+     * Storage::url() reads the 'public' disk url from config, so that value is
+     * re-derived here at runtime (config:cache safe) instead of only env().
+     */
+    protected function configureAppUrl(): void
+    {
+        $appUrl = rtrim((string) config('app.url'), '/');
+
+        if ($appUrl === '') {
+            return;
+        }
+
+        if (str_starts_with($appUrl, 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+            \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
+        }
+
+        config(['filesystems.disks.public.url' => $appUrl . '/storage']);
     }
 }

@@ -103,6 +103,7 @@
                             <a href="{{ route('category.show', $category->slug) }}" class="text-decoration-none d-block h-100">
                                 @php
                                     $catRaw = (string) localized_translation_value($category->translations, 'image_url', '');
+                                    $catRel = '';
                                     $catImgUrl = '';
 
                                     if ($catRaw !== '' && $catRaw !== 'default.jpg') {
@@ -114,12 +115,18 @@
                                             $candidate = ltrim($catRaw, '/');
 
                                             if ($disk->exists($candidate)) {
-                                                $catImgUrl = $disk->url($candidate);
+                                                $catRel = $candidate;
                                             } elseif ($disk->exists('categories/' . basename($candidate))) {
                                                 // Tolerate rows that only stored the bare file name.
-                                                $catImgUrl = $disk->url('categories/' . basename($candidate));
+                                                $catRel = 'categories/' . basename($candidate);
                                             }
                                         }
+                                    }
+
+                                    if ($catImgUrl === '' && $catRel !== '') {
+                                        // asset() honors the forced app.url root, so it
+                                        // renders https://<domain>/storage/... not the IP.
+                                        $catImgUrl = asset('storage/' . $catRel);
                                     }
                                 @endphp
                                 <div class="catcard-img">
