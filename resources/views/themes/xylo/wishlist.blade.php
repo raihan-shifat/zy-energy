@@ -15,7 +15,7 @@
                     <div class="product-card">
 
                         <div class="product-img position-relative">
-                            <img src="{{ Storage::url(optional($product->thumbnail)->image_url ?? 'default.jpg') }}"
+                            <img src="{{ asset('storage/' . (optional($product->thumbnail)->image_url ?? 'default.jpg')) }}"
                                   alt="{{ localized_translation_value($product->translations, 'name', '') }}" style="object-fit: contain; width: 100%; height: 250px;">
 
                             <!-- Same wishlist heart like homepage -->

@@ -17,7 +17,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     @if ($post->image_url)
-                        <img src="{{ Storage::url($post->image_url) }}" class="card-img-top" alt="{{ $postTitle }}" loading="lazy" style="height:190px; object-fit:cover;">
+                        <img src="{{ asset('storage/' . $post->image_url) }}" class="card-img-top" alt="{{ $postTitle }}" loading="lazy" style="height:190px; object-fit:cover;">
                     @endif
                     <div class="card-body">
                         <small class="text-muted">{{ \format_date($post->created_at) }}</small>

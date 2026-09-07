@@ -122,7 +122,7 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                         <img id="image_preview_img_{{ $language->code }}" 
-                                        src="{{ !empty($bannerTranslation->image_url) ? Storage::url($bannerTranslation->image_url) : asset('images/placeholder.png') }}" 
+                                        src="{{ !empty($bannerTranslation->image_url) ? asset('storage/' . $bannerTranslation->image_url) : asset('images/placeholder.png') }}" 
                                         alt="{{ __('cms.banners.image_preview') }}" 
                                         class="img-thumbnail" style="max-width: 100px;">                                  
                                     <input type="hidden" name="languages[{{ $index }}][language_code]" value="{{ $language->code }}"> 

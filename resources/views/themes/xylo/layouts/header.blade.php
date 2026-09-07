@@ -8,9 +8,9 @@
         <div class="row align-items-center">
             <div class="col-md-4 col-6">
                 <a href="{{ route('xylo.home') }}" class="navbar-brand">
-                    <img src="{{ $siteSettings?->logo ? Storage::url($siteSettings->logo) : asset('logo.png') }}" width="80" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
+                    <img src="{{ $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('logo.png') }}" width="80" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
                     @if($siteSettings?->header_brand_name_image)
-                        <img src="{{ Storage::url($siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="ms-2 align-middle" style="max-height: 40px; max-width: 180px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('storage/' . $siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="ms-2 align-middle" style="max-height: 40px; max-width: 180px; width: auto; object-fit: contain;">
                     @elseif($siteSettings?->site_name)
                         <span class="ms-2 align-middle fw-semibold">{{ $siteSettings->site_name }}</span>
                     @endif

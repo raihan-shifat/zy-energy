@@ -76,7 +76,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-2 text-center">
                         @if($siteSettings && $siteSettings->logo)
-                            <img src="{{ Storage::url($siteSettings->logo) }}" alt="Logo" style="max-height: 60px; max-width: 100%;">
+                            <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="Logo" style="max-height: 60px; max-width: 100%;">
                         @else
                             <div class="company-logo-placeholder"><i class="bi bi-building me-1"></i> Logo placeholder</div>
                         @endif
@@ -238,9 +238,9 @@
                             <td>
                                 <div class="image-preview-wrap mb-1" data-index="{{ $idx }}" @if(empty($item->image_path) && empty($item->reference_image)) style="display:none;" @endif>
                                     @if(!empty($item->image_path))
-                                        <img src="{{ Storage::url($item->image_path) }}" class="image-preview" alt="Preview">
+                                        <img src="{{ asset('storage/' . $item->image_path) }}" class="image-preview" alt="Preview">
                                     @elseif(!empty($item->reference_image))
-                                        <img src="{{ Str::startsWith($item->reference_image, ['http://','https://']) ? $item->reference_image : Storage::url($item->reference_image) }}" class="image-preview" alt="Preview">
+                                        <img src="{{ Str::startsWith($item->reference_image, ['http://','https://']) ? $item->reference_image : asset('storage/' . $item->reference_image) }}" class="image-preview" alt="Preview">
                                     @else
                                         <img src="" class="image-preview" alt="Preview">
                                     @endif

@@ -95,7 +95,7 @@
                 <strong>{{ __('cms.products.images') }}:</strong>
                 <div class="d-flex flex-wrap gap-2 mt-2">
                     @forelse($product->images as $image)
-                        <img src="{{ Storage::url($image->image_url) }}" alt="{{ $image->name }}" style="max-height: 100px; max-width: 100px; object-fit: cover;">
+                        <img src="{{ asset('storage/' . $image->image_url) }}" alt="{{ $image->name }}" style="max-height: 100px; max-width: 100px; object-fit: cover;">
                     @empty
                         <span class="text-muted">{{ __('cms.products.no_images') }}</span>
                     @endforelse

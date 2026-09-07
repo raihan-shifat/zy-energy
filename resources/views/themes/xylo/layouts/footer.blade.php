@@ -15,7 +15,7 @@
         <div class="footer-about d-flex flex-column gap-3">
           <a href="{{ route('xylo.home') }}" class="d-inline-block">
             <img
-              src="{{ $footerLogo ? Storage::url($footerLogo) : asset('logo.png') }}"
+              src="{{ $footerLogo ? asset('storage/' . $footerLogo) : asset('logo.png') }}"
               alt="{{ $siteSettings?->site_name ?? __('store.footer.footer_logo_alt') }}"
               class="footer-logo"
               loading="lazy"

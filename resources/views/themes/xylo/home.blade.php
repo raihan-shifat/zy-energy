@@ -25,7 +25,7 @@
                     return [
                         'title' => $t->title ?? __('store.home_b2b.hero_title'),
                         'subtitle' => html_entity_decode(strip_tags($t->subtitle ?? $t->description ?? __('store.home_b2b.hero_subtitle')), ENT_QUOTES, 'UTF-8'),
-                        'image' => $t->image_url ? Storage::url($t->image_url) : ($heroProductImage ? Storage::url($heroProductImage) : null),
+                        'image' => $t->image_url ? asset('storage/' . $t->image_url) : ($heroProductImage ? asset('storage/' . $heroProductImage) : null),
                         'cta_text' => $t->cta_text ?: __('store.home_b2b.view_all_products'),
                         'cta_link' => $t->cta_link ?: route('shop.index'),
                     ];
@@ -167,10 +167,10 @@
                     @endphp
                     <div class="col-6 col-md-3 mb-3 text-center">
                         @if ($certification->document_url)
-                            <a href="{{ Storage::url($certification->document_url) }}" target="_blank" class="text-decoration-none">
+                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" class="text-decoration-none">
                         @endif
                             @if ($certification->image_url)
-                                <img src="{{ Storage::url($certification->image_url) }}" alt="{{ $certName }}" loading="lazy" style="max-height:70px; max-width:120px; object-fit:contain;">
+                                <img src="{{ asset('storage/' . $certification->image_url) }}" alt="{{ $certName }}" loading="lazy" style="max-height:70px; max-width:120px; object-fit:contain;">
                             @else
                                 <span class="text-muted">{{ $certName }}</span>
                             @endif
@@ -256,7 +256,7 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 shadow-sm">
                             @if ($newsPost->image_url)
-                                <img src="{{ Storage::url($newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" style="height:180px; object-fit:cover;">
+                                <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" style="height:180px; object-fit:cover;">
                             @endif
                             <div class="card-body">
                                 <h5 class="card-title">{{ $newsTitle }}</h5>

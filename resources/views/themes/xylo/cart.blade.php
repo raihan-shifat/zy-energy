@@ -49,7 +49,7 @@
             </td>
             <td>
                 <div class="pr-imghead">
-                    <img src="{{ Storage::url(optional($variant->images->first() ?? $product->thumbnail)->image_url ?? 'default.jpg') }}" 
+                    <img src="{{ asset('storage/' . (optional($variant->images->first() ?? $product->thumbnail)->image_url ?? 'default.jpg')) }}" 
                          alt="{{ $variant->name ?? $product->translation->name }}">
                     <p>{{ $variant->name ?? $product->translation->name }}</p>
                 </div>

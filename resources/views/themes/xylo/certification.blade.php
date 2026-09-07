@@ -18,14 +18,14 @@
                 <div class="card text-center h-100 shadow-sm">
                     <div class="card-body d-flex flex-column align-items-center justify-content-center">
                         @if ($certification->image_url)
-                            <img src="{{ Storage::url($certification->image_url) }}" alt="{{ $certName }}"
+                            <img src="{{ asset('storage/' . $certification->image_url) }}" alt="{{ $certName }}"
                                  class="mb-3" style="max-height:100px; max-width:140px; object-fit:contain;">
                         @else
                             <i class="fa-solid fa-certificate fa-3x text-muted mb-3"></i>
                         @endif
                         <h5 class="card-title">{{ $certName }}</h5>
                         @if ($certification->document_url)
-                            <a href="{{ Storage::url($certification->document_url) }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
                                 <i class="fa-solid fa-file-pdf"></i> {{ __('store.certification.view_document') }}
                             </a>
                         @endif

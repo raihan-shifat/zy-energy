@@ -58,7 +58,7 @@
 
                             <div class="mt-2" id="image_preview_{{ $language->code }}" style="display:{{ $translation && $translation->image_url ? 'block' : 'none' }};">
                                 <img id="image_preview_img_{{ $language->code }}"
-                                     src="{{ $translation && $translation->image_url ? Storage::url($translation->image_url) : '#' }}"
+                                     src="{{ $translation && $translation->image_url ? asset('storage/' . $translation->image_url) : '#' }}"
                                      alt="{{ __('cms.pages.form_image', ['code' => $language->code]) }}"
                                      class="img-thumbnail" style="max-width: 200px;">
                             </div>

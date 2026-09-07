@@ -41,7 +41,7 @@
                         </div>
                     @empty
                         <div>
-                            <img src="{{ Storage::url('default.jpg') }}" alt="{{ __('store.category.product_name_not_available') }}" style="width: 100%; height: auto;" loading="lazy" />
+                            <img src="{{ asset('storage/default.jpg') }}" alt="{{ __('store.category.product_name_not_available') }}" style="width: 100%; height: auto;" loading="lazy" />
                         </div>
                     @endforelse
                 </div>

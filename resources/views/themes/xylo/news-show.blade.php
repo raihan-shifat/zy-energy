@@ -22,7 +22,7 @@
         <small class="text-muted d-block mb-4">{{ \format_date($post->created_at) }}</small>
 
         @if ($post->image_url)
-            <img src="{{ Storage::url($post->image_url) }}" alt="{{ __('store.news.title') }}" class="img-fluid rounded mb-4" style="max-height:400px; object-fit:cover; width:100%;">
+            <img src="{{ asset('storage/' . $post->image_url) }}" alt="{{ __('store.news.title') }}" class="img-fluid rounded mb-4" style="max-height:400px; object-fit:cover; width:100%;">
         @endif
 
         @if ($postExcerpt)

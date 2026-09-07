@@ -20,11 +20,11 @@
     foreach ($quotation->items as $li) {
         $src = null;
         if (! empty($li->image_path)) {
-            $src = \Illuminate\Support\Facades\Storage::url($li->image_path);
+            $src = asset('storage/' . $li->image_path);
         } elseif (! empty($li->reference_image)) {
             $src = \Illuminate\Support\Str::startsWith($li->reference_image, ['http://', 'https://'])
                 ? $li->reference_image
-                : \Illuminate\Support\Facades\Storage::url($li->reference_image);
+                : asset('storage/' . $li->reference_image);
         }
         $itemImageMap[$li->id] = $src;
     }

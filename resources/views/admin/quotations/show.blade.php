@@ -157,8 +157,8 @@
                     <td class="col-img text-center">
                         @php
                             $imgUrl = null;
-                            if (!empty($item->image_path)) $imgUrl = Storage::url($item->image_path);
-                            elseif (!empty($item->reference_image)) $imgUrl = Str::startsWith($item->reference_image, ['http://','https://']) ? $item->reference_image : Storage::url($item->reference_image);
+                            if (!empty($item->image_path)) $imgUrl = asset('storage/' . $item->image_path);
+                            elseif (!empty($item->reference_image)) $imgUrl = Str::startsWith($item->reference_image, ['http://','https://']) ? $item->reference_image : asset('storage/' . $item->reference_image);
                         @endphp
                         @if($imgUrl)
                             <img src="{{ $imgUrl }}" class="ref-image" alt="Ref">

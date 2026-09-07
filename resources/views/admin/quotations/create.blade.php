@@ -73,7 +73,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-2 text-center">
                         @if($siteSettings && $siteSettings->logo)
-                            <img src="{{ Storage::url($siteSettings->logo) }}" alt="Logo" style="max-height: 60px; max-width: 100%;">
+                            <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="Logo" style="max-height: 60px; max-width: 100%;">
                         @else
                             <div class="company-logo-placeholder"><i class="bi bi-building me-1"></i> Logo placeholder</div>
                         @endif
