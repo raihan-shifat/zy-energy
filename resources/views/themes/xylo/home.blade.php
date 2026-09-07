@@ -25,7 +25,7 @@
                     return [
                         'title' => $t->title ?? __('store.home_b2b.hero_title'),
                         'subtitle' => html_entity_decode(strip_tags($t->subtitle ?? $t->description ?? __('store.home_b2b.hero_subtitle')), ENT_QUOTES, 'UTF-8'),
-                        'image' => $t->image_url ? asset('storage/' . $t->image_url) : ($heroProductImage ? asset('storage/' . $heroProductImage) : null),
+                        'image' => $t->image_url ?: ($heroProductImage ?: null),
                         'cta_text' => $t->cta_text ?: __('store.home_b2b.view_all_products'),
                         'cta_link' => $t->cta_link ?: route('shop.index'),
                     ];
@@ -49,12 +49,10 @@
                         @foreach ($bannerData as $idx => $slide)
                         <div class="hero-img-slide {{ $idx === $initialIndex ? '' : 'd-none' }}" data-index="{{ $idx }}">
                             @if ($slide['image'])
-                                {!! getResponsiveImageHtml($slide['image'], [
-                                    'alt' => strip_tags($slide['title']),
-                                    'class' => 'img-fluid',
-                                    'sizes' => '(max-width: 768px) 100vw, 50vw',
-                                    'loading' => 'lazy',
-                                ]) !!}
+                                <img src="{{ asset('storage/' . $slide['image']) }}"
+                                     alt="{{ strip_tags($slide['title']) }}"
+                                     class="img-fluid"
+                                     loading="lazy">
                             @else
                                 <div class="hero-media-fallback"><i class="fa-solid fa-bolt"></i></div>
                             @endif
