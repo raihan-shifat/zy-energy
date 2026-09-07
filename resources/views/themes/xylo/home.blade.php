@@ -102,13 +102,29 @@
                         <div class="cat-card h-100">
                             <a href="{{ route('category.show', $category->slug) }}" class="text-decoration-none d-block h-100">
                                 @php
-                                    $catImg = (string) localized_translation_value($category->translations, 'image_url', '');
-                                    $catHasImg = $catImg !== '' && $catImg !== 'default.jpg'
-                                        && \Illuminate\Support\Facades\Storage::disk('public')->exists($catImg);
+                                    $catRaw = (string) localized_translation_value($category->translations, 'image_url', '');
+                                    $catImgUrl = '';
+
+                                    if ($catRaw !== '' && $catRaw !== 'default.jpg') {
+                                        if (filter_var($catRaw, FILTER_VALIDATE_URL)) {
+                                            // Seeder fallback stored a full remote URL.
+                                            $catImgUrl = $catRaw;
+                                        } else {
+                                            $disk = \Illuminate\Support\Facades\Storage::disk('public');
+                                            $candidate = ltrim($catRaw, '/');
+
+                                            if ($disk->exists($candidate)) {
+                                                $catImgUrl = $disk->url($candidate);
+                                            } elseif ($disk->exists('categories/' . basename($candidate))) {
+                                                // Tolerate rows that only stored the bare file name.
+                                                $catImgUrl = $disk->url('categories/' . basename($candidate));
+                                            }
+                                        }
+                                    }
                                 @endphp
                                 <div class="catcard-img">
-                                    @if ($catHasImg)
-                                        <img src="{{ asset('storage/' . ltrim($catImg, '/')) }}"
+                                    @if ($catImgUrl !== '')
+                                        <img src="{{ $catImgUrl }}"
                                              alt="{{ $catName }}" class="img-fluid" loading="lazy">
                                     @else
                                         <div class="catcard-img-placeholder">
