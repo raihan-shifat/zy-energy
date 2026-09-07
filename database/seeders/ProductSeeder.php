@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Language;
 use App\Models\Product;
 use App\Models\ProductAttributeValue;
+use App\Models\Shop;
 use App\Models\Vendor;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -86,9 +87,40 @@ class ProductSeeder extends Seeder
                 }
             }
 
-            $vendor = Vendor::first() ?? Vendor::factory()->create();
-            $category = Category::first() ?? Category::factory()->create();
-            $brand = Brand::first() ?? Brand::factory()->create();
+            // Deterministic parent records — never rely on factories so the
+            // seeder runs on a fresh/empty production DB too.
+            $vendor = Vendor::first() ?? Vendor::create([
+                'name' => 'Default Vendor',
+                'email' => 'vendor@zyenergy.com',
+                'password' => 'Vendor@12345',
+                'status' => 'active',
+            ]);
+
+            $shop = Shop::first();
+
+            if (! $shop) {
+                // Shop::$fillable excludes vendor_id and the column defaults to 1,
+                // so insert the row directly with the resolved vendor's id.
+                $shopId = DB::table('shops')->insertGetId([
+                    'vendor_id' => $vendor->id,
+                    'name' => 'ZY Energy Shop',
+                    'slug' => 'zy-energy-shop',
+                    'status' => 'active',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $shop = Shop::find($shopId);
+            }
+
+            $category = Category::first() ?? Category::create([
+                'slug' => 'general',
+                'status' => true,
+            ]);
+
+            $brand = Brand::first() ?? Brand::create([
+                'slug' => 'general',
+                'status' => 'active',
+            ]);
 
             $products = [
                 [
@@ -119,7 +151,7 @@ class ProductSeeder extends Seeder
 
             foreach ($products as $item) {
                 $product = Product::create([
-                    'shop_id' => 1,
+                    'shop_id' => $shop->id,
                     'vendor_id' => $vendor->id,
                     'slug' => $item['slug'],
                     'category_id' => $category->id,
