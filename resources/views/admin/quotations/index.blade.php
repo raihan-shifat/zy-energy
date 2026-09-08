@@ -49,7 +49,7 @@ $(document).ready(function() {
             { data: 'invoice_number', name: 'invoice_number' },
             { data: 'customer_name', name: 'customer_name' },
             { data: 'date', name: 'date' },
-            { data: 'total_display', name: 'total_display', orderable: false },
+            { data: 'total', name: 'total', orderable: false },
             { data: 'status', name: 'status', orderable: false, searchable: false },
             { data: 'action', name: 'action', orderable: false, searchable: false }
         ],
