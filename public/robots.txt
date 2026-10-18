@@ -1,4 +1,30 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Admin, vendor and API
+Disallow: /admin
+Disallow: /vendor
+Disallow: /api/
+
+# Login, registration and account pages
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /customer/
+Disallow: /zh/customer/
+
+# Cart, checkout and payment
+Disallow: /cart
+Disallow: /checkout
+Disallow: /thank-you
+Disallow: /stripe/
+Disallow: /zh/cart
+Disallow: /zh/checkout
+Disallow: /zh/thank-you
+Disallow: /zh/stripe/
+
+# Search results and suggestions (query-string URLs)
+Disallow: /search
+Disallow: /zh/search
 
 Sitemap: https://zzyenergy.com/sitemap.xml

@@ -32,7 +32,10 @@ class SitemapController extends Controller
         // Static pages
         $urls[] = ['loc' => '/'];
         $urls[] = ['loc' => '/products'];
-        $urls[] = ['loc' => '/news'];
+        // The news list is only worth listing when it has public posts.
+        if (News::public()->exists()) {
+            $urls[] = ['loc' => '/news'];
+        }
         // Certification is noindex while it has no records, so only list it once it has some.
         if (Certification::where('status', 1)->exists()) {
             $urls[] = ['loc' => '/certification'];
@@ -45,10 +48,12 @@ class SitemapController extends Controller
             $urls[] = ['loc' => '/about', 'lastmod' => $about->updated_at];
         }
 
-        // Active categories
+        // Active categories that show at least one public product (the category
+        // page lists its own products only, so an empty one would be a thin page)
         Category::where('status', 1)
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
+            ->whereHas('products', fn ($q) => $q->public())
             ->get(['slug', 'updated_at'])
             ->each(function ($category) use (&$urls) {
                 $urls[] = ['loc' => '/category/' . $category->slug, 'lastmod' => $category->updated_at];
@@ -72,18 +77,42 @@ class SitemapController extends Controller
                 $urls[] = ['loc' => '/news/' . $post->slug, 'lastmod' => $post->updated_at];
             });
 
+        // Every page exists once per enabled language: the default language without
+        // a prefix, others under /{locale}. Each entry lists all versions as hreflang
+        // alternates (same as the <link rel="alternate"> tags on the page).
+        $locales = enabled_store_locales();
+        $default = default_store_locale();
+        $localized = function (string $path, string $locale) use ($base, $default) {
+            if ($locale === $default) {
+                return $base . $path;
+            }
+
+            return $base . '/' . $locale . ($path === '/' ? '' : $path);
+        };
+        $xml = fn (string $value) => htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+        $multilingual = count($locales) > 1;
+
         $lines = [
             '<?xml version="1.0" encoding="UTF-8"?>',
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'
+                . ($multilingual ? ' xmlns:xhtml="http://www.w3.org/1999/xhtml"' : '') . '>',
         ];
 
         foreach ($urls as $url) {
-            $lines[] = '  <url>';
-            $lines[] = '    <loc>' . htmlspecialchars($base . $url['loc'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . '</loc>';
-            if (! empty($url['lastmod'])) {
-                $lines[] = '    <lastmod>' . $url['lastmod']->toAtomString() . '</lastmod>';
+            foreach ($locales as $locale) {
+                $lines[] = '  <url>';
+                $lines[] = '    <loc>' . $xml($localized($url['loc'], $locale)) . '</loc>';
+                if (! empty($url['lastmod'])) {
+                    $lines[] = '    <lastmod>' . $url['lastmod']->toAtomString() . '</lastmod>';
+                }
+                if ($multilingual) {
+                    foreach ($locales as $alternate) {
+                        $lines[] = '    <xhtml:link rel="alternate" hreflang="' . $alternate . '" href="' . $xml($localized($url['loc'], $alternate)) . '"/>';
+                    }
+                    $lines[] = '    <xhtml:link rel="alternate" hreflang="x-default" href="' . $xml($localized($url['loc'], $default)) . '"/>';
+                }
+                $lines[] = '  </url>';
             }
-            $lines[] = '  </url>';
         }
 
         $lines[] = '</urlset>';
