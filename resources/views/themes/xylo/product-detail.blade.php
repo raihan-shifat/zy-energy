@@ -1,5 +1,20 @@
 @extends('themes.xylo.layouts.master')
 
+@php
+    $seoName = localized_translation_value($product->translations, 'name', '');
+    $seoBrand = $product->brand?->translation?->name ?: getSiteSettings()?->site_name ?: config('app.name');
+    $seoNameMax = max(20, 60 - mb_strlen($seoBrand) - 3);
+    $seoShort = localized_translation_value($product->translations, 'short_description', '')
+        ?: localized_translation_value($product->translations, 'description', '');
+    $seoImagePath = $product->thumbnail?->image_url;
+@endphp
+@section('title', \Illuminate\Support\Str::limit($seoName, $seoNameMax, '', true).' | '.$seoBrand)
+@section('meta_description', seo_excerpt($seoShort, 150))
+@section('og_type', 'product')
+@if ($seoImagePath)
+    @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$seoImagePath)
+@endif
+
 @section('css')
     @vite(['resources/views/themes/xylo/css/slick.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">

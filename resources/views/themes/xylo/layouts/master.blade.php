@@ -7,8 +7,29 @@
     @if (($siteStatus ?? 'active') === 'unlisted')
         <meta name="robots" content="noindex, nofollow">
     @endif
-    <title>@yield('title', config('app.name', 'Laravel'))</title>
+    @php
+        $seo = getSiteSettings();
+        $seoTitle = trim($__env->yieldContent('title')) ?: ($seo?->meta_title ?: config('app.name', 'Laravel'));
+        $seoDescription = trim($__env->yieldContent('meta_description')) ?: (string) ($seo?->meta_description ?? '');
+        $seoImage = trim($__env->yieldContent('og_image'))
+            ?: ($seo?->logo ? rtrim(config('seo.canonical_domain'), '/').'/storage/'.$seo->logo : '');
+        $seoType = trim($__env->yieldContent('og_type')) ?: 'website';
+        $seoSiteName = $seo?->site_name ?: config('app.name', 'Laravel');
+    @endphp
+    <title>{{ $seoTitle }}</title>
+    <meta name="description" content="{{ $seoDescription }}">
     <link rel="canonical" href="{{ canonical_url() }}">
+    <meta property="og:site_name" content="{{ $seoSiteName }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:url" content="{{ canonical_url() }}">
+    <meta property="og:type" content="{{ $seoType }}">
+    @if ($seoImage)
+        <meta property="og:image" content="{{ $seoImage }}">
+    @endif
+    <meta name="twitter:card" content="{{ $seoImage ? 'summary_large_image' : 'summary' }}">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
     @if (!App::environment('testing'))
         @vite(['resources/views/themes/xylo/sass/app.scss'])
     @endif

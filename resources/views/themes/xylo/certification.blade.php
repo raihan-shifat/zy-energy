@@ -1,6 +1,7 @@
 @extends('themes.xylo.layouts.master')
 
 @section('title', __('store.certification.title'))
+@section('meta_description', __('store.certification.subtitle'))
 
 @section('content')
 <div class="container py-5">

@@ -67,6 +67,19 @@ if (! function_exists('getActiveBanners')) {
     }
 }
 
+if (! function_exists('seo_excerpt')) {
+    /**
+     * Plain-text excerpt for meta tags: HTML stripped, whitespace collapsed,
+     * never longer than $max characters.
+     */
+    function seo_excerpt($text, int $max = 160)
+    {
+        $plain = trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode((string) $text))));
+
+        return \Illuminate\Support\Str::limit($plain, $max, '...');
+    }
+}
+
 if (! function_exists('canonical_url')) {
     /**
      * Canonical URL for the current page: canonical host + path, no query string.

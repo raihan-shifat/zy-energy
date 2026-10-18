@@ -5,7 +5,12 @@
     $postExcerpt = localized_translation_value($post->translations, 'excerpt');
     $postBody = localized_translation_value($post->translations, 'body', '');
 @endphp
-@section('title', $postTitle)
+@section('title', \Illuminate\Support\Str::limit($postTitle, 60, ''))
+@section('meta_description', seo_excerpt($postExcerpt, 160))
+@section('og_type', 'article')
+@if ($post->image_url)
+    @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$post->image_url)
+@endif
 
 @section('content')
 <div class="container py-5">
