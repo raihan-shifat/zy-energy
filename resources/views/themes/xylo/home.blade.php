@@ -4,7 +4,37 @@
 
 @section('css')
 <style>
-    /* Hero video play button (bottom-right of the banner image), shown only when the banner has a video */
+    /* Banner video playing inside the hero image box (.hero-media is 4:3 with overflow hidden) */
+    .hero-video-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;      /* no player UI, links or clicks reachable */
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        background: transparent;
+    }
+    .hero-video-layer.is-mounted { opacity: 1; background: #000; }
+    .hero-video-layer video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    /* 16:9 iframe covering the 4:3 box (133.33% wide), scaled up a little so the
+       player's own title bar and logo at the edges are cropped away */
+    .hero-video-layer iframe {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 133.34%;
+        height: 100%;
+        border: 0;
+        transform: translate(-50%, -50%) scale(1.18);
+    }
+
+    /* Pause / play button (bottom-right of the banner image), shown only when the banner has a video */
     .hero-video-btn {
         position: absolute;
         right: 14px;
@@ -29,12 +59,6 @@
     .hero-video-btn:focus-visible {
         background: var(--brand-700, #0e7a4f);
         transform: scale(1.06);
-    }
-    #heroVideoFrame iframe,
-    #heroVideoFrame video {
-        width: 100%;
-        height: 100%;
-        background: #000;
     }
 </style>
 @endsection
@@ -104,12 +128,19 @@
                                 <div class="hero-media-fallback"><i class="fa-solid fa-bolt"></i></div>
                             @endif
                             @if (! empty($slide['video']))
-                                {{-- Play button: opens this banner's video (set in Admin → Banners) --}}
+                                {{-- Banner video (Admin → Banners) plays inside this box over the image,
+                                     muted and looping. The player element is created by the script below
+                                     only when the slide is shown, so hidden slides load nothing. --}}
+                                <div class="hero-video-layer"
+                                     data-video-type="{{ $slide['video']['type'] }}"
+                                     data-video-src="{{ $slide['video']['src'] }}"
+                                     aria-hidden="true"></div>
                                 <button type="button" class="hero-video-btn"
-                                        data-video-type="{{ $slide['video']['type'] }}"
-                                        data-video-src="{{ $slide['video']['src'] }}"
-                                        aria-label="{{ __('store.home_b2b.play_video') }}: {{ strip_tags($slide['title']) }}">
-                                    <i class="fa-solid fa-play" aria-hidden="true"></i>
+                                        aria-pressed="false"
+                                        aria-label="{{ __('store.home_b2b.pause_video') }}"
+                                        data-label-play="{{ __('store.home_b2b.play_video') }}"
+                                        data-label-pause="{{ __('store.home_b2b.pause_video') }}">
+                                    <i class="fa-solid fa-pause" aria-hidden="true"></i>
                                 </button>
                             @endif
                         </div>
@@ -120,58 +151,102 @@
         </div>
     </section>
     @if (collect($bannerData)->contains(fn ($s) => ! empty($s['video'])))
-    {{-- Hero video player (YouTube / Vimeo iframe or MP4/WebM), filled when a play button is clicked --}}
-    <div class="modal fade" id="heroVideoModal" tabindex="-1" aria-label="{{ __('store.home_b2b.play_video') }}" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content bg-black border-0">
-                <div class="modal-header border-0 py-2">
-                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="{{ __('store.a11y.close') }}"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="ratio ratio-16x9" id="heroVideoFrame"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {{-- Inline hero video: autoplays (muted, looping) inside the image box of the visible slide.
+         The round button pauses / resumes it. No popup, no player controls or links. --}}
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var modalEl = document.getElementById('heroVideoModal');
-        var frame = document.getElementById('heroVideoFrame');
-        if (!modalEl || !frame || typeof bootstrap === 'undefined') return;
-        var modal = new bootstrap.Modal(modalEl);
-        var lastButton = null;
+        var layers = document.querySelectorAll('#hero-rotation .hero-video-layer');
+        if (!layers.length) return;
 
-        document.querySelectorAll('.hero-video-btn').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var type = btn.getAttribute('data-video-type');
-                var src = btn.getAttribute('data-video-src');
-                if (!src) return;
-                frame.innerHTML = '';
-                var player;
-                if (type === 'iframe') {
-                    player = document.createElement('iframe');
-                    player.src = src;
-                    player.title = btn.getAttribute('aria-label') || 'Video';
-                    player.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-                    player.allowFullscreen = true;
-                    player.setAttribute('frameborder', '0');
-                } else {
-                    player = document.createElement('video');
-                    player.src = src;
-                    player.controls = true;
-                    player.autoplay = true;
-                    player.playsInline = true;
-                }
-                frame.appendChild(player);
-                lastButton = btn;
-                modal.show();
-            });
+        // People who ask their system for less motion start paused (button shows "play").
+        var userPaused = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+        function buttonFor(layer) { return layer.parentElement.querySelector('.hero-video-btn'); }
+        function isVisible(layer) { return !layer.closest('.hero-img-slide').classList.contains('d-none'); }
+
+        // Create the player only when needed, so hidden slides download nothing.
+        function mount(layer) {
+            if (layer.firstElementChild) return false;
+            var type = layer.getAttribute('data-video-type');
+            var src = layer.getAttribute('data-video-src');
+            var el;
+            if (type === 'video') {
+                el = document.createElement('video');
+                el.muted = true; el.loop = true; el.playsInline = true; el.autoplay = true;
+                el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
+                el.preload = 'auto';
+                el.src = src;
+            } else {
+                el = document.createElement('iframe');
+                el.src = src; // autoplay / mute / loop / no controls are in the URL
+                el.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+                el.setAttribute('tabindex', '-1');
+                el.setAttribute('title', '');
+                el.setAttribute('frameborder', '0');
+            }
+            layer.appendChild(el);
+            layer.classList.add('is-mounted');
+            return true;
+        }
+
+        function command(layer, play) {
+            var el = layer.firstElementChild;
+            if (!el) return;
+            var type = layer.getAttribute('data-video-type');
+            if (type === 'video') {
+                if (play) { var p = el.play(); if (p && p.catch) p.catch(function () {}); } else { el.pause(); }
+            } else if (el.contentWindow) {
+                var msg = type === 'youtube'
+                    ? { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: [] }
+                    : { method: play ? 'play' : 'pause' };
+                el.contentWindow.postMessage(JSON.stringify(msg), '*');
+            }
+        }
+
+        function setState(layer, playing) {
+            layer.setAttribute('data-playing', playing ? '1' : '0');
+            var btn = buttonFor(layer);
+            if (!btn) return;
+            btn.setAttribute('aria-pressed', playing ? 'false' : 'true');
+            btn.setAttribute('aria-label', playing ? btn.getAttribute('data-label-pause') : btn.getAttribute('data-label-play'));
+            btn.querySelector('i').className = playing ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+        }
+
+        function play(layer) {
+            if (!mount(layer)) command(layer, true); // a new player starts by itself (autoplay)
+            setState(layer, true);
+        }
+        function pause(layer) {
+            command(layer, false);
+            setState(layer, false);
+        }
+
+        layers.forEach(function (layer) {
+            if (isVisible(layer) && !userPaused) { play(layer); } else { setState(layer, false); }
+
+            var btn = buttonFor(layer);
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    if (layer.getAttribute('data-playing') === '1') {
+                        userPaused = true;
+                        pause(layer);
+                    } else {
+                        userPaused = false;
+                        play(layer);
+                    }
+                });
+            }
         });
 
-        // Stop playback when the popup closes, and return focus to the play button.
-        modalEl.addEventListener('hidden.bs.modal', function () {
-            frame.innerHTML = '';
-            if (lastButton) lastButton.focus();
+        // When the slideshow changes slide: stop the old video, start the new one (unless paused).
+        document.addEventListener('hero:slide', function () {
+            layers.forEach(function (layer) {
+                if (isVisible(layer)) {
+                    if (userPaused) { setState(layer, false); } else { play(layer); }
+                } else if (layer.getAttribute('data-playing') === '1') {
+                    pause(layer);
+                }
+            });
         });
     });
     </script>
@@ -186,12 +261,16 @@
         if (total <= 1) return;
         var timer = null;
         function advance() {
+            // Keep a slide whose video is playing on screen; move on once it is paused.
+            if (imgs[current].querySelector('.hero-video-layer[data-playing="1"]')) return;
             var next = (current + 1) % total;
             slides[current].classList.add('d-none');
             imgs[current].classList.add('d-none');
             slides[next].classList.remove('d-none');
             imgs[next].classList.remove('d-none');
             current = next;
+            // Tell the hero video script so it can start / stop videos.
+            document.dispatchEvent(new CustomEvent('hero:slide', { detail: { index: next } }));
         }
         function start() { timer = setInterval(advance, 60000); }
         function stop() { clearInterval(timer); timer = null; }

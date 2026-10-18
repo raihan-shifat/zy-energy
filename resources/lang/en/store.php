@@ -383,6 +383,7 @@ return [
         'send_enquiry' => 'Send Enquiry',
         'view_details' => 'View Details',
         'play_video' => 'Play video',
+        'pause_video' => 'Pause video',
     ],
 
     'wishlist' => [

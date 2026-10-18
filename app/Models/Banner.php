@@ -23,7 +23,10 @@ class Banner extends Model
      * no playable video. Only YouTube, Vimeo and direct MP4/WebM files are
      * accepted, so no other site can be embedded.
      *
-     * @return array{type: 'iframe'|'video', src: string}|null
+     * Embeds are set up for the homepage hero: autoplay, muted (browsers only
+     * allow muted autoplay), looping, and without player controls or links.
+     *
+     * @return array{type: 'youtube'|'vimeo'|'video', src: string}|null
      */
     public function getVideoEmbedAttribute(): ?array
     {
@@ -41,12 +44,18 @@ class Banner extends Model
 
         // YouTube: watch?v=, youtu.be/, shorts/, embed/
         if (preg_match('#^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/)|youtu\.be/)([A-Za-z0-9_-]{11})#i', $value, $m)) {
-            return ['type' => 'iframe', 'src' => 'https://www.youtube-nocookie.com/embed/'.$m[1].'?autoplay=1&rel=0'];
+            $id = $m[1];
+
+            return ['type' => 'youtube', 'src' => 'https://www.youtube-nocookie.com/embed/'.$id
+                .'?autoplay=1&mute=1&loop=1&playlist='.$id.'&controls=0&playsinline=1&rel=0'
+                .'&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1'];
         }
 
         // Vimeo: vimeo.com/123456 or player.vimeo.com/video/123456
+        // "background" mode = autoplay, muted, loop and no player UI at all.
         if (preg_match('#^https?://(?:www\.)?(?:player\.)?vimeo\.com/(?:video/)?(\d+)#i', $value, $m)) {
-            return ['type' => 'iframe', 'src' => 'https://player.vimeo.com/video/'.$m[1].'?autoplay=1'];
+            return ['type' => 'vimeo', 'src' => 'https://player.vimeo.com/video/'.$m[1]
+                .'?background=1&autoplay=1&loop=1&muted=1&autopause=0&dnt=1'];
         }
 
         // Direct video file link

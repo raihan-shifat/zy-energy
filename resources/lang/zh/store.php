@@ -299,6 +299,7 @@ return [
         'get_quote_text' => '正在规划项目？联系我们的出口团队获取定制报价。',
         'contact_us' => '联系我们', 'send_enquiry' => '发送询价', 'view_details' => '查看详情',
         'play_video' => '播放视频',
+        'pause_video' => '暂停视频',
     ],
 
     // Only keys added for SEO / consent; other keys in these groups fall back to English.
