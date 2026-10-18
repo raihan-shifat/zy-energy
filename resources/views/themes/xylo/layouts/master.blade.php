@@ -23,6 +23,12 @@
         <meta name="description" content="{{ $seoDescription }}">
     @endif
     <link rel="canonical" href="{{ canonical_url() }}">
+    @if (count(enabled_store_locales()) > 1)
+        @foreach (enabled_store_locales() as $hreflangCode)
+            <link rel="alternate" hreflang="{{ $hreflangCode }}" href="{{ alternate_url($hreflangCode) }}">
+        @endforeach
+        <link rel="alternate" hreflang="x-default" href="{{ alternate_url(default_store_locale()) }}">
+    @endif
     <meta property="og:site_name" content="{{ $seoSiteName }}">
     <meta property="og:title" content="{{ $seoTitle }}">
     @if ($seoDescription !== '')

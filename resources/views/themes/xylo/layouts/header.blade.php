@@ -99,32 +99,33 @@
                         'th' => 'th', 'tr' => 'tr', 'vi' => 'vn', 'zh' => 'cn',
                     ];
                     $currentStoreLang = app()->getLocale();
-                    $storeLanguages = collect(getStoreLanguageOptions());
-                    $orderedStoreLanguages = $storeLanguages->filter(fn ($language) => $language['code'] === 'en')
-                        ->concat($storeLanguages->filter(fn ($language) => $language['code'] === 'zh'))
-                        ->concat($storeLanguages->reject(fn ($language) => in_array($language['code'], ['en', 'zh'], true)));
+                    // Only enabled languages (config seo.store_locales), in that order,
+                    // with display names from the languages table when available.
+                    $storeLanguageNames = collect(getStoreLanguageOptions())->keyBy('code');
+                    $orderedStoreLanguages = collect(enabled_store_locales())->map(fn ($code) => [
+                        'code' => $code,
+                        'translated_text' => $storeLanguageNames[$code]['translated_text'] ?? strtoupper($code),
+                    ]);
                 @endphp
-                <form action="{{ route('change.store.language') }}" method="POST" id="store-lang-form">
-                    @csrf
-                    <input type="hidden" name="lang" id="selected-lang" value="{{ $currentStoreLang }}">
-                </form>
+                @if ($orderedStoreLanguages->count() > 1)
                 <div class="dropdown">
                     <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle font-style d-flex align-items-center gap-1" data-bs-toggle="dropdown">
-                        <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" alt="{{ strtoupper($currentStoreLang) }}">
+                        <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" height="15" alt="{{ strtoupper($currentStoreLang) }}">
                         {{ strtoupper($currentStoreLang) }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         @foreach ($orderedStoreLanguages as $lang)
                             <li>
-                                <a class="dropdown-item d-flex align-items-center gap-2 {{ $currentStoreLang == $lang['code'] ? 'active' : '' }}" href="#"
-                                   onclick="document.getElementById('selected-lang').value='{{ $lang['code'] }}'; document.getElementById('store-lang-form').submit(); return false;">
-                                    <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$lang['code']] ?? strtolower($lang['code']) }}.png" width="20" alt="{{ $lang['translated_text'] }}">
+                                <a class="dropdown-item d-flex align-items-center gap-2 {{ $currentStoreLang == $lang['code'] ? 'active' : '' }}"
+                                   href="{{ language_switch_url($lang['code']) }}" hreflang="{{ $lang['code'] }}" lang="{{ $lang['code'] }}" rel="nofollow">
+                                    <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$lang['code']] ?? strtolower($lang['code']) }}.png" width="20" height="15" alt="{{ $lang['translated_text'] }}">
                                     {{ $lang['translated_text'] }}
                                 </a>
                             </li>
                         @endforeach
                     </ul>
                 </div>
+                @endif
 
                 {{-- B2B: currency switcher hidden (quote-based pricing) --}}
                 {{--<form action="{{ route('change.currency') }}" method="POST">

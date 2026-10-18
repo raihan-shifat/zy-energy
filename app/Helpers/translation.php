@@ -40,6 +40,72 @@ if (! function_exists('supported_application_locales')) {
     }
 }
 
+if (! function_exists('enabled_store_locales')) {
+    /**
+     * Storefront languages that are switched on (config seo.store_locales) and
+     * have a resources/lang folder. The default locale is always included first.
+     */
+    function enabled_store_locales(): array
+    {
+        $default = default_store_locale();
+        $enabled = array_intersect((array) config('seo.store_locales', [$default]), supported_application_locales());
+
+        return array_values(array_unique(array_merge([$default], $enabled)));
+    }
+}
+
+if (! function_exists('default_store_locale')) {
+    function default_store_locale(): string
+    {
+        return (string) config('app.fallback_locale', 'en');
+    }
+}
+
+if (! function_exists('localized_base_path')) {
+    /**
+     * Current path without a leading /{locale} segment, e.g. "zh/products" -> "products".
+     */
+    function localized_base_path(): string
+    {
+        $segments = explode('/', trim(request()->path(), '/'));
+
+        if (in_array($segments[0] ?? '', enabled_store_locales(), true)) {
+            array_shift($segments);
+        }
+
+        return implode('/', $segments);
+    }
+}
+
+if (! function_exists('language_switch_url')) {
+    /**
+     * Link for the language switcher: same page and query string in another language.
+     */
+    function language_switch_url(string $locale): string
+    {
+        $path = localized_base_path();
+        $query = request()->getQueryString();
+
+        return '/'.$locale.($path !== '' ? '/'.$path : '').($query ? '?'.$query : '');
+    }
+}
+
+if (! function_exists('alternate_url')) {
+    /**
+     * Absolute hreflang URL for this page in a language (no query string).
+     * The default locale has no prefix; others live under /{locale}/.
+     */
+    function alternate_url(string $locale): string
+    {
+        $base = rtrim((string) config('seo.canonical_domain'), '/');
+        $path = localized_base_path();
+        $prefix = $locale === default_store_locale() ? '' : '/'.$locale;
+        $url = $base.$prefix.($path !== '' ? '/'.$path : '');
+
+        return $prefix === '' && $path === '' ? $url.'/' : $url;
+    }
+}
+
 if (! function_exists('application_language_options')) {
     /**
      * Return installed locales with database-provided display metadata.

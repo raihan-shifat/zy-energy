@@ -37,6 +37,14 @@ return Application::configure(basePath: dirname(__DIR__))
         using: function () {
             Route::middleware('api')->prefix('api')->group(base_path('routes/api.php'));
             Route::middleware('web')->group(base_path('routes/web.php'));
+            // Language-prefixed storefront (/zh/products ...). Registered before the unprefixed
+            // routes so /zh reaches the home page, not the /{slug} page route. LocaleMiddleware
+            // reads and removes the {locale} parameter before controllers run.
+            Route::middleware(['web', 'site.status'])
+                ->prefix('{locale}')
+                ->where(['locale' => implode('|', enabled_store_locales())])
+                ->name('localized.')
+                ->group(base_path('routes/store.php'));
             Route::middleware(['web', 'site.status'])->group(base_path('routes/store.php'));
             Route::middleware('web')->group(base_path('routes/vendor.php'));
         },
