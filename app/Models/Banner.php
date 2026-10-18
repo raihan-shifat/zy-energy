@@ -46,7 +46,7 @@ class Banner extends Model
         if (preg_match('#^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/)|youtu\.be/)([A-Za-z0-9_-]{11})#i', $value, $m)) {
             $id = $m[1];
 
-            return ['type' => 'youtube', 'src' => 'https://www.youtube-nocookie.com/embed/'.$id
+            return ['type' => 'youtube', 'id' => $id, 'src' => 'https://www.youtube-nocookie.com/embed/'.$id
                 .'?autoplay=1&mute=1&loop=1&playlist='.$id.'&controls=0&playsinline=1&rel=0'
                 .'&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&enablejsapi=1'];
         }

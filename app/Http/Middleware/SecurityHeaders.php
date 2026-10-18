@@ -39,7 +39,7 @@ class SecurityHeaders
         if (! $headers->has('Content-Security-Policy') && ! $headers->has('Content-Security-Policy-Report-Only')) {
             $headers->set('Content-Security-Policy-Report-Only', implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.datatables.net https://cdn.ckeditor.com https://www.googletagmanager.com",
+                "script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.datatables.net https://cdn.ckeditor.com https://www.googletagmanager.com https://www.youtube.com https://s.ytimg.com",
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.datatables.net",
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com",
                 "img-src 'self' data: blob: https://flagcdn.com https://ui-avatars.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com",

@@ -15,7 +15,7 @@
         transition: opacity 0.4s ease;
         background: transparent;
     }
-    .hero-video-layer.is-mounted { opacity: 1; background: #000; }
+    .hero-video-layer.is-shown { opacity: 1; background: #000; }
     .hero-video-layer video {
         width: 100%;
         height: 100%;
@@ -34,7 +34,7 @@
         transform: translate(-50%, -50%) scale(1.08);
     }
     /* Soft shade in the bottom-right corner so the round button stays readable on bright video */
-    .hero-video-layer.is-mounted::after {
+    .hero-video-layer.is-shown::after {
         content: "";
         position: absolute;
         inset: auto 0 0 auto;
@@ -144,6 +144,7 @@
                                 <div class="hero-video-layer"
                                      data-video-type="{{ $slide['video']['type'] }}"
                                      data-video-src="{{ $slide['video']['src'] }}"
+                                     data-video-id="{{ $slide['video']['id'] ?? '' }}"
                                      aria-hidden="true"></div>
                                 <button type="button" class="hero-video-btn"
                                         aria-pressed="false"
@@ -162,7 +163,9 @@
     </section>
     @if (collect($bannerData)->contains(fn ($s) => ! empty($s['video'])))
     {{-- Inline hero video: autoplays (muted, looping) inside the image box of the visible slide.
-         The round button pauses / resumes it. No popup, no player controls or links. --}}
+         The round button pauses / resumes it. No popup, no player controls, title or subtitles.
+         YouTube uses the official IFrame Player API so captions can be switched off, and the
+         banner image stays visible while YouTube would show its own title or pause screen. --}}
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var layers = document.querySelectorAll('#hero-rotation .hero-video-layer');
@@ -173,56 +176,120 @@
 
         function buttonFor(layer) { return layer.parentElement.querySelector('.hero-video-btn'); }
         function isVisible(layer) { return !layer.closest('.hero-img-slide').classList.contains('d-none'); }
+        function typeOf(layer) { return layer.getAttribute('data-video-type'); }
+        function wantsPlay(layer) { return layer.getAttribute('data-playing') === '1'; }
+
+        // ---- YouTube IFrame Player API (loaded once, only if a YouTube banner exists) ----
+        var ytWaiting = [];
+        function withYouTubeApi(cb) {
+            if (window.YT && window.YT.Player) { cb(); return; }
+            ytWaiting.push(cb);
+            if (document.getElementById('yt-iframe-api')) return;
+            var previous = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = function () {
+                if (typeof previous === 'function') previous();
+                ytWaiting.splice(0).forEach(function (fn) { fn(); });
+            };
+            var s = document.createElement('script');
+            s.id = 'yt-iframe-api';
+            s.src = 'https://www.youtube.com/iframe_api';
+            s.async = true;
+            document.head.appendChild(s);
+        }
+        function noCaptions(player) {
+            // YouTube turns subtitles on for muted autoplay; remove the captions module.
+            try { player.unloadModule('captions'); } catch (e) {}
+            try { player.unloadModule('cc'); } catch (e) {}
+            try { player.setOption('captions', 'track', {}); } catch (e) {}
+        }
+        function showLayer(layer, delay) {
+            clearTimeout(layer._showTimer);
+            layer._showTimer = setTimeout(function () {
+                if (wantsPlay(layer)) layer.classList.add('is-shown');
+            }, delay);
+        }
+        function hideLayer(layer) {
+            clearTimeout(layer._showTimer);
+            layer.classList.remove('is-shown');
+        }
 
         // Create the player only when needed, so hidden slides download nothing.
         function mount(layer) {
-            if (layer.firstElementChild) return false;
-            var type = layer.getAttribute('data-video-type');
+            if (layer._mounted) return false;
+            layer._mounted = true;
+            var type = typeOf(layer);
             var src = layer.getAttribute('data-video-src');
-            var el;
+
             if (type === 'video') {
-                el = document.createElement('video');
-                el.muted = true; el.loop = true; el.playsInline = true; el.autoplay = true;
-                el.setAttribute('muted', ''); el.setAttribute('playsinline', '');
-                el.preload = 'auto';
-                el.src = src;
-            } else {
-                el = document.createElement('iframe');
-                el.src = src; // autoplay / mute / loop / no controls are in the URL
-                el.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
-                el.setAttribute('tabindex', '-1');
-                el.setAttribute('title', '');
-                el.setAttribute('frameborder', '0');
-                if (type === 'youtube') {
-                    // YouTube may still switch subtitles on (viewer/channel setting): remove the
-                    // captions module once the player is up (retry while it finishes loading).
-                    el.addEventListener('load', function () {
-                        [300, 1500, 4000].forEach(function (ms) {
-                            setTimeout(function () {
-                                if (el.contentWindow) {
-                                    el.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unloadModule', args: ['captions'] }), '*');
+                var v = document.createElement('video');
+                v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true;
+                v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+                v.preload = 'auto';
+                v.src = src;
+                layer.appendChild(v);
+                layer.classList.add('is-shown');
+            } else if (type === 'vimeo') {
+                var f = document.createElement('iframe');
+                f.src = src; // background mode: autoplay, muted, loop, no player UI
+                f.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+                f.setAttribute('tabindex', '-1');
+                f.setAttribute('title', '');
+                f.setAttribute('frameborder', '0');
+                layer.appendChild(f);
+                layer.classList.add('is-shown');
+            } else if (type === 'youtube') {
+                var id = layer.getAttribute('data-video-id');
+                var holder = document.createElement('div');
+                layer.appendChild(holder);
+                withYouTubeApi(function () {
+                    layer._yt = new YT.Player(holder, {
+                        host: 'https://www.youtube-nocookie.com',
+                        videoId: id,
+                        playerVars: {
+                            autoplay: 1, mute: 1, loop: 1, playlist: id, controls: 0, playsinline: 1,
+                            rel: 0, modestbranding: 1, iv_load_policy: 3, disablekb: 1, fs: 0,
+                            cc_load_policy: 0, enablejsapi: 1, origin: window.location.origin
+                        },
+                        events: {
+                            onReady: function (e) {
+                                var frame = e.target.getIframe();
+                                frame.setAttribute('tabindex', '-1');
+                                frame.setAttribute('title', '');
+                                e.target.mute();
+                                noCaptions(e.target);
+                                if (wantsPlay(layer)) { e.target.playVideo(); } else { e.target.pauseVideo(); }
+                            },
+                            onApiChange: function (e) { noCaptions(e.target); },
+                            onStateChange: function (e) {
+                                if (e.data === YT.PlayerState.PLAYING) {
+                                    noCaptions(e.target);
+                                    // First start: wait until the YouTube title overlay is gone.
+                                    showLayer(layer, layer._started ? 400 : 2200);
+                                    layer._started = true;
+                                } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+                                    hideLayer(layer);
                                 }
-                            }, ms);
-                        });
+                            }
+                        }
                     });
-                }
+                });
             }
-            layer.appendChild(el);
-            layer.classList.add('is-mounted');
             return true;
         }
 
         function command(layer, play) {
-            var el = layer.firstElementChild;
-            if (!el) return;
-            var type = layer.getAttribute('data-video-type');
+            var type = typeOf(layer);
             if (type === 'video') {
-                if (play) { var p = el.play(); if (p && p.catch) p.catch(function () {}); } else { el.pause(); }
-            } else if (el.contentWindow) {
-                var msg = type === 'youtube'
-                    ? { event: 'command', func: play ? 'playVideo' : 'pauseVideo', args: [] }
-                    : { method: play ? 'play' : 'pause' };
-                el.contentWindow.postMessage(JSON.stringify(msg), '*');
+                var v = layer.querySelector('video');
+                if (!v) return;
+                if (play) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else { v.pause(); }
+            } else if (type === 'youtube') {
+                if (!play) hideLayer(layer);
+                if (!layer._yt || typeof layer._yt.playVideo !== 'function') return; // not ready yet: onReady applies it
+                if (play) { layer._yt.playVideo(); } else { layer._yt.pauseVideo(); }
+            } else if (type === 'vimeo') {
+                var f = layer.querySelector('iframe');
+                if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ method: play ? 'play' : 'pause' }), '*');
             }
         }
 
@@ -236,12 +303,12 @@
         }
 
         function play(layer) {
-            if (!mount(layer)) command(layer, true); // a new player starts by itself (autoplay)
             setState(layer, true);
+            if (!mount(layer)) command(layer, true); // a new player starts by itself
         }
         function pause(layer) {
-            command(layer, false);
             setState(layer, false);
+            command(layer, false);
         }
 
         layers.forEach(function (layer) {
@@ -250,7 +317,7 @@
             var btn = buttonFor(layer);
             if (btn) {
                 btn.addEventListener('click', function () {
-                    if (layer.getAttribute('data-playing') === '1') {
+                    if (wantsPlay(layer)) {
                         userPaused = true;
                         pause(layer);
                     } else {
@@ -266,7 +333,7 @@
             layers.forEach(function (layer) {
                 if (isVisible(layer)) {
                     if (userPaused) { setState(layer, false); } else { play(layer); }
-                } else if (layer.getAttribute('data-playing') === '1') {
+                } else if (wantsPlay(layer)) {
                     pause(layer);
                 }
             });
