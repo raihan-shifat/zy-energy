@@ -9,13 +9,14 @@
 @section('content')
     <section class="products-home py-5 mb-5 main-shop">
     <div class="container">
+        <h1 class="visually-hidden">{{ __('store.a11y.products') }}</h1>
         <div class="row">
             {{-- Filters (per-category config-driven) --}}
             <aside class="col-md-3 d-none d-lg-inline">
                 <div class="sidebar" id="filterSidebar">
                     <form method="GET" id="shop-filter-form" action="{{ route('shop.index') }}">
-                        <h5 class="mb-3">{{ __('store.shop.category') }}</h5>
-                        <select name="category" class="form-select mb-3">
+                        <h2 class="filter-title mb-3" id="shop-filter-category">{{ __('store.shop.category') }}</h2>
+                        <select name="category" class="form-select mb-3" aria-labelledby="shop-filter-category">
                             <option value="all">{{ __('store.shop.all_categories') }}</option>
                             @foreach($categories as $category)
                                 <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
@@ -26,9 +27,9 @@
 
                         {{-- Per-category dynamic filters --}}
                         @foreach ($activeFilters as $filter)
-                            <h5 class="mb-2 mt-3">{{ $filter['label'] }}</h5>
+                            <h2 class="filter-title mb-2 mt-3" id="shop-filter-{{ $filter['field'] }}">{{ $filter['label'] }}</h2>
                             @if ($filter['type'] === 'checkbox_multi' && !empty($filter['values']))
-                                <div class="mb-3 ps-1">
+                                <div class="mb-3 ps-1" role="group" aria-labelledby="shop-filter-{{ $filter['field'] }}">
                                     @foreach ($filter['values'] as $value)
                                         @php
                                             $isChecked = is_array(request($filter['field'])) && in_array($value, request($filter['field']));
@@ -57,8 +58,8 @@
                         </select>
                         --}}
 
-                        <h5 class="mb-3">{{ __('store.shop.sort_by') }}</h5>
-                        <select name="sort" class="form-select mb-3">
+                        <h2 class="filter-title mb-3" id="shop-filter-sort">{{ __('store.shop.sort_by') }}</h2>
+                        <select name="sort" class="form-select mb-3" aria-labelledby="shop-filter-sort">
                             <option value="">{{ __('store.shop.newest') }}</option>
                             <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('store.shop.name_asc') }}</option>
                             <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>{{ __('store.shop.name_desc') }}</option>
@@ -77,6 +78,7 @@
                 </div>
             </aside>
             <div class="col-md-9">
+                <h2 class="visually-hidden">{{ __('store.a11y.products') }}</h2>
                 <div class="row" id="productList">
                     @forelse ($products as $product)
                         <div class="col-lg-4 col-md-6 col-sm-6 mb-4">

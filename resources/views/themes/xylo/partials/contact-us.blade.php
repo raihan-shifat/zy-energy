@@ -21,8 +21,8 @@
         <div class="modal-content contact-modal-content">
             {{-- Green Header --}}
             <div class="modal-header contact-modal-header px-3 py-2">
-                <h6 class="modal-title fw-bold text-white mb-0" style="font-size: 0.95rem;">{{ $settings->page_title ?? __('store.contact.contact_us') }}</h6>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h2 class="modal-title fw-bold text-white mb-0" style="font-size: 0.95rem;">{{ $settings->page_title ?? __('store.contact.contact_us') }}</h2>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ __('store.a11y.close') }}"></button>
             </div>
 
             {{-- Subtitle --}}
@@ -38,7 +38,7 @@
                         @if($wechats->count() > 0)
                             <div class="col-md-6">
                                 <div class="contact-section p-2 h-100">
-                                    <h6 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->wechat_section_title ?? __('store.contact.wechat') }}</h6>
+                                    <h3 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->wechat_section_title ?? __('store.contact.wechat') }}</h3>
                                     @foreach($wechats as $wechat)
                                         <div class="d-flex align-items-start gap-2 contact-card" style="padding: 4px 0; margin-bottom: 1px;">
                                             @if($wechat->qr_code)
@@ -49,7 +49,7 @@
                                                 </div>
                                             @endif
                                             <div class="min-width-0" style="line-height: 1.2;">
-                                                <h6 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $wechat->name }}</h6>
+                                                <h4 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $wechat->name }}</h4>
                                                 @if($wechat->wechat_id)
                                                     <p class="text-muted mb-0" style="font-size: 0.82rem; line-height: 1.15;">{{ __('store.contact.wechat') }} ID: {{ $wechat->wechat_id }}</p>
                                                 @endif
@@ -70,13 +70,13 @@
                         @if($whatsapps->count() > 0)
                             <div class="col-md-6">
                                 <div class="contact-section p-2 h-100">
-                                    <h6 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->whatsapp_section_title ?? __('store.contact.whatsapp') }}</h6>
+                                    <h3 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->whatsapp_section_title ?? __('store.contact.whatsapp') }}</h3>
                                     @foreach($whatsapps as $whatsapp)
                                         <div class="contact-card" style="padding: 4px 0; {{ !$loop->last ? 'border-bottom: 1px solid #e8e8e8; margin-bottom: 4px; padding-bottom: 5px;' : '' }}">
                                             <div class="d-flex align-items-center gap-2 mb-0">
                                                 <i class="fab fa-whatsapp text-success flex-shrink-0" style="font-size: 1.35rem;"></i>
                                                 <div class="min-width-0">
-                                                    <h6 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $whatsapp->name }}</h6>
+                                                    <h4 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $whatsapp->name }}</h4>
                                                     @if($whatsapp->purpose)
                                                         <p class="text-muted mb-0" style="font-size: 0.75rem; line-height: 1.15;">{{ $whatsapp->purpose }}</p>
                                                     @endif
@@ -98,7 +98,7 @@
                 @if($emails->count() > 0)
                     <div class="px-3 pb-2">
                         <div class="contact-section p-2">
-                            <h6 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->email_section_title ?? __('store.contact.email') }}</h6>
+                            <h3 class="fw-bold text-primary mb-1" style="font-size: 0.9rem;">{{ $settings->email_section_title ?? __('store.contact.email') }}</h3>
                             <div class="row g-2">
                                 @foreach($emails as $email)
                                     <div class="col-md-6">
@@ -106,7 +106,7 @@
                                             <div class="d-flex align-items-center gap-2 mb-0">
                                                 <i class="fa-regular fa-envelope text-primary flex-shrink-0" style="font-size: 1.35rem;"></i>
                                                 <div class="min-width-0">
-                                                    <h6 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $email->name }}</h6>
+                                                    <h4 class="fw-bold text-primary mb-0" style="font-size: 0.95rem; line-height: 1.15;">{{ $email->name }}</h4>
                                                     @if($email->purpose)
                                                         <p class="text-muted mb-0" style="font-size: 0.75rem; line-height: 1.15;">{{ $email->purpose }}</p>
                                                     @endif

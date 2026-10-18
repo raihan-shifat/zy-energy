@@ -9,7 +9,7 @@
         $activeBanners = $banners->filter(function ($b) { return $b->translations->isNotEmpty(); });
     @endphp
     @if ($activeBanners->count() > 0)
-    <section class="banner-area py-5">
+    <section class="banner-area py-5" aria-label="{{ __('store.a11y.hero_carousel') }}" @if ($activeBanners->count() > 1) aria-roledescription="carousel" @endif>
         <div class="container h-100">
             @php
                 $heroProductImage = $products->first() && $products->first()->thumbnail
@@ -36,11 +36,12 @@
                 @foreach ($bannerData as $idx => $slide)
                 <div class="hero-slide col-md-6 {{ $idx === $initialIndex ? '' : 'd-none' }}" data-index="{{ $idx }}">
                     <span class="hero-eyebrow">{{ __('store.home_b2b.hero_eyebrow') }}</span>
-                    {{-- One H1 per page: the slide shown on load. Other slides use H2 styled the same. --}}
+                    {{-- One H1 per page: the slide shown on load. Hidden slides are plain text styled the same,
+                         so they do not appear as headings before the H1. --}}
                     @if ($idx === $initialIndex)
                         <h1 class="mt-0 hero-title"><span>{!! $slide['title'] !!}</span></h1>
                     @else
-                        <h2 class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></h2>
+                        <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></p>
                     @endif
                     <p class="hero-subtext">{{ $slide['subtitle'] }}</p>
                     <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}</a>
@@ -65,6 +66,16 @@
                             @endif
                         </div>
                         @endforeach
+                        @if ($activeBanners->count() > 1)
+                            {{-- WCAG 2.2.2: auto-rotating content needs a pause control --}}
+                            <button type="button" class="hero-pause" id="hero-pause"
+                                    aria-pressed="false"
+                                    aria-label="{{ __('store.a11y.pause') }}"
+                                    data-label-pause="{{ __('store.a11y.pause') }}"
+                                    data-label-play="{{ __('store.a11y.play') }}">
+                                <i class="fa-solid fa-pause" aria-hidden="true"></i>
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -78,14 +89,34 @@
         var total = slides.length;
         var current = {{ $initialIndex }};
         if (total <= 1) return;
-        setInterval(function() {
+        var timer = null;
+        function advance() {
             var next = (current + 1) % total;
             slides[current].classList.add('d-none');
             imgs[current].classList.add('d-none');
             slides[next].classList.remove('d-none');
             imgs[next].classList.remove('d-none');
             current = next;
-        }, 60000);
+        }
+        function start() { timer = setInterval(advance, 60000); }
+        function stop() { clearInterval(timer); timer = null; }
+
+        // Respect users who ask for less motion: start paused.
+        var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var pauseBtn = document.getElementById('hero-pause');
+        function setPaused(paused) {
+            if (paused) { stop(); } else if (!timer) { start(); }
+            if (!pauseBtn) return;
+            pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+            pauseBtn.setAttribute('aria-label', paused ? pauseBtn.dataset.labelPlay : pauseBtn.dataset.labelPause);
+            pauseBtn.querySelector('i').className = paused ? 'fa-solid fa-play' : 'fa-solid fa-pause';
+        }
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', function () {
+                setPaused(timer !== null);
+            });
+        }
+        setPaused(reduceMotion);
     });
     </script>
     @endif
@@ -195,7 +226,7 @@
             <h2 class="text-start pb-3 sec-heading">{{ __('store.home.trending_products') }}</h2>
 
             {{-- Native scroll-snap carousel (slick is broken under Vite module builds) --}}
-            <div class="product-slider" id="trendingTrack">
+            <div class="product-slider" id="trendingTrack" role="region" aria-roledescription="carousel" aria-label="{{ __('store.a11y.products_carousel') }}" tabindex="0">
                 @foreach ($products as $product)
                     <div class="product-slide">
                         @include('themes.xylo.partials.product-card-b2b', ['product' => $product])
@@ -205,8 +236,8 @@
 
             <!-- Custom Arrows -->
             <div class="custom-arrows">
-                <button type="button" class="prev" aria-label="Previous"><i class="fa-solid fa-chevron-left"></i></button>
-                <button type="button" class="next" aria-label="Next"><i class="fa-solid fa-chevron-right"></i></button>
+                <button type="button" class="prev" aria-label="{{ __('store.a11y.previous') }}" aria-controls="trendingTrack"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+                <button type="button" class="next" aria-label="{{ __('store.a11y.next') }}" aria-controls="trendingTrack"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
             </div>
         </div>
     </section>
@@ -264,7 +295,7 @@
                                 <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsPost->image_url) !!} style="height:180px; width:100%; object-fit:cover;">
                             @endif
                             <div class="card-body">
-                                <h5 class="card-title">{{ $newsTitle }}</h5>
+                                <h3 class="card-title">{{ $newsTitle }}</h3>
                                 <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($newsExcerpt, 90) }}</p>
                                 <a href="{{ route('news.show', $newsPost->slug) }}" class="btn btn-link p-0">{{ __('store.news.read_more') }}</a>
                             </div>

@@ -1,0 +1,96 @@
+/*
+ * Accessibility helpers for the storefront theme.
+ * Plain static file (served from public/, no Vite build needed), loaded last in
+ * layouts/master.blade.php so it can patch the theme styles.
+ */
+
+/* ---------- 1. Visible keyboard focus ---------- */
+/* One clear focus ring for every interactive element (accent-700 #1a4fbe, 7.0:1 on white). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid #1a4fbe;
+    outline-offset: 2px;
+}
+/* These two had "outline: none" with no replacement in style.css. */
+.header-categories .btn.dropdown-toggle:focus-visible,
+.cart-actions .quantity input:focus-visible {
+    outline: 3px solid #1a4fbe !important;
+    outline-offset: 2px;
+}
+/* <main> is only a skip-link target (tabindex=-1), not a control: no ring around the whole page. */
+#main-content:focus {
+    outline: none;
+}
+/* On the dark footer a white ring is easier to see. */
+.site-footer :where(a, button):focus-visible {
+    outline-color: #ffffff;
+}
+
+/* ---------- 2. Skip link ---------- */
+.skip-link:focus,
+.skip-link:focus-visible {
+    position: fixed !important;
+    top: 8px;
+    left: 8px;
+    z-index: 2000;
+    padding: 10px 16px;
+    background: #ffffff;
+    color: #0e7a4f;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(17, 28, 25, 0.25);
+}
+
+/* ---------- 3. Touch targets (at least 44 x 44 px) ---------- */
+/* Header icon controls on phones and tablets; desktop keeps its compact look. */
+@media (max-width: 991.98px) {
+    header .search-style,
+    header .homepage-icon,
+    header .dropdown > .btn.dropdown-toggle {
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+/* Modal close buttons */
+.modal .btn-close {
+    min-width: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
+}
+/* Hero slideshow pause / play */
+.hero-pause {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(17, 28, 25, 0.72);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.hero-pause:hover {
+    background: rgba(17, 28, 25, 0.9);
+}
+
+/* ---------- 4. Colour contrast (WCAG AA 4.5:1) ---------- */
+/* Contact card sub-text used --ink-400 #84948c on white = 3.18:1. Now 4.99:1. */
+.contact-grid-card .contact-sub,
+.contact-grid-card .contact-desc {
+    color: #64736c;
+}
+
+/* ---------- 5. Heading-level changes that keep the old look ---------- */
+/* Shop filter titles are now h2 (were h5 styled by ".sidebar h5"). */
+.sidebar .filter-title {
+    color: var(--ink-900, #111c19);
+    font-weight: 600;
+    font-size: 1rem;
+}

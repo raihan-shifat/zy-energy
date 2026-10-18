@@ -18,6 +18,8 @@
 {{-- Contact card grid --}}
 <section class="contact-grid">
     <div class="container">
+        {{-- Section heading so the card titles (h3) follow an h2 --}}
+        <h2 class="visually-hidden">{{ __('store.a11y.contact_options') }}</h2>
 
         @if($wechats->isEmpty() && $whatsapps->isEmpty() && $emails->isEmpty())
             <div class="text-center text-muted py-5">{{ __('store.contact.not_configured') }}</div>
@@ -88,8 +90,9 @@
                                     <i class="fab fa-whatsapp me-1"></i>{{ __('store.contact.chat_now') }}
                                 </a>
                                 <button type="button" class="btn btn-outline-secondary btn-sm contact-cta copy-btn"
-                                        data-copy="{{ $whatsapp->phone }}" data-original-label="{{ __('store.contact.copy') }}">
-                                    <i class="fa-regular fa-copy"></i>
+                                        data-copy="{{ $whatsapp->phone }}" data-original-label="{{ __('store.contact.copy') }}"
+                                        aria-label="{{ __('store.contact.copy') }}: {{ $whatsapp->phone }}" title="{{ __('store.contact.copy') }}">
+                                    <i class="fa-regular fa-copy" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>
@@ -122,8 +125,9 @@
                                     <i class="fa-regular fa-envelope me-1"></i>{{ __('store.contact.send_email') }}
                                 </a>
                                 <button type="button" class="btn btn-outline-secondary btn-sm contact-cta copy-btn"
-                                        data-copy="{{ $email->email }}" data-original-label="{{ __('store.contact.copy') }}">
-                                    <i class="fa-regular fa-copy"></i>
+                                        data-copy="{{ $email->email }}" data-original-label="{{ __('store.contact.copy') }}"
+                                        aria-label="{{ __('store.contact.copy') }}: {{ $email->email }}" title="{{ __('store.contact.copy') }}">
+                                    <i class="fa-regular fa-copy" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>

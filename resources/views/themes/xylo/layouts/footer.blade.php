@@ -33,7 +33,7 @@
 
       <!-- Column 2: Quick Links -->
       <div class="col-6 col-md-3 mb-3">
-        <h5 class="footer-heading">{{ __('store.footer.quick_links') }}</h5>
+        <h2 class="footer-heading">{{ __('store.footer.quick_links') }}</h2>
         <ul class="footer-links list-unstyled">
           @if($footerMenu && $footerMenu->menuItems->isNotEmpty())
             @foreach($footerMenu->menuItems as $menuItem)
@@ -52,7 +52,7 @@
 
       <!-- Column 3: Address -->
       <div class="col-6 col-md-3 mb-3">
-        <h5 class="footer-heading">{{ __('store.footer.address') }}</h5>
+        <h2 class="footer-heading">{{ __('store.footer.address') }}</h2>
         <div class="footer-address">
           @if($siteSettings?->address)
             <p class="footer-address-line">
@@ -74,7 +74,7 @@
 
       <!-- Column 4: Social Connect -->
       <div class="col-12 col-md-3 mb-3">
-        <h5 class="footer-heading">{{ __('store.footer.social_connect') }}</h5>
+        <h2 class="footer-heading">{{ __('store.footer.social_connect') }}</h2>
         @php
             $footerSocial = getFooterSocials();
             $socialConfig = [
@@ -117,8 +117,8 @@
             <div class="modal-dialog modal-dialog-centered modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h6 class="modal-title" id="footerWechatModalLabel">{{ __('store.footer.wechat_qr_title') }}</h6>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h2 class="modal-title h6" id="footerWechatModalLabel">{{ __('store.footer.wechat_qr_title') }}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('store.a11y.close') }}"></button>
                     </div>
                     <div class="modal-body text-center">
                         <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" decoding="async"{!! image_size_attrs($wechatQr) !!} style="max-width: 220px;">

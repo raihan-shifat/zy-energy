@@ -21,7 +21,8 @@
         </ol>
     </nav>
 
-    <h2 class="mb-3">{{ $category->translation->name ?? $category->slug }}</h2>
+    {{-- Page title is the H1 (class h2 keeps the previous size) --}}
+    <h1 class="h2 mb-3">{{ $category->translation->name ?? $category->slug }}</h1>
 
     {{-- Filters (config-driven) --}}
     <form method="GET" class="mb-4 d-flex flex-wrap gap-2 align-items-end">
@@ -33,8 +34,8 @@
                 @continue
             @endif
             <div>
-                <label class="form-label small mb-1">{{ $filter['label'] }}</label>
-                <select name="{{ $filter['field'] }}" class="form-select">
+                <label class="form-label small mb-1" for="cat-filter-{{ $filter['field'] }}">{{ $filter['label'] }}</label>
+                <select name="{{ $filter['field'] }}" id="cat-filter-{{ $filter['field'] }}" class="form-select">
                     <option value="">
                         {{ $filter['field'] === 'type' ? __('store.category.all') : __('store.category.all_series') }}
                     </option>
@@ -48,8 +49,8 @@
         @endforeach
 
         <div>
-            <label class="form-label small mb-1">{{ __('store.category.sort_by') }}</label>
-            <select name="sort" class="form-select">
+            <label class="form-label small mb-1" for="cat-filter-sort">{{ __('store.category.sort_by') }}</label>
+            <select name="sort" id="cat-filter-sort" class="form-select">
                 <option value="">{{ __('store.category.newest') }}</option>
                 <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>{{ __('store.category.name_asc') }}</option>
                 <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>{{ __('store.category.name_desc') }}</option>
@@ -63,6 +64,7 @@
     </form>
 
     {{-- Products --}}
+    <h2 class="visually-hidden">{{ __('store.a11y.products') }}</h2>
     <div class="row">
         @forelse ($products as $product)
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">

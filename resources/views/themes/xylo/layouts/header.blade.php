@@ -21,8 +21,8 @@
             <div class="col-md-8 col-6 text-end">
                 <form class="d-flex justify-content-end" action="{{ url('/search') }}" method="GET">
                     <div class="input-group search-input-width">
-                        <input type="text" class="form-control" id="search-input"  name="q" placeholder="{{ __('store.header.search_placeholder') }}">
-                        <button type="submit" class="btn btn-outline-secondary search-style"><i class="fa fa-search"></i></button>
+                        <input type="text" class="form-control" id="search-input"  name="q" placeholder="{{ __('store.header.search_placeholder') }}" aria-label="{{ __('store.a11y.search_products') }}">
+                        <button type="submit" class="btn btn-outline-secondary search-style" aria-label="{{ __('store.a11y.search') }}"><i class="fa fa-search" aria-hidden="true"></i></button>
                         <div id="search-suggestions" class="dropdown-menu show w-100 mt-5 d-none"></div>
                     </div>
                 </form>
@@ -111,7 +111,7 @@
                 @endphp
                 @if ($orderedStoreLanguages->count() > 1)
                 <div class="dropdown">
-                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle font-style d-flex align-items-center gap-1" data-bs-toggle="dropdown">
+                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle font-style d-flex align-items-center gap-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ __('store.a11y.language') }}: {{ strtoupper($currentStoreLang) }}">
                         <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" height="15" decoding="async" alt="{{ strtoupper($currentStoreLang) }}">
                         {{ strtoupper($currentStoreLang) }}
                     </button>
@@ -154,7 +154,7 @@
                 </a>--}}
 
                  <!-- Account Icon -->
-                <a href="#" class="text-dark dropdown-toggle homepage-icon" data-bs-toggle="dropdown">
+                <a href="#" class="text-dark dropdown-toggle homepage-icon" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-label="{{ __('store.a11y.account') }}">
                     @auth('customer')
                         @php
                             $customer = Auth::guard('customer')->user();

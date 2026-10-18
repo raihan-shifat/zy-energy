@@ -94,6 +94,8 @@
                 @endphp
                 @if($groupedAttributes->count())
                 <div class="spec-table mt-4">
+                    {{-- Section heading so "Specifications" (h3, styled by .pro-textarea h3) follows an h2 --}}
+                    <h2 class="visually-hidden">{{ __('store.a11y.product_details') }}</h2>
                     <h3 class="mb-3">{{ __('store.product_detail.specifications') }}</h3>
                     <table class="table table-bordered">
                         <tbody>
@@ -223,24 +225,24 @@
 
                 @auth('customer')
                 <div class="mt-4 mb-4">
-                    <h5>{{ __('store.product_detail.submit_review_title') }}</h5>
+                    <h3 class="h5">{{ __('store.product_detail.submit_review_title') }}</h3>
 
                     <form action="{{ route('review.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="rating" id="rating-value" required>
 
-                        <div id="starWrapper" style="font-size: 1.5rem; line-height: 1; display: inline-block;">
-                            <span class="star" data-value="1" style="color:#ccc; cursor:pointer;">★</span>
-                            <span class="star" data-value="2" style="color:#ccc; cursor:pointer;">★</span>
-                            <span class="star" data-value="3" style="color:#ccc; cursor:pointer;">★</span>
-                            <span class="star" data-value="4" style="color:#ccc; cursor:pointer;">★</span>
-                            <span class="star" data-value="5" style="color:#ccc; cursor:pointer;">★</span>
+                        <div id="starWrapper" role="radiogroup" aria-label="{{ __('store.a11y.rating') }}" style="font-size: 1.5rem; line-height: 1; display: inline-block;">
+                            <span class="star" data-value="1" role="radio" tabindex="0" aria-checked="false" aria-label="1 / 5" style="color:#ccc; cursor:pointer;">★</span>
+                            <span class="star" data-value="2" role="radio" tabindex="-1" aria-checked="false" aria-label="2 / 5" style="color:#ccc; cursor:pointer;">★</span>
+                            <span class="star" data-value="3" role="radio" tabindex="-1" aria-checked="false" aria-label="3 / 5" style="color:#ccc; cursor:pointer;">★</span>
+                            <span class="star" data-value="4" role="radio" tabindex="-1" aria-checked="false" aria-label="4 / 5" style="color:#ccc; cursor:pointer;">★</span>
+                            <span class="star" data-value="5" role="radio" tabindex="-1" aria-checked="false" aria-label="5 / 5" style="color:#ccc; cursor:pointer;">★</span>
                         </div>
 
                         <div class="mb-3 mt-3">
-                            <label>{{ __('store.product_detail.review_optional') }}</label>
-                            <textarea name="review" class="form-control" rows="3"></textarea>
+                            <label for="review-text">{{ __('store.product_detail.review_optional') }}</label>
+                            <textarea name="review" id="review-text" class="form-control" rows="3"></textarea>
                         </div>
 
                         <button class="btn btn-primary">{{ __('store.product_detail.submit_review_btn') }}</button>
@@ -344,7 +346,29 @@
                 ratingInput.value = val;
                 stars.forEach(s => {
                     s.style.color = (parseInt(s.dataset.value) <= val) ? 'gold' : '#ccc';
+                    // Keep the radio group state in sync for screen readers / keyboard
+                    const selected = parseInt(s.dataset.value) === val;
+                    s.setAttribute('aria-checked', selected ? 'true' : 'false');
+                    s.setAttribute('tabindex', selected ? '0' : '-1');
                 });
+            });
+
+            // Keyboard: Enter/Space selects, arrow keys move between stars
+            star.addEventListener('keydown', function (e) {
+                const val = parseInt(this.dataset.value);
+                let target = null;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    target = val;
+                } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                    target = Math.min(5, val + 1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                    target = Math.max(1, val - 1);
+                }
+                if (target === null) return;
+                e.preventDefault();
+                const next = document.querySelector('#starWrapper .star[data-value="' + target + '"]');
+                next.click();
+                next.focus();
             });
         });
     });

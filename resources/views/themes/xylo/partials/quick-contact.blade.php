@@ -48,8 +48,8 @@
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content text-center">
                 <div class="modal-header">
-                    <h5 class="modal-title mx-auto">{{ __('store.contact.wechat') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h2 class="modal-title h5 mx-auto">{{ __('store.contact.wechat') }}</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('store.a11y.close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" decoding="async"{!! image_size_attrs($wechatQr) !!} style="max-width:240px;">

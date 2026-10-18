@@ -429,4 +429,28 @@ return [
         'avatar_alt' => 'Avatar',
         'image_alt' => 'Image',
     ],
+
+    // Accessible names for icon-only controls and hidden section headings
+    'a11y' => [
+        'skip_to_content' => 'Skip to main content',
+        'search' => 'Search',
+        'search_products' => 'Search products',
+        'account' => 'My account',
+        'language' => 'Language',
+        'close' => 'Close',
+        'previous' => 'Previous',
+        'next' => 'Next',
+        'hero_carousel' => 'Featured highlights',
+        'products_carousel' => 'Trending products',
+        'pause' => 'Pause slideshow',
+        'play' => 'Play slideshow',
+        'products' => 'Products',
+        'filters' => 'Filters',
+        'product_details' => 'Product details',
+        'contact_options' => 'Contact options',
+        'filter_category' => 'Filter by category',
+        'filter_series' => 'Filter by series',
+        'sort_by' => 'Sort by',
+        'rating' => 'Rating',
+    ],
 ];
