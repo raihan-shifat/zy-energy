@@ -66,16 +66,6 @@
                             @endif
                         </div>
                         @endforeach
-                        @if ($activeBanners->count() > 1)
-                            {{-- WCAG 2.2.2: auto-rotating content needs a pause control --}}
-                            <button type="button" class="hero-pause" id="hero-pause"
-                                    aria-pressed="false"
-                                    aria-label="{{ __('store.a11y.pause') }}"
-                                    data-label-pause="{{ __('store.a11y.pause') }}"
-                                    data-label-play="{{ __('store.a11y.play') }}">
-                                <i class="fa-solid fa-pause" aria-hidden="true"></i>
-                            </button>
-                        @endif
                     </div>
                 </div>
             </div>

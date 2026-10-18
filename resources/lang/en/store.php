@@ -353,6 +353,7 @@ return [
         'view_full_page' => 'View Full Contact Page',
         'scan_qr' => 'Scan the QR code to chat with us on WeChat.',
         'quote_text' => 'This product is quote-based. Contact our export team for pricing and specifications.',
+        'whatsapp_greeting' => 'Hello, I would like to know more about your products.',
     ],
 
     'news' => [

@@ -203,9 +203,18 @@
             });
         });
     </script>
-    <!-- WhatsApp Chat Bubble -->
+    <!-- WhatsApp Chat Bubble: number from Admin → Site Settings → WhatsApp Number,
+         else the first active number in Admin → Contact → WhatsApp. Hidden if neither is set. -->
+    @php
+        $bubbleWhatsapp = preg_replace('/[^0-9]/', '', (string) (getSiteSettings()?->whatsapp_number ?? ''));
+        if ($bubbleWhatsapp === '') {
+            $firstWhatsapp = \App\Models\ContactWhatsapp::active()->ordered()->first();
+            $bubbleWhatsapp = $firstWhatsapp ? preg_replace('/[^0-9]/', '', (string) $firstWhatsapp->phone) : '';
+        }
+    @endphp
+    @if ($bubbleWhatsapp !== '')
     <div style="position: fixed; bottom: 25px; right: 25px; z-index: 99999; cursor: pointer;">
-        <a href="https://wa.me/8615118227223?text=Hello,%20I%20want%20to%20know%20more%20about%20your%20products."
+        <a href="https://wa.me/{{ $bubbleWhatsapp }}?text={{ rawurlencode(__('store.contact.whatsapp_greeting')) }}"
            target="_blank" rel="noopener"
            data-track="whatsapp_click" data-track-location="floating_button"
            title="{{ __('store.contact.chat_now') }} – {{ __('store.contact.whatsapp') }}"
@@ -217,6 +226,7 @@
             </svg>
         </a>
     </div>
+    @endif
     @include('themes.xylo.partials.cookie-notice')
 </body>
 </html>

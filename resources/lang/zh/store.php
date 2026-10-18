@@ -275,6 +275,7 @@ return [
         'copy' => '复制',
         'view_full_page' => '查看完整联系页面',
         'quote_text' => '此产品为报价产品。请联系我们的出口团队获取价格和规格。',
+        'whatsapp_greeting' => '您好，我想进一步了解贵公司的产品。',
     ],
 
     'common' => [
