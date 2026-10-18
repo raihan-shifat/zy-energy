@@ -380,6 +380,7 @@ return [
         'contact_us' => 'Contact Us',
         'send_enquiry' => 'Send Enquiry',
         'view_details' => 'View Details',
+        'play_video' => 'Play video',
     ],
 
     'wishlist' => [

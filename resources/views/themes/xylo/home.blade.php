@@ -2,6 +2,43 @@
 
 {{-- No slick CSS here: the homepage carousel is native scroll-snap, slick is only used on product detail. --}}
 
+@section('css')
+<style>
+    /* Hero video play button (bottom-right of the banner image), shown only when the banner has a video */
+    .hero-video-btn {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        z-index: 2;
+        width: 56px;
+        height: 56px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(17, 28, 25, 0.75);
+        color: #ffffff;
+        font-size: 1.15rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 4px; /* optically centre the play triangle */
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .hero-video-btn:hover,
+    .hero-video-btn:focus-visible {
+        background: var(--brand-700, #0e7a4f);
+        transform: scale(1.06);
+    }
+    #heroVideoFrame iframe,
+    #heroVideoFrame video {
+        width: 100%;
+        height: 100%;
+        background: #000;
+    }
+</style>
+@endsection
+
 @section('content')
     @php $currency = activeCurrency(); @endphp
     {{-- Hero Section (B2B: clean industrial hero, admin-editable via banner title/description) --}}
@@ -25,6 +62,8 @@
                         'image' => $t->image_url ?: ($heroProductImage ?: null),
                         'cta_text' => $t->cta_text ?: __('store.home_b2b.view_all_products'),
                         'cta_link' => $t->cta_link ?: route('shop.index'),
+                        // Optional video set in Admin → Banners (YouTube / Vimeo / MP4); null if none
+                        'video' => $banner->video_embed,
                     ];
                 })->values()->toArray();
 
@@ -64,6 +103,15 @@
                             @else
                                 <div class="hero-media-fallback"><i class="fa-solid fa-bolt"></i></div>
                             @endif
+                            @if (! empty($slide['video']))
+                                {{-- Play button: opens this banner's video (set in Admin → Banners) --}}
+                                <button type="button" class="hero-video-btn"
+                                        data-video-type="{{ $slide['video']['type'] }}"
+                                        data-video-src="{{ $slide['video']['src'] }}"
+                                        aria-label="{{ __('store.home_b2b.play_video') }}: {{ strip_tags($slide['title']) }}">
+                                    <i class="fa-solid fa-play" aria-hidden="true"></i>
+                                </button>
+                            @endif
                         </div>
                         @endforeach
                     </div>
@@ -71,6 +119,63 @@
             </div>
         </div>
     </section>
+    @if (collect($bannerData)->contains(fn ($s) => ! empty($s['video'])))
+    {{-- Hero video player (YouTube / Vimeo iframe or MP4/WebM), filled when a play button is clicked --}}
+    <div class="modal fade" id="heroVideoModal" tabindex="-1" aria-label="{{ __('store.home_b2b.play_video') }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content bg-black border-0">
+                <div class="modal-header border-0 py-2">
+                    <button type="button" class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal" aria-label="{{ __('store.a11y.close') }}"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="ratio ratio-16x9" id="heroVideoFrame"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modalEl = document.getElementById('heroVideoModal');
+        var frame = document.getElementById('heroVideoFrame');
+        if (!modalEl || !frame || typeof bootstrap === 'undefined') return;
+        var modal = new bootstrap.Modal(modalEl);
+        var lastButton = null;
+
+        document.querySelectorAll('.hero-video-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var type = btn.getAttribute('data-video-type');
+                var src = btn.getAttribute('data-video-src');
+                if (!src) return;
+                frame.innerHTML = '';
+                var player;
+                if (type === 'iframe') {
+                    player = document.createElement('iframe');
+                    player.src = src;
+                    player.title = btn.getAttribute('aria-label') || 'Video';
+                    player.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+                    player.allowFullscreen = true;
+                    player.setAttribute('frameborder', '0');
+                } else {
+                    player = document.createElement('video');
+                    player.src = src;
+                    player.controls = true;
+                    player.autoplay = true;
+                    player.playsInline = true;
+                }
+                frame.appendChild(player);
+                lastButton = btn;
+                modal.show();
+            });
+        });
+
+        // Stop playback when the popup closes, and return focus to the play button.
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            frame.innerHTML = '';
+            if (lastButton) lastButton.focus();
+        });
+    });
+    </script>
+    @endif
     @if ($activeBanners->count() > 1)
     <script>
     document.addEventListener('DOMContentLoaded', function() {

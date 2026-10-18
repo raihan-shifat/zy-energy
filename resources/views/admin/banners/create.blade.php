@@ -25,6 +25,9 @@
                 @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
+            {{-- Optional hero video (same for every language) --}}
+            @include('admin.banners._video')
+
             {{-- Language tabs --}}
             <ul class="nav nav-tabs mt-4" role="tablist">
                 @foreach($languages as $language)

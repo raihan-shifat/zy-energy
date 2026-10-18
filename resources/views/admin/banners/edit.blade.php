@@ -31,6 +31,9 @@
                     </select>
                 </div>
 
+                {{-- Optional hero video (same for every language) --}}
+                @include('admin.banners._video', ['banner' => $banner])
+
                 <div id="languages-container" class="mt-4">
                     @if(!empty($languages) && count($languages) > 0)
                         <ul class="nav nav-tabs" id="languageTabs" role="tablist">

@@ -612,6 +612,14 @@ return [
         'massage_delete' => '删除',
         'success' => '成功',
 
+        'video' => '首页视频（可选）',
+        'video_url' => '视频链接',
+        'video_url_help' => '支持 YouTube、Vimeo 或 .mp4 / .webm 直链。首页该横幅上会显示播放按钮。',
+        'video_file' => '或上传视频文件',
+        'video_file_help' => 'MP4 或 WebM，最大 50 MB。较大的视频建议使用 YouTube 链接。',
+        'video_current' => '当前视频',
+        'video_remove' => '删除视频',
+        'video_unsupported' => '此链接不是支持的视频（YouTube、Vimeo、MP4 或 WebM），因此不会显示播放按钮。',
     ],
 
     'menus' => [

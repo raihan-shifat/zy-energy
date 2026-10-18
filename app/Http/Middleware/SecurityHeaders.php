@@ -44,7 +44,10 @@ class SecurityHeaders
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net https://cdnjs.cloudflare.com",
                 "img-src 'self' data: blob: https://flagcdn.com https://ui-avatars.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com",
                 "connect-src 'self' https://cdn.jsdelivr.net https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com",
-                'frame-src https://www.google.com https://www.googletagmanager.com',
+                // Google Maps, GTM, and hero videos (YouTube privacy-enhanced mode, Vimeo)
+                'frame-src https://www.google.com https://www.googletagmanager.com https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com',
+                // Hero videos: uploaded files are same-origin; direct .mp4/.webm links can be on any https host
+                "media-src 'self' https:",
                 "frame-ancestors 'self'",
                 "base-uri 'self'",
                 "form-action 'self'",

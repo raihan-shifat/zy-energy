@@ -617,6 +617,14 @@ return [
         'massage_cancel' => 'Cancel',
         'massage_delete' => 'Delete',
         'success' => 'Success',
+        'video' => 'Hero video (optional)',
+        'video_url' => 'Video link',
+        'video_url_help' => 'YouTube, Vimeo, or a direct .mp4 / .webm link. A play button appears on this banner on the homepage.',
+        'video_file' => 'Or upload a video file',
+        'video_file_help' => 'MP4 or WebM, max 50 MB. For large videos a YouTube link is better.',
+        'video_current' => 'Current video',
+        'video_remove' => 'Remove video',
+        'video_unsupported' => 'This link is not a supported video (YouTube, Vimeo, MP4 or WebM), so no play button will show.',
     ],
 
     'menus' => [

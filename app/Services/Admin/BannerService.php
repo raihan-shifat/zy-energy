@@ -29,7 +29,7 @@ class BannerService
 
         $rules = [
             'type' => 'required|in:promotion,sale,seasonal,featured,announcement',
-        ];
+        ] + $this->videoRules();
 
         foreach ($activeLanguages as $code) {
             if ($code === $defaultLang) {
@@ -48,6 +48,7 @@ class BannerService
         $validated = $request->validate($rules);
 
         $banner = $this->bannerRepository->createBanner($request->only('type'));
+        $this->saveVideo($request, $banner);
 
         $defaultImage = null;
         if ($request->hasFile("languages.$defaultLang.image")) {
@@ -87,7 +88,7 @@ class BannerService
             'languages.*.title' => 'nullable|string|max:255',
             'languages.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10000',
             'type' => 'required|in:promotion,sale,seasonal,featured,announcement',
-        ]);
+        ] + $this->videoRules());
 
         // The edit form posts numeric-indexed rows with a language_code field,
         // so `languages.en.title` can never match — enforce the EN title manually.
@@ -101,6 +102,7 @@ class BannerService
         $banner = $this->bannerRepository->getBannerById($id);
 
         $this->bannerRepository->updateBanner($banner, $request->only('type'));
+        $this->saveVideo($request, $banner);
 
         foreach ($request->languages as $languageData) {
             if (empty($languageData['title'])) {
@@ -156,6 +158,51 @@ class BannerService
     /**
      * Sanitize plain-text fields: decode HTML entities and strip tags.
      */
+    /**
+     * Optional hero video: a YouTube/Vimeo/MP4 link or an uploaded MP4/WebM (max 50 MB).
+     */
+    private function videoRules(): array
+    {
+        return [
+            'video_url' => ['nullable', 'url:http,https', 'max:500'],
+            'video_file' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm', 'max:51200'],
+            'remove_video' => ['nullable', 'boolean'],
+        ];
+    }
+
+    /**
+     * Save the banner's video. Priority: remove > new upload > link.
+     * With none of these on update, the current video is kept.
+     * Uploaded files live in storage/app/public/banner_videos (not tracked by git).
+     */
+    private function saveVideo(Request $request, $banner): void
+    {
+        $current = (string) $banner->video_url;
+        $currentIsUpload = $current !== '' && ! preg_match('#^https?://#i', $current);
+        $deleteCurrentUpload = function () use ($current, $currentIsUpload) {
+            if ($currentIsUpload && Storage::disk('public')->exists($current)) {
+                Storage::disk('public')->delete($current);
+            }
+        };
+
+        if ($request->boolean('remove_video')) {
+            $deleteCurrentUpload();
+            $banner->video_url = null;
+        } elseif ($request->hasFile('video_file')) {
+            $deleteCurrentUpload();
+            $banner->video_url = $request->file('video_file')->store('banner_videos', 'public');
+        } elseif ($request->filled('video_url')) {
+            if ($request->input('video_url') !== $current) {
+                $deleteCurrentUpload();
+            }
+            $banner->video_url = trim((string) $request->input('video_url'));
+        } else {
+            return; // nothing submitted: keep the current video
+        }
+
+        $banner->save();
+    }
+
     private function sanitizeText(?string $value): ?string
     {
         if ($value === null || trim($value) === '') {
