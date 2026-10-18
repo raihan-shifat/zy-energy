@@ -20,15 +20,27 @@ return [
     | Public storefront languages
     |--------------------------------------------------------------------------
     |
-    | Languages offered in the public language switcher, in /{locale}/ URLs
-    | and in hreflang tags. Only list languages whose resources/lang files are
-    | translated well enough to publish; codes without a lang folder are ignored.
-    | The default (fallback) locale is served without a URL prefix.
-    | Override with STORE_LOCALES="en,zh" in .env.
+    | Languages offered in the public language switcher, in /{locale}/ URLs,
+    | hreflang tags and the sitemap. "*" means every installed language
+    | (every folder in resources/lang). Or list codes, e.g. STORE_LOCALES="en,zh".
+    | Codes without a lang folder are ignored. The default (fallback) locale is
+    | served without a URL prefix.
     |
     */
 
-    'store_locales' => array_values(array_filter(array_map('trim', explode(',', (string) env('STORE_LOCALES', 'en,zh'))))),
+    'store_locales' => array_values(array_filter(array_map('trim', explode(',', (string) env('STORE_LOCALES', '*'))))),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin panel languages
+    |--------------------------------------------------------------------------
+    |
+    | Languages the admin panel can be switched to (dropdown + middleware).
+    | Anything else falls back to the default locale inside /admin.
+    |
+    */
+
+    'admin_locales' => array_values(array_filter(array_map('trim', explode(',', (string) env('ADMIN_LOCALES', 'en,zh'))))),
 
     /*
     |--------------------------------------------------------------------------

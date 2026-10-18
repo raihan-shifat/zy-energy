@@ -48,7 +48,25 @@ if (! function_exists('enabled_store_locales')) {
     function enabled_store_locales(): array
     {
         $default = default_store_locale();
-        $enabled = array_intersect((array) config('seo.store_locales', [$default]), supported_application_locales());
+        $configured = (array) config('seo.store_locales', ['*']);
+        $installed = supported_application_locales();
+
+        // "*" = every installed language
+        $enabled = in_array('*', $configured, true) ? $installed : array_intersect($configured, $installed);
+
+        return array_values(array_unique(array_merge([$default], $enabled)));
+    }
+}
+
+if (! function_exists('admin_locales')) {
+    /**
+     * Languages the admin panel can use (config seo.admin_locales, default en + zh)
+     * that also have a resources/lang folder. The default locale is always included.
+     */
+    function admin_locales(): array
+    {
+        $default = default_store_locale();
+        $enabled = array_intersect((array) config('seo.admin_locales', [$default, 'zh']), supported_application_locales());
 
         return array_values(array_unique(array_merge([$default], $enabled)));
     }

@@ -12,9 +12,13 @@ class LanguageController extends Controller
     {
         $lang = $request->input('lang');
 
-        $supportedLanguages = supported_application_locales();
+        // Same controller serves /admin/change-language (admin: en + zh only)
+        // and /change-store-language (storefront: every enabled language).
+        $supportedLanguages = $request->is('admin', 'admin/*')
+            ? admin_locales()
+            : enabled_store_locales();
 
-        if (! in_array($lang, $supportedLanguages)) {
+        if (! in_array($lang, $supportedLanguages, true)) {
             $lang = config('app.fallback_locale', 'en');
         }
 

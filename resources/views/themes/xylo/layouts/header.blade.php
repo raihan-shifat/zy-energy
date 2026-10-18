@@ -104,10 +104,14 @@
                     // Only enabled languages (config seo.store_locales), in that order,
                     // with display names from the languages table when available.
                     $storeLanguageNames = collect(getStoreLanguageOptions())->keyBy('code');
-                    $orderedStoreLanguages = collect(enabled_store_locales())->map(fn ($code) => [
-                        'code' => $code,
-                        'translated_text' => $storeLanguageNames[$code]['translated_text'] ?? strtoupper($code),
-                    ]);
+                    // English and Chinese first, then the other languages alphabetically.
+                    $orderedStoreLanguages = collect(enabled_store_locales())
+                        ->sortBy(fn ($code) => ($code === 'en' ? '0' : ($code === 'zh' ? '1' : '2')).$code)
+                        ->values()
+                        ->map(fn ($code) => [
+                            'code' => $code,
+                            'translated_text' => $storeLanguageNames[$code]['translated_text'] ?? strtoupper($code),
+                        ]);
                 @endphp
                 @if ($orderedStoreLanguages->count() > 1)
                 <div class="dropdown">
@@ -115,7 +119,7 @@
                         <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" height="15" decoding="async" alt="{{ strtoupper($currentStoreLang) }}">
                         {{ strtoupper($currentStoreLang) }}
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
+                    <ul class="dropdown-menu dropdown-menu-end" style="max-height: 70vh; overflow-y: auto;">
                         @foreach ($orderedStoreLanguages as $lang)
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 {{ $currentStoreLang == $lang['code'] ? 'active' : '' }}"

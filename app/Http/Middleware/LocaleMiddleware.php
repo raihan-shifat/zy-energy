@@ -17,10 +17,15 @@ class LocaleMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Admin and vendor panels keep every installed language; the public
-        // storefront only offers the enabled ones (config seo.store_locales).
-        $isPanel = $request->is('admin', 'admin/*', 'vendor', 'vendor/*');
-        $supportedLocales = $isPanel ? supported_application_locales() : enabled_store_locales();
+        // Admin panel: only the admin languages (config seo.admin_locales, default en + zh).
+        // Vendor panel: every installed language. Storefront: config seo.store_locales.
+        if ($request->is('admin', 'admin/*')) {
+            $supportedLocales = admin_locales();
+        } elseif ($request->is('vendor', 'vendor/*')) {
+            $supportedLocales = supported_application_locales();
+        } else {
+            $supportedLocales = enabled_store_locales();
+        }
 
         // A /{locale}/ URL prefix wins and is remembered. Remove the parameter so
         // controllers keep receiving only their own route parameters.

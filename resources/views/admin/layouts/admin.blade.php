@@ -38,7 +38,7 @@
                     <img src="https://flagcdn.com/w40/{{ $adminLanguageFlags[$adminLocale] ?? 'us' }}.png" width="20"> {{ strtoupper($adminLocale) }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    @foreach ($activeLanguages->whereIn('code', ['en', 'zh']) as $language)
+                    @foreach ($activeLanguages->whereIn('code', admin_locales()) as $language)
                         <li>
                             <a class="dropdown-item language-select {{ $adminLocale === $language->code ? 'active' : '' }}" data-lang="{{ $language->code }}" href="#">
                                 <img src="https://flagcdn.com/w40/{{ $adminLanguageFlags[$language->code] ?? strtolower($language->code) }}.png" width="20">
