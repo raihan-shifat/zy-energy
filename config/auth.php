@@ -152,7 +152,9 @@ return [
 
     'super_admin' => [
         'email' => env('SUPER_ADMIN_EMAIL', 'raihan.shifat01@gmail.com'),
-        'default_password' => env('SUPER_ADMIN_DEFAULT_PASSWORD', '9090ab'),
+        // No fallback: a default password in a public repo is a published password.
+        // Set SUPER_ADMIN_DEFAULT_PASSWORD in .env, or the seeder generates a random one.
+        'default_password' => env('SUPER_ADMIN_DEFAULT_PASSWORD'),
         // Stricter login throttle than the default (attempts per decay window).
         'max_login_attempts' => env('SUPER_ADMIN_MAX_LOGIN_ATTEMPTS', 3),
         'login_decay_seconds' => env('SUPER_ADMIN_LOGIN_DECAY_SECONDS', 900),

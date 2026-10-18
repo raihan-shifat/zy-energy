@@ -19,7 +19,15 @@ class AdminSeeder extends Seeder
         $email = config('auth.super_admin.email');
         $defaultPassword = config('auth.super_admin.default_password');
 
-        User::firstOrCreate(
+        // Never fall back to a fixed password (this repo is public). Generate a random one
+        // and show it once in the console, only when the account is actually created.
+        $generated = false;
+        if (! is_string($defaultPassword) || $defaultPassword === '') {
+            $defaultPassword = \Illuminate\Support\Str::password(20);
+            $generated = true;
+        }
+
+        $user = User::firstOrCreate(
             ['email' => $email],
             [
                 'name' => 'Super Admin',
@@ -29,5 +37,10 @@ class AdminSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        if ($generated && $user->wasRecentlyCreated && $this->command) {
+            $this->command->warn('Super admin created with a generated password (shown once): '.$defaultPassword);
+            $this->command->warn('Log in and change it, or set SUPER_ADMIN_DEFAULT_PASSWORD in .env before seeding.');
+        }
     }
 }

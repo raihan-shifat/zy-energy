@@ -18,7 +18,7 @@ class PaymentSeeder extends Seeder
     {
         $user = User::firstOrCreate(
             ['email' => 'testuser@example.com'],
-            ['name' => 'Test User', 'password' => bcrypt('password')]
+            ['name' => 'Test User', 'password' => bcrypt(\Illuminate\Support\Str::password(20))]
         );
 
         $gateway = PaymentGateway::firstOrCreate(

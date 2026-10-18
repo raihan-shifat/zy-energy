@@ -23,6 +23,11 @@
                     @endphp
                     <form id="contact-enquiry-form" action="{{ route('enquiry.store') }}" method="POST" class="mb-5">
                         @csrf
+                        {{-- Spam honeypot: hidden from people and screen readers; bots tend to fill it --}}
+                        <div style="position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden;" aria-hidden="true">
+                            <label for="contact-website">Website</label>
+                            <input type="text" name="website" id="contact-website" tabindex="-1" autocomplete="off" value="">
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ __('store.enquiry.name') }} *</label>

@@ -89,13 +89,16 @@ class InstallApp extends Command
             [
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
-                'password' => Hash::make('abc123'),
+                'password' => Hash::make($password = \Illuminate\Support\Str::password(20)),
                 'profile_image' => 'https://i.postimg.cc/1t3RZtmT/images-9.jpg',
             ]
         );
 
         if ($user->wasRecentlyCreated) {
             $this->info('Admin user created successfully.');
+            // Random password (this repo is public, so no fixed default). Shown once.
+            $this->warn('Generated password for admin@example.com: '.$password);
+            $this->warn('Change it after first login.');
         } else {
             $this->info('Admin user already exists.');
         }

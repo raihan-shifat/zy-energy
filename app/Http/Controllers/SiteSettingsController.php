@@ -56,9 +56,9 @@ class SiteSettingsController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
             'customer_login_heading' => 'nullable|string|max:255',
             'wechat_qr_image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:5000',
-            'logo' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,svg|max:5000',
-            'header_brand_name_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,svg|max:5000',
-            'footer_logo' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,svg|max:5000',
+            'logo' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:5000', // no SVG: it can carry script
+            'header_brand_name_image' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:5000', // no SVG: it can carry script
+            'footer_logo' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:5000', // no SVG: it can carry script
             'site_status' => 'nullable|in:active,inactive,published,unpublished,unlisted',
         ]);
 

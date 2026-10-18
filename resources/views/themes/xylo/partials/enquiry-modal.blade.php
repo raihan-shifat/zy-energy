@@ -68,6 +68,11 @@
                             </div>
                         </div>
                         <input type="hidden" name="source_page" id="enquiry-source-page">
+                        {{-- Spam honeypot: hidden from people and screen readers; bots tend to fill it --}}
+                        <div style="position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden;" aria-hidden="true">
+                            <label for="enquiry-website">Website</label>
+                            <input type="text" name="website" id="enquiry-website" tabindex="-1" autocomplete="off" value="">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

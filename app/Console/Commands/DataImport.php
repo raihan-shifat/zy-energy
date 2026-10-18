@@ -69,7 +69,8 @@ class DataImport extends Command
             [
                 'name' => 'Seller',
                 'email' => 'seller@example.com',
-                'password' => Hash::make('abc123'),
+                // Random password: no fixed default in a public repo.
+                'password' => Hash::make(\Illuminate\Support\Str::password(20)),
                 'phone' => '+923001234567',
                 'profile_image' => 'https://i.postimg.cc/FHxQs4Br/images-10.jpg',
             ]

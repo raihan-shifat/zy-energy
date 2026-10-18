@@ -17,6 +17,14 @@ class EnquiryController extends Controller
      */
     public function store(Request $request)
     {
+        // Honeypot: "website" is a hidden field people never see. Bots that fill it get a
+        // normal-looking success response, but nothing is saved or emailed.
+        if ($request->filled('website')) {
+            return $request->wantsJson()
+                ? response()->json(['success' => true, 'message' => __('store.enquiry.success')])
+                : redirect()->back()->with('success', __('store.enquiry.success'));
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'company' => 'nullable|string|max:255',

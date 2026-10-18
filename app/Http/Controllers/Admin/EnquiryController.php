@@ -35,12 +35,14 @@ class EnquiryController extends Controller
 
         return datatables()->of($enquiries)
             ->addColumn('product', function ($enquiry) {
-                // New enquiries carry a Category; older ones may reference a Product
+                // New enquiries carry a Category; older ones may reference a Product.
+                // This column is listed in rawColumns, so every value must be escaped here:
+                // product_name comes straight from the public enquiry form.
                 if ($enquiry->category_name) {
-                    return $enquiry->category_name;
+                    return e($enquiry->category_name);
                 }
 
-                return $enquiry->product_name ?? ($enquiry->product ? $enquiry->product->translation->name ?? 'Product #' . $enquiry->product_id : '-');
+                return e($enquiry->product_name ?? ($enquiry->product ? $enquiry->product->translation->name ?? 'Product #' . $enquiry->product_id : '-'));
             })
             ->addColumn('country', function ($enquiry) {
                 return $enquiry->country ?? '-';
@@ -50,10 +52,16 @@ class EnquiryController extends Controller
             })
             ->addColumn('source_page', function ($enquiry) {
                 if (empty($enquiry->source_page)) return '-';
-                $url = $enquiry->source_page;
+                $url = (string) $enquiry->source_page;
                 $path = parse_url($url, PHP_URL_PATH) ?? '/';
                 $path = $path === '/' ? '/home' : $path;
-                return '<a href="' . e($url) . '" target="_blank" title="' . e($url) . '">' . e($path) . '</a>';
+                // source_page is visitor-supplied: only link real http(s) URLs. Anything else
+                // (e.g. "javascript:...") is shown as plain text so it can never run.
+                $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+                if (! in_array($scheme, ['http', 'https'], true)) {
+                    return e($url);
+                }
+                return '<a href="' . e($url) . '" target="_blank" rel="noopener noreferrer" title="' . e($url) . '">' . e($path) . '</a>';
             })
             ->addColumn('customer_enquiry_count', function ($enquiry) {
                 $count = $enquiry->enquiry_count ?? 1;
@@ -63,7 +71,7 @@ class EnquiryController extends Controller
             })
             ->addColumn('status_badge', function ($enquiry) {
                 $color = $enquiry->status == 'new' ? 'warning' : ($enquiry->status == 'contacted' ? 'info' : 'secondary');
-                return '<span class="badge bg-' . $color . '">' . ucfirst($enquiry->status) . '</span>';
+                return '<span class="badge bg-' . $color . '">' . e(ucfirst((string) $enquiry->status)) . '</span>';
             })
         ->addColumn('action', function ($enquiry) {
             $viewBtn = '<span class="border border-edit dt-trash rounded-3 d-inline-block"><a href="/admin/enquiries/' . $enquiry->id . '" class=""><i class="bi bi-eye pencil-edit-color"></i></a></span>';

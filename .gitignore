@@ -9,6 +9,7 @@
 .env
 .env.backup
 .env.production
+.envy
 
 # Local dev / scratch artifacts (not part of the application source)
 /reset_super_pw.php

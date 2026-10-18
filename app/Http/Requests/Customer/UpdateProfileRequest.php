@@ -51,10 +51,15 @@ class UpdateProfileRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->filled('password')) {
-                $customer = Auth::guard('customer')->user();
+            $customer = Auth::guard('customer')->user();
 
-                if (! $customer || ! Hash::check($this->input('current_password', ''), $customer->password)) {
+            // Changing the password OR the email needs the current password: an email
+            // change followed by "forgot password" would otherwise take over the account.
+            $changingEmail = $customer
+                && strcasecmp((string) $this->input('email'), (string) $customer->email) !== 0;
+
+            if ($this->filled('password') || $changingEmail) {
+                if (! $customer || ! Hash::check((string) $this->input('current_password', ''), $customer->password)) {
                     $validator->errors()->add('current_password', __('validation.incorrect_current_password'));
                 }
             }

@@ -29,7 +29,7 @@ class CustomerController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:customers,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:8',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'status' => ['required', Rule::in(['active', 'inactive'])],
