@@ -74,9 +74,11 @@ if (! function_exists('seo_excerpt')) {
      */
     function seo_excerpt($text, int $max = 160)
     {
-        $plain = trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode((string) $text))));
+        // Put a space where line breaks and block ends were, so words do not run together.
+        $spaced = preg_replace('/<br\s*\/?>|<\/(p|div|li|h[1-6]|tr|td|blockquote)>/i', ' ', (string) $text);
+        $plain = trim(preg_replace('/\s+/u', ' ', strip_tags(html_entity_decode($spaced))));
 
-        return \Illuminate\Support\Str::limit($plain, $max, '...');
+        return \Illuminate\Support\Str::limit($plain, max(1, $max - 3), '...', true);
     }
 }
 
