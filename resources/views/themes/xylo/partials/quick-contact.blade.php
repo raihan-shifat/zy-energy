@@ -52,7 +52,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" style="max-width:240px;">
+                    <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" decoding="async"{!! image_size_attrs($wechatQr) !!} style="max-width:240px;">
                     <p class="text-muted mt-2 small">{{ __('store.contact.scan_qr') }}</p>
                 </div>
             </div>

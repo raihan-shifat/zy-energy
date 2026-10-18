@@ -42,7 +42,7 @@
                                     @foreach($wechats as $wechat)
                                         <div class="d-flex align-items-start gap-2 contact-card" style="padding: 4px 0; margin-bottom: 1px;">
                                             @if($wechat->qr_code)
-                                                <img src="{{ asset('storage/' . $wechat->qr_code) }}" alt="{{ $wechat->name }}" class="flex-shrink-0" loading="lazy" style="width: 80px; height: 80px; object-fit: contain; border-radius: 6px;">
+                                                <img src="{{ asset('storage/' . $wechat->qr_code) }}" alt="{{ $wechat->name }}" class="flex-shrink-0" width="80" height="80" loading="lazy" decoding="async" style="width: 80px; height: 80px; object-fit: contain; border-radius: 6px;">
                                             @else
                                                 <div class="bg-light rounded d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 80px; height: 80px;">
                                                     <i class="fab fa-weixin fa-2x text-success"></i>

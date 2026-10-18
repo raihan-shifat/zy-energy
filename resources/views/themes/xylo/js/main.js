@@ -93,6 +93,10 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    // slick is only loaded on product detail, and no page has .client-slider today.
+    if (! $.fn.slick || ! $('.client-slider').length) {
+        return;
+    }
     $('.client-slider').slick({
         slidesToShow: 3,
         slidesToScroll: 1,

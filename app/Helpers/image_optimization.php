@@ -72,3 +72,30 @@ if (! function_exists('generateResponsiveImages')) {
         return app(ImageOptimizationService::class)->generateResponsiveImages($storedPath);
     }
 }
+
+if (! function_exists('image_size_attrs')) {
+    /**
+     * ' width="W" height="H"' for an image on the public disk (read once, cached),
+     * or '' when the file is missing. Pass $displayWidth to scale the pair to the
+     * width the image is shown at, keeping the aspect ratio.
+     * Use as {!! image_size_attrs($path) !!}.
+     */
+    function image_size_attrs(?string $path, ?int $displayWidth = null): string
+    {
+        if (! $path) {
+            return '';
+        }
+
+        [$width, $height] = app(ImageOptimizationService::class)->getImageDimensions($path);
+        if (! $width || ! $height) {
+            return '';
+        }
+
+        if ($displayWidth) {
+            $height = max(1, (int) round($height * $displayWidth / $width));
+            $width = $displayWidth;
+        }
+
+        return ' width="'.$width.'" height="'.$height.'"';
+    }
+}

@@ -8,9 +8,11 @@
         <div class="row align-items-center">
             <div class="col-md-4 col-6">
                 <a href="/" class="navbar-brand">
-                    <img src="{{ $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('logo.png') }}" width="80" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
+                    {{-- Above the fold: not lazy. Height matches the 80px display width so no layout shift. --}}
+                    @php $headerLogoSize = $siteSettings?->logo ? image_size_attrs($siteSettings->logo, 80) : ''; @endphp
+                    <img src="{{ $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('logo.png') }}" {!! $headerLogoSize !== '' ? trim($headerLogoSize) : 'width="80"' !!} decoding="async" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
                     @if($siteSettings?->header_brand_name_image)
-                        <img src="{{ asset('storage/' . $siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="ms-2 align-middle" style="max-height: 40px; max-width: 180px; width: auto; object-fit: contain;">
+                        <img src="{{ asset('storage/' . $siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="ms-2 align-middle" decoding="async"{!! image_size_attrs($siteSettings->header_brand_name_image) !!} style="max-height: 40px; max-width: 180px; width: auto; height: auto; object-fit: contain;">
                     @elseif($siteSettings?->site_name)
                         <span class="ms-2 align-middle fw-semibold">{{ $siteSettings->site_name }}</span>
                     @endif
@@ -110,7 +112,7 @@
                 @if ($orderedStoreLanguages->count() > 1)
                 <div class="dropdown">
                     <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle font-style d-flex align-items-center gap-1" data-bs-toggle="dropdown">
-                        <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" height="15" alt="{{ strtoupper($currentStoreLang) }}">
+                        <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$currentStoreLang] ?? strtolower($currentStoreLang) }}.png" width="20" height="15" decoding="async" alt="{{ strtoupper($currentStoreLang) }}">
                         {{ strtoupper($currentStoreLang) }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -118,7 +120,7 @@
                             <li>
                                 <a class="dropdown-item d-flex align-items-center gap-2 {{ $currentStoreLang == $lang['code'] ? 'active' : '' }}"
                                    href="{{ language_switch_url($lang['code']) }}" hreflang="{{ $lang['code'] }}" lang="{{ $lang['code'] }}" rel="nofollow">
-                                    <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$lang['code']] ?? strtolower($lang['code']) }}.png" width="20" height="15" alt="{{ $lang['translated_text'] }}">
+                                    <img src="https://flagcdn.com/w40/{{ $storeLangFlags[$lang['code']] ?? strtolower($lang['code']) }}.png" width="20" height="15" loading="lazy" decoding="async" alt="{{ $lang['translated_text'] }}">
                                     {{ $lang['translated_text'] }}
                                 </a>
                             </li>
@@ -158,13 +160,13 @@
                             $customer = Auth::guard('customer')->user();
                         @endphp
                         @if($customer->profile_image)
-                            <img src="{{ asset('storage/' . $customer->profile_image) }}" 
-                                alt="{{ __('store.common.profile_alt') }}" 
+                            <img src="{{ asset('storage/' . $customer->profile_image) }}"
+                                alt="{{ __('store.common.profile_alt') }}" width="32" height="32" loading="lazy" decoding="async"
                                 class="rounded-circle" 
                                 style="width:32px; height:32px; object-fit:cover;">
                         @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($customer->name) }}" 
-                                alt="{{ __('store.common.avatar_alt') }}" 
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($customer->name) }}"
+                                alt="{{ __('store.common.avatar_alt') }}" width="32" height="32" loading="lazy" decoding="async"
                                 class="rounded-circle" 
                                 style="width:32px; height:32px; object-fit:cover;">
                         @endif

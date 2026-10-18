@@ -54,7 +54,9 @@
                                 'alt' => $seoName ?: ($image['name'] ?? ''),
                                 'class' => 'img-fluid',
                                 'sizes' => '(max-width: 768px) 100vw, 50vw',
-                                'loading' => 'lazy',
+                                // First gallery image is above the fold (LCP): load it right away.
+                                'loading' => $loop->first ? 'eager' : 'lazy',
+                                'fetchpriority' => $loop->first ? 'high' : null,
                             ]) !!}
                         </div>
                     @empty
@@ -63,7 +65,7 @@
                                 'alt' => $seoName ?: __('store.category.product_name_not_available'),
                                 'class' => 'img-fluid w-100',
                                 'sizes' => '(max-width: 768px) 100vw, 50vw',
-                                'loading' => 'lazy',
+                                'loading' => 'eager',
                             ]) !!}
                         </div>
                     @endforelse
@@ -261,6 +263,7 @@
                                                 ? asset('storage/' . $review->customer->profile_image)
                                                 : 'https://ui-avatars.com/api/?name=' . urlencode($review->customer->name) . '&background=0D8ABC&color=fff&size=70' }}"
                                             alt="{{ $review->customer->name }}"
+                                            width="45" height="45" loading="lazy" decoding="async"
                                             class="review-customer-avatar"
                                             style="width:45px; height:45px; border-radius:50%; object-fit:cover;"/>
                                         <strong>{{ ucwords($review->customer->name) }}</strong>

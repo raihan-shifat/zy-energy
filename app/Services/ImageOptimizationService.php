@@ -3,7 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManagerStatic as Image;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\ImageManager;
 
 class ImageOptimizationService
 {
@@ -57,6 +58,8 @@ class ImageOptimizationService
         $extension = strtolower(pathinfo($storedPath, PATHINFO_EXTENSION));
 
         $generated = [];
+        // intervention/image v3 (composer.json ^3.11); the old v2 ImageManagerStatic API no longer exists.
+        $manager = new ImageManager(new GdDriver());
 
         foreach (self::RESPONSIVE_SIZES as $sizeKey => $size) {
             $suffix = $size['suffix'];
@@ -64,28 +67,31 @@ class ImageOptimizationService
             $outputPath = "{$directory}/{$outputFilename}";
             $outputFullPath = Storage::disk($disk)->path($outputPath);
 
+            // Never write over the uploaded original (e.g. a .webp upload's full-size variant).
+            if ($outputPath === $storedPath) {
+                continue;
+            }
+
             try {
-                $img = Image::make($originalPath);
+                $img = $manager->read($originalPath);
 
                 if ($size['width'] && $size['height']) {
-                    // Resize maintaining aspect ratio, fit within bounds
-                    $img->fit($size['width'], $size['height'], function ($constraint) {
-                        $constraint->upsize();
-                    });
+                    // Scale down to fit within the box, keeping the aspect ratio (no cropping, no upsizing)
+                    $img->scaleDown($size['width'], $size['height']);
                 }
 
                 // Save as WebP
-                $img->encode('webp', self::WEBP_QUALITY)->save($outputFullPath);
+                $img->toWebp(self::WEBP_QUALITY)->save($outputFullPath);
                 $generated[$sizeKey] = $outputPath;
 
                 // Also generate JPEG fallback for original size
                 if ($sizeKey === 'original') {
                     $jpegPath = "{$directory}/{$filename}_fallback.jpg";
                     $jpegFullPath = Storage::disk($disk)->path($jpegPath);
-                    Image::make($originalPath)->encode('jpg', self::JPEG_QUALITY)->save($jpegFullPath);
+                    $manager->read($originalPath)->toJpeg(self::JPEG_QUALITY)->save($jpegFullPath);
                     $generated['fallback_jpg'] = $jpegPath;
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 \Log::warning("Failed to generate responsive image {$sizeKey} for {$storedPath}: " . $e->getMessage());
             }
         }
@@ -125,6 +131,8 @@ class ImageOptimizationService
         $class = $options['class'] ?? '';
         $sizes = $options['sizes'] ?? '(max-width: 480px) 300px, (max-width: 768px) 480px, (max-width: 1200px) 768px, 1200px';
         $loading = $options['loading'] ?? 'lazy';
+        $decoding = $options['decoding'] ?? 'async';
+        $fetchPriority = $options['fetchpriority'] ?? null;
 
         // Build WebP srcset
         $webpSources = [];
@@ -135,7 +143,9 @@ class ImageOptimizationService
             $webpPath = $this->getWebpPath($originalPath, $suffix);
             
             if ($webpPath && Storage::disk('public')->exists($webpPath)) {
-                $webpSources[] = asset('storage/' . $webpPath) . " {$size['width']}w";
+                // Variants keep the aspect ratio, so use the file's real width as the descriptor.
+                [$variantWidth] = $this->getImageDimensions($webpPath);
+                $webpSources[] = asset('storage/' . $webpPath) . ' ' . ($variantWidth ?: $size['width']) . 'w';
             }
         }
 
@@ -168,6 +178,12 @@ class ImageOptimizationService
         if ($loading) {
             $html .= ' loading="' . $loading . '"';
         }
+        if ($decoding) {
+            $html .= ' decoding="' . $decoding . '"';
+        }
+        if ($fetchPriority) {
+            $html .= ' fetchpriority="' . $fetchPriority . '"';
+        }
         if ($width && $height) {
             $html .= ' width="' . $width . '" height="' . $height . '"';
         }
@@ -181,7 +197,7 @@ class ImageOptimizationService
      * Intrinsic [width, height] of a public-disk image, read once and cached.
      * Returns [0, 0] when the file is missing or not an image.
      */
-    private function getImageDimensions(string $path): array
+    public function getImageDimensions(string $path): array
     {
         return \Illuminate\Support\Facades\Cache::rememberForever('img_dims:' . md5($path), function () use ($path) {
             $disk = Storage::disk('public');

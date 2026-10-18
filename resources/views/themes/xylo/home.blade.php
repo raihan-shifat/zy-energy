@@ -1,9 +1,6 @@
 @extends('themes.xylo.layouts.master')
 
-@section('css')
-    @vite(['resources/views/themes/xylo/css/slick.css'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">
-@endsection
+{{-- No slick CSS here: the homepage carousel is native scroll-snap, slick is only used on product detail. --}}
 
 @section('content')
     @php $currency = activeCurrency(); @endphp
@@ -54,10 +51,15 @@
                         @foreach ($bannerData as $idx => $slide)
                         <div class="hero-img-slide {{ $idx === $initialIndex ? '' : 'd-none' }}" data-index="{{ $idx }}">
                             @if ($slide['image'])
-                                <img src="{{ asset('storage/' . $slide['image']) }}"
-                                     alt="{{ strip_tags($slide['title']) }}"
-                                     class="img-fluid"
-                                     loading="lazy">
+                                {{-- The slide shown on load is the LCP image: load it eagerly with high priority.
+                                     Hidden slides stay lazy and only load when the rotation shows them. --}}
+                                {!! getResponsiveImageHtml($slide['image'], [
+                                    'alt' => strip_tags($slide['title']),
+                                    'class' => 'img-fluid',
+                                    'sizes' => '(max-width: 768px) 100vw, 50vw',
+                                    'loading' => $idx === $initialIndex ? 'eager' : 'lazy',
+                                    'fetchpriority' => $idx === $initialIndex ? 'high' : null,
+                                ]) !!}
                             @else
                                 <div class="hero-media-fallback"><i class="fa-solid fa-bolt"></i></div>
                             @endif
@@ -135,7 +137,7 @@
                                 <div class="catcard-img">
                                     @if ($catImgUrl !== '')
                                         <img src="{{ $catImgUrl }}"
-                                             alt="{{ $catName }}" class="img-fluid" loading="lazy">
+                                             alt="{{ $catName }}" class="img-fluid" loading="lazy" decoding="async"{!! image_size_attrs($catRel) !!}>
                                     @else
                                         <div class="catcard-img-placeholder">
                                             <i class="fa-regular fa-image"></i>
@@ -173,7 +175,7 @@
                             <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" class="text-decoration-none">
                         @endif
                             @if ($certification->image_url)
-                                <img src="{{ asset('storage/' . $certification->image_url) }}" alt="{{ $certName }}" loading="lazy" style="max-height:70px; max-width:120px; object-fit:contain;">
+                                <img src="{{ asset('storage/' . $certification->image_url) }}" alt="{{ $certName }}" loading="lazy" decoding="async"{!! image_size_attrs($certification->image_url) !!} style="max-height:70px; max-width:120px; width:auto; height:auto; object-fit:contain;">
                             @else
                                 <span class="text-muted">{{ $certName }}</span>
                             @endif
@@ -259,7 +261,7 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 shadow-sm">
                             @if ($newsPost->image_url)
-                                <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" style="height:180px; object-fit:cover;">
+                                <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsPost->image_url) !!} style="height:180px; width:100%; object-fit:cover;">
                             @endif
                             <div class="card-body">
                                 <h5 class="card-title">{{ $newsTitle }}</h5>

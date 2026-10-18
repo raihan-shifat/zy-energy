@@ -19,6 +19,8 @@
               alt="{{ $siteSettings?->site_name ?? __('store.footer.footer_logo_alt') }}"
               class="footer-logo"
               loading="lazy"
+              decoding="async"
+              {!! $footerLogo ? trim(image_size_attrs($footerLogo)) : '' !!}
             >
           </a>
           @if($footerDescription)
@@ -119,7 +121,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
-                        <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" style="max-width: 220px;">
+                        <img src="{{ asset('storage/' . $wechatQr) }}" alt="{{ __('store.contact.wechat') }}" class="img-fluid" loading="lazy" decoding="async"{!! image_size_attrs($wechatQr) !!} style="max-width: 220px;">
                         <p class="text-muted small mt-2 mb-0">{{ __('store.footer.wechat_qr_hint') }}</p>
                     </div>
                 </div>

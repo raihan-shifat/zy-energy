@@ -62,10 +62,7 @@
         @if (!App::environment('testing'))
             @vite(['resources/views/themes/xylo/css/animate.min.css'])
         @endif
-        @if (!App::environment('testing'))
-            @vite(['resources/views/themes/xylo/css/slick.css'])
-        @endif
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">
+        {{-- slick CSS is loaded only by product-detail (the one page that runs slick) --}}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
         @if (!App::environment('testing'))
             @vite(['resources/views/themes/xylo/css/style.css'])
@@ -77,7 +74,7 @@
             @vite(['resources/views/themes/xylo/css/design-system.css'])
         @endif
     @yield('css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.css"/>
     @yield('fonts')
 </head>
 <body>
@@ -89,7 +86,7 @@
     @include('themes.xylo.partials.enquiry-modal')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     @if (!App::environment('testing'))
         @vite(['resources/views/themes/xylo/js/app.js'])
     @endif
@@ -99,6 +96,11 @@
     @yield('js')
     <script>
         $(document).ready(function() {
+            // slick is only loaded on product detail; elsewhere $.fn.slick is undefined
+            // and calling it threw a TypeError on every page.
+            if (! $.fn.slick) {
+                return;
+            }
             $('.product-slider').slick({
                 slidesToShow: 4,
                 slidesToScroll: 1,
