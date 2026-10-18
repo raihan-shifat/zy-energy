@@ -22,4 +22,16 @@ class News extends Model
         return $this->hasOne(NewsTranslation::class)
             ->where('language_code', App::getLocale());
     }
+
+    /**
+     * Only active posts that have a title and body. Used by public news pages.
+     */
+    public function scopePublic($query)
+    {
+        return $query->where('status', 1)
+            ->whereHas('translations', function ($q) {
+                $q->whereRaw("TRIM(COALESCE(title, '')) <> ''")
+                    ->whereRaw("TRIM(COALESCE(body, '')) <> ''");
+            });
+    }
 }

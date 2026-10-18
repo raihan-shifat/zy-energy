@@ -10,11 +10,31 @@ class Product extends Model
 {
     use HasFactory;
 
+    /**
+     * Test/placeholder names that must never appear on public pages.
+     */
+    const PLACEHOLDER_NAMES = ['name', 'edit test product', 'test product'];
+
     protected $fillable = [
         'category_id',  'brand_id', 'seller_id', 'shop_id', 'price', 'stock', 'status', 'slug', 'currency', 'SKU',
         'weight', 'dimensions', 'product_type',  'image_url', 'vendor_id', 'series', 'type',
 
     ];
+
+    /**
+     * Only active products that have a real (non-empty, non-placeholder) name.
+     * Used by public storefront queries; the admin area does not use it.
+     */
+    public function scopePublic($query)
+    {
+        $placeholders = implode(',', array_fill(0, count(self::PLACEHOLDER_NAMES), '?'));
+
+        return $query->where('status', 1)
+            ->whereHas('translations', function ($q) use ($placeholders) {
+                $q->whereRaw("TRIM(COALESCE(name, '')) <> ''")
+                    ->whereRaw("LOWER(TRIM(name)) NOT IN ({$placeholders})", self::PLACEHOLDER_NAMES);
+            });
+    }
 
     /**
      * Get the translations for the product.

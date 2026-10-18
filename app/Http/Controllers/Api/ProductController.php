@@ -24,7 +24,7 @@ class ProductController extends Controller
             'primaryVariant',
         ])
             ->withAvg('reviews', 'rating')
-            ->where('status', 1)
+            ->public()
             ->get()
             ->map(function ($product) {
                 $translation = $product->translations->first();

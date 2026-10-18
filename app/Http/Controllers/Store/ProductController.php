@@ -34,7 +34,7 @@ class ProductController extends Controller
         ])->withAvg('reviews', 'rating')
             ->withCount('reviews')
             ->where('slug', $slug)
-            ->where('status', 1)
+            ->public()
             ->firstOrFail();
 
         $primaryVariant = $product->primaryVariant;

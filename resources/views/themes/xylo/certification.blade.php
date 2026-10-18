@@ -33,7 +33,7 @@
                 </div>
             </div>
         @empty
-            <p class="text-muted text-center">{{ __('store.certification.title') }} — {{ __('store.news.no_posts') }}</p>
+            <p class="text-muted text-center">{{ __('store.certification.empty') }}</p>
         @endforelse
     </div>
 </div>

@@ -31,7 +31,7 @@ class CategoryController extends Controller
             ->withAvg(['reviews' => function ($q) {
                 $q->where('is_approved', 1);
             }], 'rating')
-            ->where('status', 1)
+            ->public()
             ->where('category_id', $category->id);
 
         // B2B filters — series + type, config-driven so more filters can be added later

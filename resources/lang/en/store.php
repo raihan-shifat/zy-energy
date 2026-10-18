@@ -326,6 +326,7 @@ return [
         'title' => 'Certification',
         'subtitle' => 'Our products are manufactured and tested in accordance with international standards.',
         'view_document' => 'View Document',
+        'empty' => 'No certifications available yet.',
     ],
 
     'contact' => [

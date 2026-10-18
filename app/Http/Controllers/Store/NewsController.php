@@ -13,7 +13,7 @@ class NewsController extends Controller
     public function index()
     {
         $posts = News::with('translations')
-            ->where('status', 1)
+            ->public()
             ->orderBy('id', 'desc')
             ->paginate(9);
 
@@ -27,7 +27,7 @@ class NewsController extends Controller
     {
         $post = News::with('translations')
             ->where('slug', $slug)
-            ->where('status', 1)
+            ->public()
             ->firstOrFail();
 
         return view('themes.xylo.news-show', compact('post'));

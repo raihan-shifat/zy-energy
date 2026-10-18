@@ -72,7 +72,7 @@ class ShopController extends Controller
         $query = Product::with(['translation', 'translations', 'thumbnail', 'primaryVariant'])
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->where('status', 1);
+            ->public();
 
         // Category filter
         if ($categoryId) {

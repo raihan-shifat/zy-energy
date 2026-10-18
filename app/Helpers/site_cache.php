@@ -95,7 +95,7 @@ if (! function_exists('getHomepageProducts')) {
     function getHomepageProducts()
     {
         return Cache::remember('homepage:products:' . app()->getLocale(), now()->addMinutes(10), function () {
-            return Product::where('status', 1)
+            return Product::public()
                 ->with(['translation', 'translations', 'thumbnail', 'primaryVariant'])
                 ->withCount('reviews')
                 ->orderByDesc('id')
@@ -112,7 +112,7 @@ if (! function_exists('getHomepageNews')) {
     function getHomepageNews()
     {
         return Cache::remember('homepage:news:' . app()->getLocale(), now()->addMinutes(10), function () {
-            return News::where('status', 1)
+            return News::public()
                 ->with(['translation', 'translations'])
                 ->orderByDesc('id')
                 ->limit(3)
