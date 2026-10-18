@@ -31,7 +31,17 @@
         width: 133.34%;
         height: 100%;
         border: 0;
-        transform: translate(-50%, -50%) scale(1.18);
+        transform: translate(-50%, -50%) scale(1.08);
+    }
+    /* Soft shade in the bottom-right corner so the round button stays readable on bright video */
+    .hero-video-layer.is-mounted::after {
+        content: "";
+        position: absolute;
+        inset: auto 0 0 auto;
+        width: 45%;
+        height: 40%;
+        background: radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 70%);
+        pointer-events: none;
     }
 
     /* Pause / play button (bottom-right of the banner image), shown only when the banner has a video */
@@ -183,6 +193,19 @@
                 el.setAttribute('tabindex', '-1');
                 el.setAttribute('title', '');
                 el.setAttribute('frameborder', '0');
+                if (type === 'youtube') {
+                    // YouTube may still switch subtitles on (viewer/channel setting): remove the
+                    // captions module once the player is up (retry while it finishes loading).
+                    el.addEventListener('load', function () {
+                        [300, 1500, 4000].forEach(function (ms) {
+                            setTimeout(function () {
+                                if (el.contentWindow) {
+                                    el.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'unloadModule', args: ['captions'] }), '*');
+                                }
+                            }, ms);
+                        });
+                    });
+                }
             }
             layer.appendChild(el);
             layer.classList.add('is-mounted');

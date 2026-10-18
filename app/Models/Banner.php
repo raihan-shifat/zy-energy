@@ -48,7 +48,7 @@ class Banner extends Model
 
             return ['type' => 'youtube', 'src' => 'https://www.youtube-nocookie.com/embed/'.$id
                 .'?autoplay=1&mute=1&loop=1&playlist='.$id.'&controls=0&playsinline=1&rel=0'
-                .'&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1'];
+                .'&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0&cc_load_policy=0&enablejsapi=1'];
         }
 
         // Vimeo: vimeo.com/123456 or player.vimeo.com/video/123456
