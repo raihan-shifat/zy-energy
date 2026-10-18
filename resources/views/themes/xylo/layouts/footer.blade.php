@@ -130,7 +130,7 @@
   <div class="footer-bottom">
     <div class="container">
       <div class="d-flex justify-content-start align-items-center flex-wrap gap-2">
-        <span class="footer-copyright">{{ __('store.footer.copyright') }} <span class="footer-divider">|</span> Developed by <a href="mailto:raihan.shifat@qq.com" class="footer-email">Raihan Shifat<span class="footer-email-arrow">↗</span></a></span>
+        <span class="footer-copyright">{{ __('store.footer.copyright') }}</span>
       </div>
     </div>
   </div>
