@@ -42,10 +42,11 @@
                                 <input type="email" name="email" class="form-control">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ __('store.enquiry.phone') }}</label>
-                                <input type="tel" name="whatsapp_number" id="contact-phone" class="form-control" placeholder="1712 345 678">
+                                <label class="form-label" for="contact-phone">{{ __('store.enquiry.phone') }} <span class="text-muted small">{{ __('store.enquiry.phone_hint') }}</span></label>
+                                <input type="tel" name="whatsapp_number" id="contact-phone" class="form-control" placeholder="1712 345 678" aria-describedby="contact-phone-help">
                                 {{-- Country code derived from the selected flag/dial code (intl-tel-input) --}}
                                 <input type="hidden" name="country_code" id="contact-country-code">
+                                <div id="contact-phone-help" class="form-text">{{ __('store.enquiry.phone_help') }}</div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ __('store.enquiry.category') }}</label>

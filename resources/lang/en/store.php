@@ -308,6 +308,8 @@ return [
         'company' => 'Company',
         'email' => 'Email',
         'phone' => 'WhatsApp Number',
+        'phone_hint' => '(with country code)',
+        'phone_help' => 'Choose your country from the flag list, then type your WhatsApp number.',
         'country' => 'Country',
         'product' => 'Product',
         'category' => 'Category',

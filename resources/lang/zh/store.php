@@ -312,6 +312,9 @@ return [
         'consent' => '我同意 :link，并同意贵司就我的询盘与我联系。',
         'privacy_policy' => '隐私政策',
         'validation_consent' => '请先同意隐私政策后再提交询盘。',
+        'phone' => 'WhatsApp 号码',
+        'phone_hint' => '（含国家区号）',
+        'phone_help' => '请先在国旗列表中选择您的国家，再输入 WhatsApp 号码。',
     ],
     'a11y' => [
         'skip_to_content' => '跳到主要内容',
