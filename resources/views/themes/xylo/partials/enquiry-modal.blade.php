@@ -31,14 +31,6 @@
                             <div class="invalid-feedback">{{ __('store.enquiry.validation_email') }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label" for="enquiry-phone">{{ __('store.enquiry.phone') }} <span class="text-muted small">{{ __('store.enquiry.phone_hint') }}</span></label>
-                            <input type="tel" name="whatsapp_number" id="enquiry-phone" class="form-control" placeholder="1712 345 678" aria-describedby="enquiry-phone-help">
-                            {{-- Country code derived from the selected flag/dial code (intl-tel-input) --}}
-                            <input type="hidden" name="country_code" id="enquiry-country-code">
-                            <div id="enquiry-phone-help" class="form-text">{{ __('store.enquiry.phone_help') }}</div>
-                            <div class="invalid-feedback">{{ __('store.enquiry.validation_phone') }}</div>
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label" for="enquiry-category">{{ __('store.enquiry.category') }}</label>
                             <select name="category" id="enquiry-category" class="form-select">
                                 <option value="">{{ __('store.enquiry.select_category') }}</option>
@@ -49,6 +41,16 @@
                                     <option value="{{ $enquiryCategory->id }}">{{ $catLabel }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        {{-- Full-width row: the flag picker + number get the same width as the other fields,
+                             and the help line fits on one line. --}}
+                        <div class="col-12 mb-3 enquiry-phone-field">
+                            <label class="form-label" for="enquiry-phone">{{ __('store.enquiry.phone') }} <span class="text-muted small fw-normal">{{ __('store.enquiry.phone_hint') }}</span></label>
+                            <input type="tel" name="whatsapp_number" id="enquiry-phone" class="form-control" placeholder="1712 345 678" aria-describedby="enquiry-phone-help">
+                            {{-- Country code derived from the selected flag/dial code (intl-tel-input) --}}
+                            <input type="hidden" name="country_code" id="enquiry-country-code">
+                            <div id="enquiry-phone-help" class="form-text"><i class="fa-solid fa-circle-info me-1" aria-hidden="true"></i>{{ __('store.enquiry.phone_help') }}</div>
+                            <div class="invalid-feedback">{{ __('store.enquiry.validation_phone') }}</div>
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label" for="enquiry-message">{{ __('store.enquiry.message') }} *</label>

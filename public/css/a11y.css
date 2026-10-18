@@ -88,6 +88,29 @@
     text-decoration: underline;
 }
 
+/* ---------- Enquiry forms: WhatsApp field with flag picker ---------- */
+/* intl-tel-input wraps the input in an inline-block .iti, so it was narrower
+   than the other fields. Make it full width like every other input. */
+.enquiry-phone-field .iti {
+    display: block;
+    width: 100%;
+}
+.enquiry-phone-field .iti .form-control {
+    width: 100%;
+}
+.enquiry-phone-field .form-text {
+    margin-top: 0.35rem;
+}
+/* The wrapper also hides Bootstrap's error text (it only shows next to an
+   invalid input); show it when the wrapped input is marked invalid. */
+.enquiry-phone-field .iti:has(.is-invalid) ~ .invalid-feedback {
+    display: block;
+}
+/* Keep the country list above the modal content and scrollable */
+.iti__dropdown-content {
+    z-index: 1060;
+}
+
 /* ---------- 5. Heading-level changes that keep the old look ---------- */
 /* Shop filter titles are now h2 (were h5 styled by ".sidebar h5"). */
 .sidebar .filter-title {
