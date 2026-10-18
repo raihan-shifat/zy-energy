@@ -1,6 +1,6 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', $translation->title ?? __('store.footer.about'))
+@section('title', page_title($translation->title ?? __('store.footer.about')))
 @section('meta_description', seo_excerpt($translation->content ?? '', 160))
 
 @section('content')

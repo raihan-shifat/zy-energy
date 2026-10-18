@@ -1,6 +1,11 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', __('store.news.title'))
+@section('title', page_title(__('store.news.title')))
+@section('meta_description', __('store.news.meta_description', ['site' => getSiteSettings()?->site_name ?: config('app.name')]))
+{{-- Paginated list pages (?page=2 ...) stay out of the index; canonical points to /news. --}}
+@if (! empty(request()->query()))
+    @section('robots', 'noindex, follow')
+@endif
 
 @section('content')
 <div class="container py-5">
@@ -11,7 +16,7 @@
     <div class="row">
         @forelse ($posts as $post)
             @php
-                    $postTitle = localized_translation_value($post->translations, 'title', $post->slug);
+                    $postTitle = localized_translation_value($post->translations, 'title') ?: readable_slug($post->slug);
                     $postExcerpt = localized_translation_value($post->translations, 'excerpt', '');
             @endphp
             <div class="col-md-4 mb-4">

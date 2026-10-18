@@ -82,6 +82,35 @@ if (! function_exists('seo_excerpt')) {
     }
 }
 
+if (! function_exists('readable_slug')) {
+    /**
+     * Human-readable fallback for a slug: "93-of-americas-wind" -> "93 Of Americas Wind".
+     */
+    function readable_slug($slug)
+    {
+        return \Illuminate\Support\Str::title(trim(preg_replace('/[-_]+/', ' ', (string) $slug)));
+    }
+}
+
+if (! function_exists('page_title')) {
+    /**
+     * "{Page} | {Site name}", dropping the site name when it would push the title past 60 chars.
+     */
+    function page_title($title)
+    {
+        $title = trim((string) $title);
+        $site = trim((string) (getSiteSettings()?->site_name ?: config('app.name')));
+
+        if ($site === '' || $title === '' || stripos($title, $site) !== false) {
+            return $title !== '' ? $title : $site;
+        }
+
+        $full = $title.' | '.$site;
+
+        return mb_strlen($full) <= 60 ? $full : $title;
+    }
+}
+
 if (! function_exists('canonical_url')) {
     /**
      * Canonical URL for the current page: canonical host + path, no query string.

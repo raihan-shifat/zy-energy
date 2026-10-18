@@ -1,13 +1,22 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', __('store.certification.title'))
-@section('meta_description', __('store.certification.subtitle'))
+@php $hasCertifications = $certifications->isNotEmpty(); @endphp
+@section('title', page_title(__('store.certification.title')))
+@if ($hasCertifications)
+    @section('meta_description', __('store.certification.subtitle'))
+@else
+    {{-- No records yet: neutral text, and keep the page out of the index until real certificates exist. --}}
+    @section('meta_description', __('store.certification.empty'))
+    @section('robots', 'noindex, follow')
+@endif
 
 @section('content')
 <div class="container py-5">
     <div class="text-center mb-5">
         <h1 class="sec-heading">{{ __('store.certification.title') }}</h1>
-        <p class="text-muted">{{ __('store.certification.subtitle') }}</p>
+        @if ($hasCertifications)
+            <p class="text-muted">{{ __('store.certification.subtitle') }}</p>
+        @endif
     </div>
 
     <div class="row justify-content-center">

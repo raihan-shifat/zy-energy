@@ -253,7 +253,7 @@
             <div class="row">
                 @forelse ($newsPosts as $newsPost)
                     @php
-                        $newsTitle = localized_translation_value($newsPost->translations, 'title', $newsPost->slug);
+                        $newsTitle = localized_translation_value($newsPost->translations, 'title') ?: readable_slug($newsPost->slug);
                         $newsExcerpt = localized_translation_value($newsPost->translations, 'excerpt', '');
                     @endphp
                     <div class="col-md-4 mb-4">

@@ -317,6 +317,9 @@ return [
         'validation_name' => 'Please enter your name.',
         'validation_email' => 'Please enter a valid email address.',
         'validation_message' => 'Please enter your message.',
+        'consent' => 'I agree to the :link and to being contacted about my enquiry.',
+        'privacy_policy' => 'Privacy Policy',
+        'validation_consent' => 'Please accept the Privacy Policy to send your enquiry.',
         'validation_phone' => 'Please enter a valid WhatsApp number.',
         'sending' => 'Sending...',
         'success_message' => 'Thank you, we will get back to you within 24 hours.',
@@ -326,7 +329,7 @@ return [
         'title' => 'Certification',
         'subtitle' => 'Our products are manufactured and tested in accordance with international standards.',
         'view_document' => 'View Document',
-        'empty' => 'No certifications available yet.',
+        'empty' => 'Certification details will be published soon.',
     ],
 
     'contact' => [
@@ -353,6 +356,7 @@ return [
         'read_more' => 'Read More',
         'back_to_news' => 'Back to News',
         'no_posts' => 'No news posts yet.',
+        'meta_description' => 'News and updates from :site.',
         'posted_on' => 'Posted on',
     ],
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Certification;
 use App\Models\News;
 use App\Models\Page;
 use App\Models\Product;
@@ -32,7 +33,10 @@ class SitemapController extends Controller
         $urls[] = ['loc' => '/'];
         $urls[] = ['loc' => '/products'];
         $urls[] = ['loc' => '/news'];
-        $urls[] = ['loc' => '/certification'];
+        // Certification is noindex while it has no records, so only list it once it has some.
+        if (Certification::where('status', 1)->exists()) {
+            $urls[] = ['loc' => '/certification'];
+        }
         $urls[] = ['loc' => '/contact'];
 
         // About is a CMS page with slug "about", served at /about

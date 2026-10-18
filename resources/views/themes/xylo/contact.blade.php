@@ -1,6 +1,7 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', __('store.contact.contact_us'))
+@section('title', page_title(__('store.contact.contact_us')))
+@section('meta_description', seo_excerpt($settings->page_subtitle ?: __('store.contact.subtitle'), 160))
 
 @section('content')
 

@@ -17,28 +17,28 @@
                     <div id="enquiry-form-success" class="d-none alert alert-success py-2"></div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.name') }} *</label>
+                            <label class="form-label" for="enquiry-name">{{ __('store.enquiry.name') }} *</label>
                             <input type="text" name="name" id="enquiry-name" class="form-control" required>
                             <div class="invalid-feedback">{{ __('store.enquiry.validation_name') }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.company') }}</label>
-                            <input type="text" name="company" class="form-control">
+                            <label class="form-label" for="enquiry-company">{{ __('store.enquiry.company') }}</label>
+                            <input type="text" name="company" id="enquiry-company" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.email') }}</label>
+                            <label class="form-label" for="enquiry-email">{{ __('store.enquiry.email') }}</label>
                             <input type="email" name="email" id="enquiry-email" class="form-control">
                             <div class="invalid-feedback">{{ __('store.enquiry.validation_email') }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.phone') }}</label>
+                            <label class="form-label" for="enquiry-phone">{{ __('store.enquiry.phone') }}</label>
                             <input type="tel" name="whatsapp_number" id="enquiry-phone" class="form-control" placeholder="1712 345 678">
                             {{-- Country code derived from the selected flag/dial code (intl-tel-input) --}}
                             <input type="hidden" name="country_code" id="enquiry-country-code">
                             <div class="invalid-feedback">{{ __('store.enquiry.validation_phone') }}</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.category') }}</label>
+                            <label class="form-label" for="enquiry-category">{{ __('store.enquiry.category') }}</label>
                             <select name="category" id="enquiry-category" class="form-select">
                                 <option value="">{{ __('store.enquiry.select_category') }}</option>
                                 @foreach ($enquiryCategories as $enquiryCategory)
@@ -50,9 +50,22 @@
                             </select>
                         </div>
                         <div class="col-12 mb-3">
-                            <label class="form-label">{{ __('store.enquiry.message') }} *</label>
+                            <label class="form-label" for="enquiry-message">{{ __('store.enquiry.message') }} *</label>
                             <textarea name="message" id="enquiry-message" rows="4" class="form-control" placeholder="{{ __('store.enquiry.placeholder_message') }}" required></textarea>
                             <div class="invalid-feedback">{{ __('store.enquiry.validation_message') }}</div>
+                        </div>
+                        <div class="col-12 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="privacy_consent" id="enquiry-consent" value="1" required>
+                                <label class="form-check-label small" for="enquiry-consent">
+                                    {!! str_replace(
+                                        '%LINK%',
+                                        '<a href="/privacy-policy" target="_blank" rel="noopener">'.e(__('store.enquiry.privacy_policy')).'</a>',
+                                        e(__('store.enquiry.consent', ['link' => '%LINK%']))
+                                    ) !!} *
+                                </label>
+                                <div class="invalid-feedback">{{ __('store.enquiry.validation_consent') }}</div>
+                            </div>
                         </div>
                         <input type="hidden" name="source_page" id="enquiry-source-page">
                     </div>
@@ -140,6 +153,9 @@
         if (form) {
             form.reset();
             form.classList.remove('was-validated');
+            form.querySelectorAll('.is-invalid').forEach(function (el) {
+                el.classList.remove('is-invalid');
+            });
         }
         if (productName && messageInput) {
             messageInput.value = 'Product of interest: ' + productName;
@@ -234,6 +250,15 @@
                 } else if (typeof window.syncEnquiryPhone === 'function') {
                     // Still derive the country from the flag even when no number is typed
                     window.syncEnquiryPhone();
+                }
+
+                // Privacy Policy consent is required (the form uses novalidate, so check it here)
+                var consent = document.getElementById('enquiry-consent');
+                if (consent) {
+                    consent.classList.toggle('is-invalid', !consent.checked);
+                    if (!consent.checked) {
+                        valid = false;
+                    }
                 }
 
                 if (!valid) {
