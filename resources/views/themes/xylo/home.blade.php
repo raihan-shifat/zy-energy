@@ -39,7 +39,12 @@
                 @foreach ($bannerData as $idx => $slide)
                 <div class="hero-slide col-md-6 {{ $idx === $initialIndex ? '' : 'd-none' }}" data-index="{{ $idx }}">
                     <span class="hero-eyebrow">{{ __('store.home_b2b.hero_eyebrow') }}</span>
-                    <h1 class="mt-0"><span>{!! $slide['title'] !!}</span></h1>
+                    {{-- One H1 per page: the slide shown on load. Other slides use H2 styled the same. --}}
+                    @if ($idx === $initialIndex)
+                        <h1 class="mt-0 hero-title"><span>{!! $slide['title'] !!}</span></h1>
+                    @else
+                        <h2 class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></h2>
+                    @endif
                     <p class="hero-subtext">{{ $slide['subtitle'] }}</p>
                     <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}</a>
                 </div>

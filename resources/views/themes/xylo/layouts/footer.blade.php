@@ -13,7 +13,7 @@
       <!-- Column 1: About / Logo + Bio -->
       <div class="col-12 col-md-3 mb-3">
         <div class="footer-about d-flex flex-column gap-3">
-          <a href="{{ route('xylo.home') }}" class="d-inline-block">
+          <a href="/" class="d-inline-block">
             <img
               src="{{ $footerLogo ? asset('storage/' . $footerLogo) : asset('logo.png') }}"
               alt="{{ $siteSettings?->site_name ?? __('store.footer.footer_logo_alt') }}"
@@ -85,8 +85,13 @@
         @endphp
         <div class="d-flex gap-3 flex-wrap align-items-center social-connect">
             @foreach ($footerSocial as $social)
-                @php $socialType = strtolower($social->type); @endphp
-                @if (isset($socialConfig[$socialType]))
+                @php
+                    $socialType = strtolower($social->type);
+                    // Skip empty links and bare home pages like https://www.instagram.com/ (no profile path).
+                    $socialPath = trim((string) parse_url((string) $social->link, PHP_URL_PATH), '/');
+                    $socialHasProfile = filled($social->link) && ($socialPath !== '' || filled(parse_url((string) $social->link, PHP_URL_QUERY)));
+                @endphp
+                @if (isset($socialConfig[$socialType]) && $socialHasProfile)
                     <a href="{{ $social->link }}" target="_blank" rel="noopener"
                        class="social-icon social-icon--{{ $socialType }}"
                        aria-label="{{ $socialConfig[$socialType]['label'] }}"
