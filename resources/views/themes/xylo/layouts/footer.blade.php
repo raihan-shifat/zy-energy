@@ -136,8 +136,13 @@
   <!-- Footer Bottom Strip -->
   <div class="footer-bottom">
     <div class="container">
-      <div class="d-flex justify-content-start align-items-center flex-wrap gap-2">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span class="footer-copyright">{{ __('store.footer.copyright') }}</span>
+        <nav class="footer-legal" aria-label="{{ __('store.footer.legal') }}">
+          <a href="/privacy-policy">{{ __('store.footer.privacy_policy') }}</a>
+          <a href="/terms">{{ __('store.footer.terms') }}</a>
+          <a href="/cookie-policy">{{ __('store.footer.cookie_policy') }}</a>
+        </nav>
       </div>
     </div>
   </div>

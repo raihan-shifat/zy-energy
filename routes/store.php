@@ -100,6 +100,11 @@ Route::middleware(['throttle:5,1'])->group(function () {
     Route::post('/enquiry', [EnquiryController::class, 'store'])->name('enquiry.store');
 });
 
+// Legal pages (draft text pending legal review). Before /{slug} so they win over CMS pages.
+Route::get('/privacy-policy', [\App\Http\Controllers\Store\LegalPageController::class, 'privacy'])->name('legal.privacy');
+Route::get('/terms', [\App\Http\Controllers\Store\LegalPageController::class, 'terms'])->name('legal.terms');
+Route::get('/cookie-policy', [\App\Http\Controllers\Store\LegalPageController::class, 'cookies'])->name('legal.cookies');
+
 Route::get('/sitemap.xml', [\App\Http\Controllers\Store\SitemapController::class, 'index'])->name('sitemap');
 
 Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');

@@ -87,6 +87,27 @@
     color: #64736c;
 }
 
+/* ---------- Footer legal links (Privacy / Terms / Cookies) ---------- */
+/* #b0bdb5 on the footer strip #07110d = 9.86:1; links are 44px tall for touch. */
+.footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+}
+.footer-legal a {
+    color: #b0bdb5;
+    font-size: 0.8125rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+.footer-legal a:hover,
+.footer-legal a:focus-visible {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
 /* ---------- 5. Heading-level changes that keep the old look ---------- */
 /* Shop filter titles are now h2 (were h5 styled by ".sidebar h5"). */
 .sidebar .filter-title {
