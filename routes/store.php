@@ -100,4 +100,6 @@ Route::middleware(['throttle:5,1'])->group(function () {
     Route::post('/enquiry', [EnquiryController::class, 'store'])->name('enquiry.store');
 });
 
+Route::get('/sitemap.xml', [\App\Http\Controllers\Store\SitemapController::class, 'index'])->name('sitemap');
+
 Route::get('/{slug}', [PageController::class, 'show'])->name('page.show');
