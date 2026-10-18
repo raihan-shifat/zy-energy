@@ -115,6 +115,20 @@ return [
             'add_new' => 'Add New',
             'list' => 'List',
         ],
+        'quotations' => [
+            'title' => 'Quotations',
+            'create' => 'Create Quotation',
+            'list' => 'All Quotations',
+            'exchange_rates' => 'Exchange Rates',
+            'settings' => 'Quotation Settings',
+        ],
+        'contact' => [
+            'title' => 'Contact Us',
+            'settings' => 'Contact Settings',
+            'wechat' => 'WeChat Contacts',
+            'whatsapp' => 'WhatsApp Contacts',
+            'email' => 'Email Contacts',
+        ],
         'orders' => [
             'title' => 'Orders',
             'all_orders' => 'All Orders',

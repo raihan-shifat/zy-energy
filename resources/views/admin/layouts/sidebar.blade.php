@@ -278,29 +278,29 @@
     </li>
     <li class="nav-item">
         <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#quotationMenu" role="button" aria-expanded="false" aria-controls="quotationMenu">
-            <span><i class="fas fa-file-invoice me-2"></i> <span>Quotations</span></span>
+            <span><i class="fas fa-file-invoice me-2"></i> <span>{{ __('cms.sidebar.quotations.title') }}</span></span>
             <i class="fas fa-chevron-down"></i>
         </a>
         <div class="collapse {{ in_array(Route::currentRouteName(), ['admin.quotations.index', 'admin.quotations.create', 'admin.quotations.edit', 'admin.quotations.show', 'admin.exchange-rates.index', 'admin.quotation-settings.edit']) ? 'show' : '' }}" id="quotationMenu">
             <ul class="nav flex-column ms-3">
-                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotations.create' ? 'active' : '' }}" href="{{ route('admin.quotations.create') }}">Create Quotation</a></li>
-                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotations.index' ? 'active' : '' }}" href="{{ route('admin.quotations.index') }}">All Quotations</a></li>
-                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.exchange-rates.index' ? 'active' : '' }}" href="{{ route('admin.exchange-rates.index') }}">Exchange Rates</a></li>
-                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotation-settings.edit' ? 'active' : '' }}" href="{{ route('admin.quotation-settings.edit') }}">Quotation Settings</a></li>
+                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotations.create' ? 'active' : '' }}" href="{{ route('admin.quotations.create') }}">{{ __('cms.sidebar.quotations.create') }}</a></li>
+                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotations.index' ? 'active' : '' }}" href="{{ route('admin.quotations.index') }}">{{ __('cms.sidebar.quotations.list') }}</a></li>
+                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.exchange-rates.index' ? 'active' : '' }}" href="{{ route('admin.exchange-rates.index') }}">{{ __('cms.sidebar.quotations.exchange_rates') }}</a></li>
+                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.quotation-settings.edit' ? 'active' : '' }}" href="{{ route('admin.quotation-settings.edit') }}">{{ __('cms.sidebar.quotations.settings') }}</a></li>
             </ul>
         </div>
     </li>
     <li class="nav-item">
         <a class="nav-link d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#contactMenu" role="button" aria-expanded="false" aria-controls="contactMenu">
-            <span><i class="fas fa-address-book me-2"></i> <span>Contact Us</span></span>
+            <span><i class="fas fa-address-book me-2"></i> <span>{{ __('cms.sidebar.contact.title') }}</span></span>
             <i class="fas fa-chevron-down"></i>
         </a>
         <div class="collapse {{ in_array(Route::currentRouteName(), ['admin.contact.settings', 'admin.contact.wechat.index', 'admin.contact.wechat.create', 'admin.contact.wechat.edit', 'admin.contact.whatsapp.index', 'admin.contact.whatsapp.create', 'admin.contact.whatsapp.edit', 'admin.contact.email.index', 'admin.contact.email.create', 'admin.contact.email.edit']) ? 'show' : '' }}" id="contactMenu">
             <ul class="nav flex-column ms-3">
-                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.contact.settings' ? 'active' : '' }}" href="{{ route('admin.contact.settings') }}">Contact Settings</a></li>
-                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.wechat.index', 'admin.contact.wechat.create', 'admin.contact.wechat.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.wechat.index') }}">WeChat Contacts</a></li>
-                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.whatsapp.index', 'admin.contact.whatsapp.create', 'admin.contact.whatsapp.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.whatsapp.index') }}">WhatsApp Contacts</a></li>
-                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.email.index', 'admin.contact.email.create', 'admin.contact.email.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.email.index') }}">Email Contacts</a></li>
+                <li><a class="nav-link {{ Route::currentRouteName() == 'admin.contact.settings' ? 'active' : '' }}" href="{{ route('admin.contact.settings') }}">{{ __('cms.sidebar.contact.settings') }}</a></li>
+                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.wechat.index', 'admin.contact.wechat.create', 'admin.contact.wechat.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.wechat.index') }}">{{ __('cms.sidebar.contact.wechat') }}</a></li>
+                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.whatsapp.index', 'admin.contact.whatsapp.create', 'admin.contact.whatsapp.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.whatsapp.index') }}">{{ __('cms.sidebar.contact.whatsapp') }}</a></li>
+                <li><a class="nav-link {{ in_array(Route::currentRouteName(), ['admin.contact.email.index', 'admin.contact.email.create', 'admin.contact.email.edit']) ? 'active' : '' }}" href="{{ route('admin.contact.email.index') }}">{{ __('cms.sidebar.contact.email') }}</a></li>
             </ul>
         </div>
     </li>

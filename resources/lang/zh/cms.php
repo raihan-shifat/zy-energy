@@ -118,6 +118,45 @@ return [
             'title' => '支付网关',
             'list' => '列表',
         ],
+
+        'certifications' => [
+            'title' => '认证',
+            'add_new' => '新增',
+            'list' => '列表',
+        ],
+
+        'news' => [
+            'title' => '新闻',
+            'add_new' => '新增',
+            'list' => '列表',
+        ],
+
+        'enquiries' => [
+            'title' => '询盘',
+            'list' => '列表',
+        ],
+
+        'users' => [
+            'title' => '用户',
+            'add_new' => '新增',
+            'list' => '列表',
+        ],
+
+        'quotations' => [
+            'title' => '报价单',
+            'create' => '新建报价单',
+            'list' => '所有报价单',
+            'exchange_rates' => '汇率',
+            'settings' => '报价设置',
+        ],
+
+        'contact' => [
+            'title' => '联系我们',
+            'settings' => '联系设置',
+            'wechat' => '微信联系人',
+            'whatsapp' => 'WhatsApp 联系人',
+            'email' => '邮箱联系人',
+        ],
     ],
 
     'profile' => [
