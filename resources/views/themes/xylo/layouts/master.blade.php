@@ -8,6 +8,7 @@
         <meta name="robots" content="noindex, nofollow">
     @endif
     <title>@yield('title', config('app.name', 'Laravel'))</title>
+    <link rel="canonical" href="{{ canonical_url() }}">
     @if (!App::environment('testing'))
         @vite(['resources/views/themes/xylo/sass/app.scss'])
     @endif

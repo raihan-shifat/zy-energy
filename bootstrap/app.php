@@ -10,6 +10,7 @@ use App\Http\Middleware\EnsureStaff;
 use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\LocaleMiddleware;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
+use App\Http\Middleware\RedirectToCanonicalHost;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrackVisits;
 use App\Http\Middleware\TrimStrings;
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ValidatePathEncoding::class,
             InvokeDeferredCallbacks::class,
             TrustProxies::class,
+            RedirectToCanonicalHost::class,
             HandleCors::class,
             PreventRequestsDuringMaintenance::class,
             ValidatePostSize::class,

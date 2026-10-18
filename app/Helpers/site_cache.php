@@ -67,6 +67,19 @@ if (! function_exists('getActiveBanners')) {
     }
 }
 
+if (! function_exists('canonical_url')) {
+    /**
+     * Canonical URL for the current page: canonical host + path, no query string.
+     */
+    function canonical_url()
+    {
+        $base = rtrim((string) config('seo.canonical_domain'), '/');
+        $path = trim(request()->path(), '/');
+
+        return $base.($path === '' ? '/' : '/'.$path);
+    }
+}
+
 if (! function_exists('getActiveCertifications')) {
     /**
      * Get cached active certifications with translations.
