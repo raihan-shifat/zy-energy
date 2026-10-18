@@ -22,7 +22,8 @@ class Product extends Model
     ];
 
     /**
-     * Only active products that have a real (non-empty, non-placeholder) name.
+     * Only active products that have a real (non-empty, non-placeholder) name
+     * and a short description or description in the same translation.
      * Used by public storefront queries; the admin area does not use it.
      */
     public function scopePublic($query)
@@ -32,7 +33,11 @@ class Product extends Model
         return $query->where('status', 1)
             ->whereHas('translations', function ($q) use ($placeholders) {
                 $q->whereRaw("TRIM(COALESCE(name, '')) <> ''")
-                    ->whereRaw("LOWER(TRIM(name)) NOT IN ({$placeholders})", self::PLACEHOLDER_NAMES);
+                    ->whereRaw("LOWER(TRIM(name)) NOT IN ({$placeholders})", self::PLACEHOLDER_NAMES)
+                    ->where(function ($d) {
+                        $d->whereRaw("TRIM(COALESCE(short_description, '')) <> ''")
+                            ->orWhereRaw("TRIM(COALESCE(description, '')) <> ''");
+                    });
             });
     }
 

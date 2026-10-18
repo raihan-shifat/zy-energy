@@ -147,6 +147,9 @@ class ImageOptimizationService
 
         $srcset = implode(', ', $webpSources);
         $src = $fallbackUrl;
+        [$width, $height] = $this->getImageDimensions(
+            $fallbackJpg && Storage::disk('public')->exists($fallbackJpg) ? $fallbackJpg : $originalPath
+        );
 
         // Build picture element with WebP sources and JPEG fallback
         $html = '<picture>';
@@ -165,10 +168,31 @@ class ImageOptimizationService
         if ($loading) {
             $html .= ' loading="' . $loading . '"';
         }
+        if ($width && $height) {
+            $html .= ' width="' . $width . '" height="' . $height . '"';
+        }
         $html .= '>';
         $html .= '</picture>';
 
         return $html;
+    }
+
+    /**
+     * Intrinsic [width, height] of a public-disk image, read once and cached.
+     * Returns [0, 0] when the file is missing or not an image.
+     */
+    private function getImageDimensions(string $path): array
+    {
+        return \Illuminate\Support\Facades\Cache::rememberForever('img_dims:' . md5($path), function () use ($path) {
+            $disk = Storage::disk('public');
+            if (! $disk->exists($path)) {
+                return [0, 0];
+            }
+
+            $size = @getimagesize($disk->path($path));
+
+            return $size ? [(int) $size[0], (int) $size[1]] : [0, 0];
+        });
     }
 
     /**

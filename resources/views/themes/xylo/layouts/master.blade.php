@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @if (($siteStatus ?? 'active') === 'unlisted')
         <meta name="robots" content="noindex, nofollow">
+    @elseif (trim($__env->yieldContent('robots')) !== '')
+        <meta name="robots" content="{{ trim($__env->yieldContent('robots')) }}">
     @endif
     @php
         $seo = getSiteSettings();
@@ -17,11 +19,15 @@
         $seoSiteName = $seo?->site_name ?: config('app.name', 'Laravel');
     @endphp
     <title>{{ $seoTitle }}</title>
-    <meta name="description" content="{{ $seoDescription }}">
+    @if ($seoDescription !== '')
+        <meta name="description" content="{{ $seoDescription }}">
+    @endif
     <link rel="canonical" href="{{ canonical_url() }}">
     <meta property="og:site_name" content="{{ $seoSiteName }}">
     <meta property="og:title" content="{{ $seoTitle }}">
-    <meta property="og:description" content="{{ $seoDescription }}">
+    @if ($seoDescription !== '')
+        <meta property="og:description" content="{{ $seoDescription }}">
+    @endif
     <meta property="og:url" content="{{ canonical_url() }}">
     <meta property="og:type" content="{{ $seoType }}">
     @if ($seoImage)
@@ -29,7 +35,9 @@
     @endif
     <meta name="twitter:card" content="{{ $seoImage ? 'summary_large_image' : 'summary' }}">
     <meta name="twitter:title" content="{{ $seoTitle }}">
-    <meta name="twitter:description" content="{{ $seoDescription }}">
+    @if ($seoDescription !== '')
+        <meta name="twitter:description" content="{{ $seoDescription }}">
+    @endif
     @if (!App::environment('testing'))
         @vite(['resources/views/themes/xylo/sass/app.scss'])
     @endif

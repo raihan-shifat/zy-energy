@@ -4,12 +4,15 @@
     $seoName = localized_translation_value($product->translations, 'name', '');
     $seoBrand = $product->brand?->translation?->name ?: getSiteSettings()?->site_name ?: config('app.name');
     $seoNameMax = max(20, 60 - mb_strlen($seoBrand) - 3);
+    // Short description, then full description, then the brand's own description.
+    // If all are empty the layout falls back to the site default.
     $seoShort = localized_translation_value($product->translations, 'short_description', '')
-        ?: localized_translation_value($product->translations, 'description', '');
+        ?: localized_translation_value($product->translations, 'description', '')
+        ?: ($product->brand?->translation?->description ?? '');
     $seoImagePath = $product->thumbnail?->image_url;
 @endphp
 @section('title', \Illuminate\Support\Str::limit($seoName, $seoNameMax, '', true).' | '.$seoBrand)
-@section('meta_description', seo_excerpt($seoShort, 150))
+@section('meta_description', seo_excerpt($seoShort, 160))
 @section('og_type', 'product')
 @if ($seoImagePath)
     @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$seoImagePath)
@@ -48,7 +51,7 @@
                     @forelse ($product->images as $image)
                         <div>
                             {!! getResponsiveImageHtml($image['image_url'], [
-                                'alt' => $image['name'] ?? '',
+                                'alt' => $seoName ?: ($image['name'] ?? ''),
                                 'class' => 'img-fluid',
                                 'sizes' => '(max-width: 768px) 100vw, 50vw',
                                 'loading' => 'lazy',
@@ -56,7 +59,12 @@
                         </div>
                     @empty
                         <div>
-                            <img src="{{ asset('storage/default.jpg') }}" alt="{{ __('store.category.product_name_not_available') }}" style="width: 100%; height: auto;" loading="lazy" />
+                            {!! getResponsiveImageHtml('default.jpg', [
+                                'alt' => $seoName ?: __('store.category.product_name_not_available'),
+                                'class' => 'img-fluid w-100',
+                                'sizes' => '(max-width: 768px) 100vw, 50vw',
+                                'loading' => 'lazy',
+                            ]) !!}
                         </div>
                     @endforelse
                 </div>

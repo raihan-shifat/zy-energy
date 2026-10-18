@@ -1,6 +1,10 @@
 @extends('themes.xylo.layouts.master')
 
 @section('title', __('store.footer.products'))
+{{-- Filter, sort and page URLs: keep out of the index, canonical points to the clean URL. --}}
+@if (! empty(request()->query()))
+    @section('robots', 'noindex, follow')
+@endif
 
 @section('content')
     <section class="products-home py-5 mb-5 main-shop">
