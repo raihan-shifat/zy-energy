@@ -82,6 +82,25 @@ if (! function_exists('seo_excerpt')) {
     }
 }
 
+if (! function_exists('analytics_config')) {
+    /**
+     * Validated analytics IDs from config/seo.php. Anything that does not look
+     * like a real GTM / GA4 ID is ignored, so it can never be printed into a script.
+     *
+     * @return array{gtm: ?string, ga4: ?string, enabled: bool}
+     */
+    function analytics_config(): array
+    {
+        $gtm = strtoupper(trim((string) config('seo.analytics.gtm_id', '')));
+        $ga4 = strtoupper(trim((string) config('seo.analytics.ga4_id', '')));
+
+        $gtm = preg_match('/^GTM-[A-Z0-9]{4,12}$/', $gtm) ? $gtm : null;
+        $ga4 = preg_match('/^G-[A-Z0-9]{4,15}$/', $ga4) ? $ga4 : null;
+
+        return ['gtm' => $gtm, 'ga4' => $ga4, 'enabled' => (bool) ($gtm || $ga4)];
+    }
+}
+
 if (! function_exists('readable_slug')) {
     /**
      * Human-readable fallback for a slug: "93-of-americas-wind" -> "93 Of Americas Wind".

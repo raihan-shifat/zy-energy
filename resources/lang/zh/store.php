@@ -333,4 +333,12 @@ return [
         'sort_by' => '排序方式',
         'rating' => '评分',
     ],
+    'consent' => [
+        'title' => 'Cookie 提示',
+        'text' => '我们希望使用分析 Cookie 来了解网站的使用情况。只有在您同意后才会设置。',
+        'accept' => '接受',
+        'decline' => '拒绝',
+        'more' => 'Cookie 政策',
+        'change' => '更改 Cookie 选择',
+    ],
 ];

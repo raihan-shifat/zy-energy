@@ -286,6 +286,15 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
                     if (result.status >= 200 && result.status < 300 && result.body.success) {
+                        // Analytics (only if configured + consented): no field values, only where and which category.
+                        if (typeof window.zyTrack === 'function') {
+                            var trackCategory = form.querySelector('#enquiry-category');
+                            window.zyTrack('form_submit', {
+                                form_id: 'enquiry_modal',
+                                form_location: window.location.pathname,
+                                enquiry_category: (trackCategory && trackCategory.value) ? trackCategory.value : 'none'
+                            });
+                        }
                         showSuccess(result.body.message || @json(__('store.enquiry.success_message')));
                         // Close the modal shortly after showing success
                         setTimeout(function () {

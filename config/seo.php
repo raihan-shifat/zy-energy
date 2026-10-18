@@ -30,4 +30,21 @@ return [
 
     'store_locales' => array_values(array_filter(array_map('trim', explode(',', (string) env('STORE_LOCALES', 'en,zh'))))),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Analytics (Google Tag Manager / GA4)
+    |--------------------------------------------------------------------------
+    |
+    | Leave both empty to output no analytics code at all. If a GTM container
+    | is set, GA4 should be configured inside GTM and the GA4 ID here is not
+    | used. Scripts load only after the visitor accepts the cookie notice.
+    | Set GTM_CONTAINER_ID="GTM-XXXXXXX" and/or GA4_MEASUREMENT_ID="G-XXXXXXXXXX".
+    |
+    */
+
+    'analytics' => [
+        'gtm_id' => env('GTM_CONTAINER_ID', ''),
+        'ga4_id' => env('GA4_MEASUREMENT_ID', ''),
+    ],
+
 ];

@@ -14,7 +14,7 @@
     <p>This page lists the cookies this website sets and why.</p>
 
     <h2 class="h4 mt-5">Data we collect with cookies</h2>
-    <p>The website currently sets only these cookies. All are needed for the site to work:</p>
+    <p>The website sets these cookies. The first three are needed for the site to work:</p>
     <div class="table-responsive">
         <table class="table table-bordered align-middle">
             <thead>
@@ -40,11 +40,28 @@
                     <td>Remembers the language you chose.</td>
                     <td>1 year</td>
                 </tr>
+                @if (analytics_config()['enabled'])
+                    <tr>
+                        <td><code>_ga</code>, <code>_ga_*</code></td>
+                        <td>Google Analytics: counts visits and how the site is used. <strong>Only set if you accept</strong> the cookie notice.</td>
+                        <td>Up to 2 years [confirm in Google Analytics settings]</td>
+                    </tr>
+                @endif
             </tbody>
         </table>
     </div>
-    <p>We do not use analytics, advertising or social-media tracking cookies at this time.
-        If that changes, this page will be updated and you will be asked for consent first.</p>
+    @if (analytics_config()['enabled'])
+        <p>
+            Analytics cookies are optional. Your choice is stored in your browser (localStorage, key
+            <code>zy_cookie_consent</code>). Analytics is not loaded until you accept.
+            Events we measure (for example "WhatsApp button clicked" or "enquiry form sent") do not include your name,
+            email, phone number or message.
+        </p>
+        <p><button type="button" class="btn btn-outline-primary btn-sm" data-cookie-settings>{{ __('store.consent.change') }}</button></p>
+    @else
+        <p>We do not use analytics, advertising or social-media tracking cookies at this time.
+            If that changes, this page will be updated and you will be asked for consent first.</p>
+    @endif
 
     <h2 class="h4 mt-5">How we use it</h2>
     <p>These cookies are used only to provide the website you asked for. They are not used for profiling or advertising.</p>

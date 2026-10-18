@@ -164,6 +164,13 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(function (data) {
                 if (data.success) {
+                    // Analytics (only if configured + consented): no field values are sent.
+                    if (typeof window.zyTrack === 'function') {
+                        window.zyTrack('form_submit', {
+                            form_id: 'page_contact_form',
+                            form_location: window.location.pathname
+                        });
+                    }
                     toastr.success(data.message);
                     form.reset();
                 } else {

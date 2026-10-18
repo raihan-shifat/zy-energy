@@ -38,11 +38,20 @@
         (e.g. hosting provider, email provider), and whether it is transferred outside your country.]</p>
 
     <h2 class="h4 mt-5">Cookies</h2>
-    <p>
-        This website uses only the cookies it needs to work (session, security and language choice).
-        It does not use analytics or advertising cookies at this time.
-        Details are in the <a href="/cookie-policy">Cookie Policy</a>.
-    </p>
+    @if (analytics_config()['enabled'])
+        <p>
+            This website uses the cookies it needs to work (session, security and language choice) and,
+            only if you accept the cookie notice, Google Analytics cookies to measure how the site is used.
+            Analytics events do not include your name, email, phone number or message.
+            Details are in the <a href="/cookie-policy">Cookie Policy</a>.
+        </p>
+    @else
+        <p>
+            This website uses only the cookies it needs to work (session, security and language choice).
+            It does not use analytics or advertising cookies at this time.
+            Details are in the <a href="/cookie-policy">Cookie Policy</a>.
+        </p>
+    @endif
 
     <h2 class="h4 mt-5">Your rights</h2>
     <p>[Rights available to you under applicable law, e.g. access, correction, deletion, objection,

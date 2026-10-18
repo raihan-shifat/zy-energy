@@ -85,7 +85,7 @@
                             @endif
 
                             <div class="card-actions d-flex gap-2">
-                                <a href="{{ $whatsapp->whatsapp_link }}" target="_blank" rel="noopener"
+                                <a href="{{ $whatsapp->whatsapp_link }}" target="_blank" rel="noopener" data-track="whatsapp_click" data-track-location="contact_page"
                                    class="btn btn-success btn-sm flex-fill contact-cta">
                                     <i class="fab fa-whatsapp me-1"></i>{{ __('store.contact.chat_now') }}
                                 </a>
@@ -121,7 +121,7 @@
                             @endif
 
                             <div class="card-actions d-flex gap-2">
-                                <a href="{{ $email->mailto_link }}" class="btn btn-primary btn-sm flex-fill contact-cta">
+                                <a href="{{ $email->mailto_link }}" class="btn btn-primary btn-sm flex-fill contact-cta" data-track="email_click" data-track-location="contact_page">
                                     <i class="fa-regular fa-envelope me-1"></i>{{ __('store.contact.send_email') }}
                                 </a>
                                 <button type="button" class="btn btn-outline-secondary btn-sm contact-cta copy-btn"

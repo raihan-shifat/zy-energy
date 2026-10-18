@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- GTM / GA4 (outputs nothing when no ID is configured; loads only after cookie consent) --}}
+    @include('themes.xylo.partials.analytics-head')
+    @if (analytics_config()['enabled'])
+        <script src="{{ asset('js/tracking.js') }}?v={{ @filemtime(public_path('js/tracking.js')) }}" defer></script>
+    @endif
     @if (($siteStatus ?? 'active') === 'unlisted')
         <meta name="robots" content="noindex, nofollow">
     @elseif (trim($__env->yieldContent('robots')) !== '')
@@ -202,6 +207,7 @@
     <div style="position: fixed; bottom: 25px; right: 25px; z-index: 99999; cursor: pointer;">
         <a href="https://wa.me/8615118227223?text=Hello,%20I%20want%20to%20know%20more%20about%20your%20products."
            target="_blank" rel="noopener"
+           data-track="whatsapp_click" data-track-location="floating_button"
            title="{{ __('store.contact.chat_now') }} – {{ __('store.contact.whatsapp') }}"
            aria-label="{{ __('store.contact.chat_now') }} – {{ __('store.contact.whatsapp') }}"
            style="display: flex; align-items: center; justify-content: center; width: 55px; height: 55px; background-color: #25d366; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.3s ease;">
@@ -211,5 +217,6 @@
             </svg>
         </a>
     </div>
+    @include('themes.xylo.partials.cookie-notice')
 </body>
 </html>

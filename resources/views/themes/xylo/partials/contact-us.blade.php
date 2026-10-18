@@ -83,7 +83,7 @@
                                                 </div>
                                             </div>
                                             <p class="text-muted mb-1 mt-1" style="font-size: 0.85rem; line-height: 1.2;">{{ $whatsapp->phone }}</p>
-                                            <a href="{{ $whatsapp->whatsapp_link }}" target="_blank" rel="noopener" class="btn btn-success btn-sm w-100" style="font-size: 0.8rem; padding: 0.15rem 0.5rem;">
+                                            <a href="{{ $whatsapp->whatsapp_link }}" target="_blank" rel="noopener" data-track="whatsapp_click" data-track-location="contact_modal" class="btn btn-success btn-sm w-100" style="font-size: 0.8rem; padding: 0.15rem 0.5rem;">
                                                 <i class="fab fa-whatsapp me-1"></i> {{ __('store.contact.chat_now') }}
                                             </a>
                                         </div>
@@ -114,7 +114,7 @@
                                             </div>
                                             <p class="mb-1 mt-1" style="font-size: 0.88rem; font-weight: 500; color: #333; line-height: 1.2;">{{ $email->email }}</p>
                                             <div class="d-flex gap-1">
-                                                <a href="{{ $email->mailto_link }}" class="btn btn-outline-primary btn-sm flex-fill" style="font-size: 0.8rem; padding: 0.15rem 0.4rem;">
+                                                <a href="{{ $email->mailto_link }}" data-track="email_click" data-track-location="contact_modal" class="btn btn-outline-primary btn-sm flex-fill" style="font-size: 0.8rem; padding: 0.15rem 0.4rem;">
                                                     <i class="fa-regular fa-envelope me-1"></i> {{ __('store.contact.send_email') }}
                                                 </a>
                                                 <button type="button" class="btn btn-outline-secondary btn-sm copy-email" data-email="{{ $email->email }}" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('store.contact.copy') }}" style="font-size: 0.8rem; padding: 0.15rem 0.4rem;">

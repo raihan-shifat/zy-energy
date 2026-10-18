@@ -35,7 +35,7 @@
                         @endif
                         <h5 class="card-title">{{ $certName }}</h5>
                         @if ($certification->document_url)
-                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm mt-2" data-track="file_download" data-track-location="certification_page">
                                 <i class="fa-solid fa-file-pdf"></i> {{ __('store.certification.view_document') }}
                             </a>
                         @endif

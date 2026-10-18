@@ -203,7 +203,7 @@
                     @endphp
                     <div class="col-6 col-md-3 mb-3 text-center">
                         @if ($certification->document_url)
-                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" class="text-decoration-none">
+                            <a href="{{ asset('storage/' . $certification->document_url) }}" target="_blank" rel="noopener" class="text-decoration-none" data-track="file_download" data-track-location="home_certifications">
                         @endif
                             @if ($certification->image_url)
                                 <img src="{{ asset('storage/' . $certification->image_url) }}" alt="{{ $certName }}" loading="lazy" decoding="async"{!! image_size_attrs($certification->image_url) !!} style="max-height:70px; max-width:120px; width:auto; height:auto; object-fit:contain;">

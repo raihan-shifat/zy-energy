@@ -12,7 +12,7 @@
 @endphp
 <div class="quick-contact-row d-flex align-items-center gap-2 mt-3 flex-wrap">
     @if ($whatsappDigits !== '')
-        <a href="https://wa.me/{{ $whatsappDigits }}?text={{ urlencode($contactQuery) }}"
+        <a href="https://wa.me/{{ $whatsappDigits }}?text={{ urlencode($contactQuery) }}" data-track="whatsapp_click" data-track-location="quick_contact"
            target="_blank" rel="noopener" class="btn btn-success"
             title="{{ __('store.contact.whatsapp') }}">
             <i class="fab fa-whatsapp fs-5"></i>
@@ -27,7 +27,7 @@
     @endif
 
     @if ($contactEmail !== '')
-        <a href="mailto:{{ $contactEmail }}?subject={{ urlencode($contactQuery) }}"
+        <a href="mailto:{{ $contactEmail }}?subject={{ urlencode($contactQuery) }}" data-track="email_click" data-track-location="quick_contact"
            class="btn btn-outline-dark"
            title="{{ __('store.contact.email') }}">
             <i class="fa-regular fa-envelope fs-5"></i>
@@ -35,7 +35,7 @@
     @endif
 
     @if ($contactPhone !== '')
-        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}"
+        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}" data-track="phone_click" data-track-location="quick_contact"
            class="btn btn-outline-dark"
            title="{{ __('store.contact.phone') }}">
             <i class="fa-solid fa-phone fs-5"></i>

@@ -457,4 +457,14 @@ return [
         'sort_by' => 'Sort by',
         'rating' => 'Rating',
     ],
+
+    // Cookie notice (shown only when analytics is configured)
+    'consent' => [
+        'title' => 'Cookie notice',
+        'text' => 'We would like to use analytics cookies to understand how this site is used. They are only set if you accept.',
+        'accept' => 'Accept',
+        'decline' => 'Decline',
+        'more' => 'Cookie Policy',
+        'change' => 'Change cookie choice',
+    ],
 ];
