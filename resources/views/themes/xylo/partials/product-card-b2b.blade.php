@@ -26,7 +26,7 @@
         @if($cardDesc)
             <p class="text-muted small">{{ \Illuminate\Support\Str::limit($cardDesc, 80) }}</p>
         @endif
-        <div class="d-flex gap-2 mt-2">
+        <div class="product-actions d-flex gap-2">
             <a href="{{ route('product.show', $product->slug) }}" class="btn btn-outline-primary btn-sm">
                 <i class="fa-regular fa-eye"></i> {{ __('store.category.view_details') }}
             </a>

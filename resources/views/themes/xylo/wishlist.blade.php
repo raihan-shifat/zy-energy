@@ -16,7 +16,7 @@
 
                         <div class="product-img position-relative">
                             <img src="{{ asset('storage/' . (optional($product->thumbnail)->image_url ?? 'default.jpg')) }}"
-                                  alt="{{ localized_translation_value($product->translations, 'name', '') }}" style="object-fit: contain; width: 100%; height: 250px;">
+                                  alt="{{ localized_translation_value($product->translations, 'name', '') }}">
 
                             <!-- Same wishlist heart like homepage -->
                             <button class="wishlist-btn border-0 bg-transparent"

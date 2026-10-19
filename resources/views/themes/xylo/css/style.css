@@ -655,9 +655,6 @@ header {
         transition: 0.3s;
     /* border-radius: 20px; Curved Image */
 }
-.product-img:hover img{
-    transform: scale(1.1);
-}
 .wishlist-btn {
     position: absolute;
     top: 10px;

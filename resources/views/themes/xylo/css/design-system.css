@@ -293,6 +293,9 @@ section { padding-top: var(--section-y); padding-bottom: var(--section-y); }
 .cat-card .small { color: var(--brand-700); }
 
 /* ---------- Product cards ---------- */
+/* Shared by partials/product-card-b2b (category, shop, search, home) and wishlist.
+   The card fills its grid cell and stacks image / info; the info block grows so
+   the action buttons sit on the same line in every card of a row. */
 .product-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -301,26 +304,60 @@ section { padding-top: var(--section-y); padding-bottom: var(--section-y); }
     box-shadow: var(--shadow-sm);
     text-align: left;
     margin-bottom: 0;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    height: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.product-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    border-color: var(--brand-400);
+/* Real pointers only: on touch screens :hover sticks after a tap and left one
+   card with a permanent green border. No lift, so rows stay aligned. */
+@media (hover: hover) and (pointer: fine) {
+    .product-card:hover {
+        box-shadow: var(--shadow-md);
+        border-color: var(--brand-400);
+    }
 }
+/* Fixed-ratio box; the image is pinned to it so the <a>/<picture> wrappers and
+   the image's intrinsic size can never push it out of the card. */
 .product-img {
+    position: relative;
+    flex-shrink: 0;
+    width: 100%;
+    height: auto;
     aspect-ratio: 4 / 3;
     border-radius: var(--radius);
-    background: var(--surface-2);
+    background: transparent;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+.product-img > a {
+    position: absolute;
+    inset: 0;
+    display: block;
 }
 .product-img img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+    max-width: none;
     object-fit: contain;
+    object-position: center;
+}
+.product-info {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+.product-info h3 {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    min-height: calc(2em * 1.35);
+}
+.product-actions {
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.5rem;
 }
 .product-title {
     font-size: 1.05rem;
