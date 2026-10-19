@@ -1,6 +1,11 @@
 <?php
 
-return [
+// Machine-drafted (2026-10-19): every key in the "Machine-drafted" block at the end of
+// this file was translated by Claude from en/cms.php so zh has no missing keys.
+// Please have a native speaker review that block, then move reviewed keys up into
+// their groups. Hand-written keys above it are unchanged.
+
+$translations = [
     'auth' => [
         'login' => '登录',
         'email' => '电子邮件地址',
@@ -874,3 +879,138 @@ return [
         'scan_qr' => '扫描二维码在微信上与我们聊天。',
     ],
 ];
+
+// ---------------------------------------------------------------------------
+// Machine-drafted translations, pending native-speaker review.
+// ---------------------------------------------------------------------------
+return array_replace_recursive($translations, [
+    'dashboard' => [
+        'my_sales' => '我的销售',
+        'my_orders' => '我的订单',
+        'my_products' => '我的产品',
+    ],
+
+    'customers' => [
+        'customer_create' => '新增客户',
+        'password' => '密码',
+        'password_hint' => '至少 6 个字符。',
+        'confirm_password' => '确认密码',
+        'save' => '保存客户',
+        'cancel' => '取消',
+    ],
+
+    'products' => [
+        'select_category' => '选择分类',
+    ],
+
+    'social_media_links' => [
+        'types' => [
+            'wechat' => '微信',
+        ],
+    ],
+
+    'certifications' => [
+        'heading' => '认证',
+        'add_new' => '添加认证',
+        'edit' => '编辑认证',
+        'update' => '更新',
+        'create' => '创建',
+        'id' => 'ID',
+        'name' => '名称',
+        'logo' => '标志',
+        'document' => 'PDF / 文件',
+        'status' => '状态',
+        'action' => '操作',
+        'no_logo' => '无标志',
+        'choose_file' => '选择文件',
+        'confirm_delete' => '确认删除',
+        'confirm_delete_msg' => '确定要删除此认证吗？',
+        'delete' => '删除',
+        'cancel' => '取消',
+    ],
+
+    'news' => [
+        'heading' => '新闻',
+        'add_new' => '添加新闻',
+        'edit' => '编辑新闻',
+        'update' => '更新',
+        'create' => '创建',
+        'id' => 'ID',
+        'title' => '标题',
+        'slug' => '网址别名',
+        'excerpt' => '摘要',
+        'body' => '正文',
+        'image' => '图片',
+        'status' => '状态',
+        'action' => '操作',
+        'choose_file' => '选择文件',
+        'confirm_delete' => '确认删除',
+        'confirm_delete_msg' => '确定要删除这条新闻吗？',
+        'delete' => '删除',
+        'cancel' => '取消',
+    ],
+
+    'enquiries' => [
+        'heading' => '询价（RFQ 线索）',
+        'view' => '询价',
+        'all_status' => '全部状态',
+        'id' => 'ID',
+        'name' => '姓名',
+        'company' => '公司',
+        'email' => '邮箱',
+        'phone' => 'WhatsApp',
+        'country' => '国家',
+        'product' => '分类',
+        'source_page' => '来源',
+        'customer_enquiries' => '询价',
+        'status' => '状态',
+        'date' => '日期',
+        'message' => '留言',
+        'action' => '操作',
+        'update_status' => '更新状态',
+        'back' => '返回列表',
+        'confirm_delete' => '确认删除',
+        'confirm_delete_msg' => '确定要删除此询价吗？',
+        'delete' => '删除',
+        'cancel' => '取消',
+        'filter_email' => '按邮箱筛选',
+        'filter' => '筛选',
+        'clear' => '清除',
+        'export_csv' => '导出 CSV',
+    ],
+
+    'users' => [
+        'title_list' => '用户管理（管理员 / 经理）',
+        'title_create' => '新增用户',
+        'title_edit' => '编辑用户',
+        'id' => 'ID',
+        'name' => '姓名',
+        'email' => '邮箱',
+        'phone' => '电话',
+        'role' => '角色',
+        'status' => '状态',
+        'actions' => '操作',
+        'add_new' => '新增用户',
+        'password' => '密码',
+        'password_hint' => '至少 8 个字符，且至少包含一个符号。',
+        'password_edit_hint' => '留空则保留当前密码。',
+        'confirm_password' => '确认密码',
+        'save' => '保存用户',
+        'update' => '更新用户',
+        'cancel' => '取消',
+        'active' => '启用',
+        'inactive' => '停用',
+        'roles' => [
+            'admin' => '管理员',
+            'manager' => '经理',
+        ],
+        'success_created' => '用户创建成功。',
+        'success_updated' => '用户更新成功。',
+        'success_deleted' => '用户删除成功。',
+        'success' => '成功',
+        'error_delete' => '无法删除该用户。',
+        'delete' => '删除',
+        'modal_confirm_delete_title' => '确认删除',
+        'modal_confirm_delete_body' => '确定要删除该用户吗？此操作无法撤销。',
+    ],
+]);

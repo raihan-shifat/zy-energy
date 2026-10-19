@@ -1,6 +1,11 @@
 <?php
 
-return [
+// Machine-drafted (2026-10-19): every key in the "Machine-drafted" block at the end of
+// this file was translated by Claude from en/store.php so zh has no missing keys.
+// Please have a native speaker review that block, then move reviewed keys up into
+// their groups. Hand-written keys above it are unchanged.
+
+$translations = [
     'header' => [
         'top_bar_message' => '满 $50 订单免费配送 | 支持 | 门店查找',
         'search_placeholder' => '搜索产品',
@@ -15,7 +20,7 @@ return [
         'terms_of_service' => '服务条款',
         'follow_us' => '关注我们',
         'footer_logo_alt' => 'ZY Energy 底部logo',
-        'copyright' => '© 2026 ZY Energy. All Rights Reserved.',
+        'copyright' => '© 2026 ZY Energy. 保留所有权利。',
         'privacy_policy' => '隐私政策',
         'terms' => '使用条款',
         'cookie_policy' => 'Cookie 政策',
@@ -348,3 +353,152 @@ return [
         'change' => '更改 Cookie 选择',
     ],
 ];
+
+// ---------------------------------------------------------------------------
+// Machine-drafted translations, pending native-speaker review.
+// ---------------------------------------------------------------------------
+return array_replace_recursive($translations, [
+    'footer' => [
+        'about_text' => 'ZY Energy 是一家风力发电机、太阳能板、太阳能路灯、逆变器、电池以及离网/并网整体系统解决方案的制造商和出口商。',
+        'certification' => '认证',
+        'rated_power' => '额定功率',
+        'type' => '类型',
+    ],
+
+    'about_page' => [
+        'eyebrow' => '关于我们',
+        'title' => '以可靠的可再生能源系统，助力更清洁的未来',
+        'narrative' => 'ZY Energy 是一家风力发电机、太阳能板、太阳能路灯、逆变器、电池以及离网/并网整体系统解决方案的制造商和出口商。从单个部件到交钥匙电站，我们打造能够在最严苛环境中稳定运行的产品，并为每一批出货提供及时的出口支持。',
+        'narrative_lead' => '自创立之初，我们就专注于可再生能源产品的制造与出口。',
+        'mission_title' => '我们的使命',
+        'mission_text' => '通过高品质的制造和诚信、高效的合作，让全球企业和社区都能用上可靠、实惠的可再生能源。',
+        'vision_title' => '我们的愿景',
+        'vision_text' => '成为风能、太阳能和储能解决方案值得信赖的全球合作伙伴，帮助客户从依赖电网走向能源独立。',
+        'values_title' => '我们的价值观',
+        'values_list' => '品质绝不妥协|始终客户至上|每笔交易诚信为本|持续创新',
+        'strengths_heading' => '为什么选择与 ZY Energy 合作',
+        'strengths_subheading' => '面向 B2B 采购商、经销商和项目开发商的制造与出口合作伙伴。',
+        // Icon class names, not text: identical to en.
+        'strength_1_icon' => 'fa-solid fa-industry',
+        'strength_1_title' => 'OEM 与 ODM 制造',
+        'strength_1_text' => '在自有工厂按您的市场需求定制品牌、设计和规格。',
+        'strength_2_icon' => 'fa-solid fa-certificate',
+        'strength_2_title' => '认证品质',
+        'strength_2_text' => '产品按国际标准生产和测试，并提供出口所需的配套文件。',
+        'strength_3_icon' => 'fa-solid fa-earth-asia',
+        'strength_3_title' => '全球出口',
+        'strength_3_text' => '拥有向各大洲项目运送可再生能源设备的丰富经验。',
+        'strength_4_icon' => 'fa-solid fa-cubes',
+        'strength_4_title' => '完整系统解决方案',
+        'strength_4_text' => '风能、太阳能、风光互补及储能系统作为一个集成、兼容的整体进行设计。',
+        'strength_5_icon' => 'fa-solid fa-headset',
+        'strength_5_title' => '技术支持',
+        'strength_5_text' => '提供应用指导、安装文档和售后技术支持。',
+        'strength_6_icon' => 'fa-solid fa-truck-fast',
+        'strength_6_title' => '可靠交付',
+        'strength_6_text' => '交期明确、包装细致，从工厂到港口物流稳定可靠。',
+        'cta_title' => '准备开始您的项目了吗？',
+        'cta_text' => '与我们的出口团队沟通产品、OEM 需求或整套系统报价。',
+        'cta_quote' => '获取报价',
+        'cta_contact' => '联系我们',
+    ],
+
+    'product_detail' => [
+        'quote_text' => '本产品按询价报价。请联系我们的出口团队获取价格和规格。',
+        'specifications' => '技术参数',
+    ],
+
+    'shop' => [
+        'category' => '分类',
+        'series' => '系列',
+        'all_categories' => '全部分类',
+        'all_series' => '全部系列',
+        'sort_by' => '排序方式',
+        'newest' => '最新',
+        'name_asc' => '名称：A 到 Z',
+        'name_desc' => '名称：Z 到 A',
+        'filter' => '筛选',
+        'reset' => '重置',
+        'view_details' => '查看详情',
+        'enquiry' => '询价',
+        'no_products_found' => '未找到产品。',
+        'rated_power' => '额定功率',
+        'type' => '类型',
+    ],
+
+    'category' => [
+        'series' => '系列',
+        'type' => '类型',
+        'name_asc' => '名称：A 到 Z',
+        'name_desc' => '名称：Z 到 A',
+        'all' => '全部',
+        'all_series' => '全部系列',
+        'view_details' => '查看详情',
+        'enquiry' => '询价',
+    ],
+
+    'enquiry' => [
+        'title' => '发送询价',
+        'subtitle' => '请告诉我们您的需求，我们的出口团队将在 24 小时内回复您。',
+        'name' => '姓名',
+        'company' => '公司',
+        'email' => '邮箱',
+        'country' => '国家',
+        'product' => '产品',
+        'category' => '分类',
+        'select_category' => '请选择分类',
+        'message' => '留言',
+        'send' => '发送询价',
+        'close' => '关闭',
+        'success' => '谢谢！我们已收到您的询价，我们的团队会尽快与您联系。',
+        'select_product' => '请选择产品',
+        'placeholder_message' => '请描述产品、数量、规格、目的国等信息。',
+        'validation_name' => '请输入您的姓名。',
+        'validation_email' => '请输入有效的邮箱地址。',
+        'validation_message' => '请输入留言内容。',
+        'validation_phone' => '请输入有效的 WhatsApp 号码。',
+        'sending' => '发送中...',
+        'success_message' => '谢谢，我们将在 24 小时内回复您。',
+    ],
+
+    'certification' => [
+        'title' => '认证',
+        'subtitle' => '我们的产品均按照国际标准生产和测试。',
+        'view_document' => '查看文件',
+    ],
+
+    'contact' => [
+        'support' => '支持',
+        'copied' => '已复制！',
+        'subtitle' => '可通过微信、WhatsApp 或邮件联系我们的团队。',
+    ],
+
+    'news' => [
+        'title' => '新闻',
+        'read_more' => '阅读全文',
+        'back_to_news' => '返回新闻',
+        'no_posts' => '暂无新闻。',
+        'posted_on' => '发布于',
+    ],
+
+    'common' => [
+        'fix_errors' => '请修正以下错误。',
+        'something_wrong' => '出现错误，请重试。',
+    ],
+
+    'wishlist' => [
+        'add_to_cart_error' => '加入购物车失败',
+    ],
+
+    'a11y' => [
+        'breadcrumb' => '面包屑导航',
+    ],
+
+    'maintenance' => [
+        'page_title' => '维护中',
+        'heading' => '我们很快回来',
+        'text' => '我们正在对网站进行定期维护。感谢您的耐心等待，网站将很快恢复访问。',
+        'contact' => '需要帮助？请联系',
+        'logo_alt' => '标志',
+    ],
+]);
