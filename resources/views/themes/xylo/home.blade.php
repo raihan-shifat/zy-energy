@@ -88,8 +88,7 @@
                     : null;
 
                 $bannerData = $activeBanners->map(function ($banner) use ($heroProductImage) {
-                    $t = $banner->translations->firstWhere('language_code', app()->getLocale())
-                        ?? $banner->translations->first();
+                    $t = localized_translation($banner->translations);
                     return [
                         'title' => $t->title ?? __('store.home_b2b.hero_title'),
                         'subtitle' => html_entity_decode(strip_tags($t->subtitle ?? $t->description ?? __('store.home_b2b.hero_subtitle')), ENT_QUOTES, 'UTF-8'),

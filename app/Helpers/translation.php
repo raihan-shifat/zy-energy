@@ -152,18 +152,70 @@ if (! function_exists('application_language_options')) {
     }
 }
 
+if (! function_exists('log_translation_gap_once')) {
+    /**
+     * Log a missing translation once per day per $key, so a gap shows up in the
+     * logs without flooding them on every page view. Never breaks the page.
+     */
+    function log_translation_gap_once(string $key, string $message, array $context): void
+    {
+        static $seen = [];
+        if (isset($seen[$key])) {
+            return;
+        }
+        $seen[$key] = true;
+
+        try {
+            if (\Illuminate\Support\Facades\Cache::add('translation-gap:'.$key, true, now()->addDay())) {
+                \Illuminate\Support\Facades\Log::warning($message, $context);
+            }
+        } catch (\Throwable $e) {
+            // Logging a gap must never take the storefront down.
+        }
+    }
+}
+
+if (! function_exists('localized_translation')) {
+    /**
+     * The translation row for the current locale, else the fallback locale (en),
+     * else any row. A missing current-locale row is logged with its table and
+     * record ID so absent content (e.g. no zh product name) can be found.
+     */
+    function localized_translation($translations)
+    {
+        $translations = collect($translations ?? []);
+        $locale = app()->getLocale();
+
+        $translation = $translations->firstWhere('language_code', $locale);
+        if ($translation !== null || $translations->isEmpty()) {
+            return $translation;
+        }
+
+        $sample = $translations->first();
+        $table = $sample instanceof \Illuminate\Database\Eloquent\Model ? $sample->getTable() : 'unknown';
+        $attributes = $sample instanceof \Illuminate\Database\Eloquent\Model ? $sample->getAttributes() : (array) $sample;
+        $ownerKey = collect(array_keys($attributes))->first(fn ($k) => $k !== 'id' && str_ends_with($k, '_id'));
+        $recordId = $ownerKey ? ($attributes[$ownerKey] ?? null) : null;
+
+        log_translation_gap_once("row:{$locale}:{$table}:{$recordId}", 'Missing translation row, showing fallback', [
+            'locale' => $locale,
+            'table' => $table,
+            'record_key' => $ownerKey,
+            'record_id' => $recordId,
+        ]);
+
+        return $translations->firstWhere('language_code', config('app.fallback_locale', 'en'))
+            ?? $sample;
+    }
+}
+
 if (! function_exists('localized_translation_value')) {
     /**
      * Resolve a translated model attribute without forcing English first.
      */
     function localized_translation_value($translations, string $attribute, $fallback = null)
     {
-        $translations = collect($translations ?? []);
-        $translation = $translations->firstWhere('language_code', app()->getLocale())
-            ?? $translations->firstWhere('language_code', config('app.fallback_locale', 'en'))
-            ?? $translations->first();
-
-        return data_get($translation, $attribute, $fallback);
+        return data_get(localized_translation($translations), $attribute, $fallback);
     }
 }
 
@@ -201,10 +253,23 @@ if (! function_exists('load_translation_fallbacks')) {
                 return $result;
             };
 
+            $fallbackLines = $flatten($fallback, $group);
+            $currentLines = $flatten($current, $group);
+
+            $missingKeys = array_keys(array_diff_key($fallbackLines, $currentLines));
+            if ($missingKeys !== []) {
+                log_translation_gap_once("keys:{$locale}:{$group}", 'Missing translation keys, showing English', [
+                    'locale' => $locale,
+                    'file' => "{$group}.php",
+                    'count' => count($missingKeys),
+                    'keys' => array_slice($missingKeys, 0, 50),
+                ]);
+            }
+
             $translator = app('translator');
             $translator->load('*', $group, $locale);
-            $translator->addLines($flatten($fallback, $group), $locale);
-            $translator->addLines($flatten($current, $group), $locale);
+            $translator->addLines($fallbackLines, $locale);
+            $translator->addLines($currentLines, $locale);
         }
     }
 }
