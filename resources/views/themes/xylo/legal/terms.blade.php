@@ -1,58 +1,56 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', page_title('Terms of Use'))
-@section('meta_description', 'Terms of Use of '.$siteName.' (draft pending legal review).')
+@section('title', page_title(__('legal.terms.title')))
+@section('meta_description', __('legal.terms.meta_description', ['site' => $siteName]))
 {{-- Draft text: keep out of search results until it has been reviewed. Remove this line when approved. --}}
 @section('robots', 'noindex, follow')
 
 @section('content')
+@php
+    $privacyLink = '<a href="/privacy-policy">'.e(__('legal.common.privacy_link')).'</a>';
+    $cookieLink = '<a href="/cookie-policy">'.e(__('legal.common.cookie_link')).'</a>';
+@endphp
 <div class="container py-5" style="max-width: 860px;">
-    <h1 class="mb-4">Terms of Use</h1>
+    <h1 class="mb-4">{{ __('legal.terms.title') }}</h1>
 
     @include('themes.xylo.legal._draft-notice')
 
-    <p>
-        These terms apply to your use of this website, operated by {{ $siteName }}
-        ([company legal name], [registered address]).
-    </p>
+    <p>{{ __('legal.terms.intro', ['site' => $siteName]) }}</p>
 
-    <h2 class="h4 mt-5">Use of the website</h2>
-    <p>[Permitted use of the site and what is not allowed.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.terms.use_heading') }}</h2>
+    <p>{{ __('legal.terms.use_text') }}</p>
 
-    <h2 class="h4 mt-5">Product information and quotations</h2>
-    <p>
-        Product pages are for information. Prices are given on request through a quotation.
-        [State whether quotations are binding, how long they are valid, and which terms of sale apply to orders.]
-    </p>
+    <h2 class="h4 mt-5">{{ __('legal.terms.products_heading') }}</h2>
+    <p>{{ __('legal.terms.products_text') }}</p>
 
-    <h2 class="h4 mt-5">Data we collect</h2>
-    <p>How we handle personal data is described in the <a href="/privacy-policy">Privacy Policy</a>.</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.data_we_collect') }}</h2>
+    <p>{!! __('legal.terms.data_text', ['link' => $privacyLink]) !!}</p>
 
-    <h2 class="h4 mt-5">Cookies</h2>
-    <p>See the <a href="/cookie-policy">Cookie Policy</a>.</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.cookies') }}</h2>
+    <p>{!! __('legal.terms.cookies_text', ['link' => $cookieLink]) !!}</p>
 
-    <h2 class="h4 mt-5">Intellectual property</h2>
-    <p>[Ownership of the website content, logos and product images, and permitted use.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.terms.ip_heading') }}</h2>
+    <p>{{ __('legal.terms.ip_text') }}</p>
 
-    <h2 class="h4 mt-5">Liability</h2>
-    <p>[Limitation of liability, to be written by your legal adviser.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.terms.liability_heading') }}</h2>
+    <p>{{ __('legal.terms.liability_text') }}</p>
 
-    <h2 class="h4 mt-5">Governing law</h2>
-    <p>[Applicable law and competent courts.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.terms.law_heading') }}</h2>
+    <p>{{ __('legal.terms.law_text') }}</p>
 
-    <h2 class="h4 mt-5">Contact</h2>
+    <h2 class="h4 mt-5">{{ __('legal.common.contact') }}</h2>
     <p>
         @if ($contactEmail)
             <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>
         @else
-            [contact email]
+            {{ __('legal.common.contact_email_placeholder') }}
         @endif
         @if ($contactAddress)
-            <br>Address: {{ $contactAddress }}
+            <br>{{ __('legal.common.address', ['address' => $contactAddress]) }}
         @endif
     </p>
 
-    <h2 class="h4 mt-5">Last updated</h2>
-    <p>Draft prepared {{ $draftDate }}. [Replace with the date these terms are approved and published.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.last_updated') }}</h2>
+    <p>{{ __('legal.terms.draft_prepared', ['date' => $draftDate]) }}</p>
 </div>
 @endsection

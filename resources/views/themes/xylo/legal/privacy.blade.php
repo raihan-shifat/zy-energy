@@ -1,76 +1,61 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', page_title('Privacy Policy'))
-@section('meta_description', 'Privacy Policy of '.$siteName.' (draft pending legal review).')
+@section('title', page_title(__('legal.privacy.title')))
+@section('meta_description', __('legal.privacy.meta_description', ['site' => $siteName]))
 {{-- Draft text: keep out of search results until it has been reviewed. Remove this line when approved. --}}
 @section('robots', 'noindex, follow')
 
 @section('content')
+@php
+    $cookieLink = '<a href="/cookie-policy">'.e(__('legal.common.cookie_link')).'</a>';
+    $emailHtml = $contactEmail
+        ? '<a href="mailto:'.e($contactEmail).'">'.e($contactEmail).'</a>'
+        : e(__('legal.common.contact_email_placeholder'));
+@endphp
 <div class="container py-5" style="max-width: 860px;">
-    <h1 class="mb-4">Privacy Policy</h1>
+    <h1 class="mb-4">{{ __('legal.privacy.title') }}</h1>
 
     @include('themes.xylo.legal._draft-notice')
 
-    <p>
-        This policy explains how {{ $siteName }} ("we") handles personal data collected through this website.
-        Operator: [company legal name], [registered address], [registration number].
-    </p>
+    <p>{{ __('legal.privacy.intro', ['site' => $siteName]) }}</p>
 
-    <h2 class="h4 mt-5">Data we collect</h2>
-    <p>Based on how this website currently works, we collect:</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.data_we_collect') }}</h2>
+    <p>{{ __('legal.privacy.collect_intro') }}</p>
     <ul>
-        <li><strong>Enquiry form:</strong> name, company, email address, phone / WhatsApp number, country,
-            the product or category you ask about, your message, and the page the form was sent from.</li>
-        <li><strong>Customer account</strong> (only if you register): the details you enter in your profile.</li>
-        <li><strong>Visit log:</strong> for each visit, a session identifier, the date, your IP address and your
-            browser's user-agent string.</li>
-        <li><strong>Cookies:</strong> see the <a href="/cookie-policy">Cookie Policy</a>.</li>
+        <li>{!! __('legal.privacy.collect_enquiry') !!}</li>
+        <li>{!! __('legal.privacy.collect_account') !!}</li>
+        <li>{!! __('legal.privacy.collect_visits') !!}</li>
+        <li>{!! __('legal.privacy.collect_cookies', ['link' => $cookieLink]) !!}</li>
     </ul>
-    <p>[Add any other data collected offline or through other channels, e.g. email, WhatsApp, WeChat.]</p>
+    <p>{{ __('legal.privacy.collect_other') }}</p>
 
-    <h2 class="h4 mt-5">How we use it</h2>
+    <h2 class="h4 mt-5">{{ __('legal.common.how_we_use_it') }}</h2>
     <ul>
-        <li>To answer your enquiry and, if you ask for one, prepare a quotation.</li>
-        <li>To run and secure the website (for example, the visit log).</li>
-        <li>[Other purposes, if any, e.g. sending product updates - only with consent.]</li>
+        <li>{{ __('legal.privacy.use_enquiry') }}</li>
+        <li>{{ __('legal.privacy.use_security') }}</li>
+        <li>{{ __('legal.privacy.use_other') }}</li>
     </ul>
-    <p>[Legal basis for each purpose, how long each type of data is kept, who it is shared with
-        (e.g. hosting provider, email provider), and whether it is transferred outside your country.]</p>
+    <p>{{ __('legal.privacy.use_basis') }}</p>
 
-    <h2 class="h4 mt-5">Cookies</h2>
+    <h2 class="h4 mt-5">{{ __('legal.common.cookies') }}</h2>
     @if (analytics_config()['enabled'])
-        <p>
-            This website uses the cookies it needs to work (session, security and language choice) and,
-            only if you accept the cookie notice, Google Analytics cookies to measure how the site is used.
-            Analytics events do not include your name, email, phone number or message.
-            Details are in the <a href="/cookie-policy">Cookie Policy</a>.
-        </p>
+        <p>{!! __('legal.privacy.cookies_analytics', ['link' => $cookieLink]) !!}</p>
     @else
-        <p>
-            This website uses only the cookies it needs to work (session, security and language choice).
-            It does not use analytics or advertising cookies at this time.
-            Details are in the <a href="/cookie-policy">Cookie Policy</a>.
-        </p>
+        <p>{!! __('legal.privacy.cookies_essential', ['link' => $cookieLink]) !!}</p>
     @endif
 
-    <h2 class="h4 mt-5">Your rights</h2>
-    <p>[Rights available to you under applicable law, e.g. access, correction, deletion, objection,
-        and how to exercise them.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.privacy.rights_heading') }}</h2>
+    <p>{{ __('legal.privacy.rights_text') }}</p>
 
-    <h2 class="h4 mt-5">Contact</h2>
+    <h2 class="h4 mt-5">{{ __('legal.common.contact') }}</h2>
     <p>
-        For questions about this policy or your data, contact us
-        @if ($contactEmail)
-            at <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.
-        @else
-            at [contact email].
-        @endif
+        {!! __('legal.privacy.contact_text', ['email' => $emailHtml]) !!}
         @if ($contactAddress)
-            <br>Address: {{ $contactAddress }}
+            <br>{{ __('legal.common.address', ['address' => $contactAddress]) }}
         @endif
     </p>
 
-    <h2 class="h4 mt-5">Last updated</h2>
-    <p>Draft prepared {{ $draftDate }}. [Replace with the date this policy is approved and published.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.last_updated') }}</h2>
+    <p>{{ __('legal.common.draft_prepared', ['date' => $draftDate]) }}</p>
 </div>
 @endsection

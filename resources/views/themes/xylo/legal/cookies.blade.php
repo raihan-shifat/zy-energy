@@ -1,94 +1,81 @@
 @extends('themes.xylo.layouts.master')
 
-@section('title', page_title('Cookie Policy'))
-@section('meta_description', 'Cookie Policy of '.$siteName.' (draft pending legal review).')
+@section('title', page_title(__('legal.cookies.title')))
+@section('meta_description', __('legal.cookies.meta_description', ['site' => $siteName]))
 {{-- Draft text: keep out of search results until it has been reviewed. Remove this line when approved. --}}
 @section('robots', 'noindex, follow')
 
 @section('content')
+@php
+    $privacyLink = '<a href="/privacy-policy">'.e(__('legal.common.privacy_link')).'</a>';
+    $emailHtml = $contactEmail
+        ? '<a href="mailto:'.e($contactEmail).'">'.e($contactEmail).'</a>'
+        : e(__('legal.common.contact_email_placeholder'));
+@endphp
 <div class="container py-5" style="max-width: 860px;">
-    <h1 class="mb-4">Cookie Policy</h1>
+    <h1 class="mb-4">{{ __('legal.cookies.title') }}</h1>
 
     @include('themes.xylo.legal._draft-notice')
 
-    <p>This page lists the cookies this website sets and why.</p>
+    <p>{{ __('legal.cookies.intro') }}</p>
 
-    <h2 class="h4 mt-5">Data we collect with cookies</h2>
-    <p>The website sets these cookies. The first three are needed for the site to work:</p>
+    <h2 class="h4 mt-5">{{ __('legal.cookies.collect_heading') }}</h2>
+    <p>{{ __('legal.cookies.collect_intro') }}</p>
     <div class="table-responsive">
         <table class="table table-bordered align-middle">
             <thead>
                 <tr>
-                    <th scope="col">Cookie</th>
-                    <th scope="col">Purpose</th>
-                    <th scope="col">Duration</th>
+                    <th scope="col">{{ __('legal.cookies.col_cookie') }}</th>
+                    <th scope="col">{{ __('legal.cookies.col_purpose') }}</th>
+                    <th scope="col">{{ __('legal.cookies.col_duration') }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td><code>zy_energy_session</code></td>
-                    <td>Keeps your session (for example, the enquiry form and login) working between pages.</td>
-                    <td>2 hours</td>
+                    <td>{{ __('legal.cookies.session_purpose') }}</td>
+                    <td>{{ __('legal.cookies.duration_2_hours') }}</td>
                 </tr>
                 <tr>
                     <td><code>XSRF-TOKEN</code></td>
-                    <td>Security: protects forms against cross-site request forgery.</td>
-                    <td>2 hours</td>
+                    <td>{{ __('legal.cookies.xsrf_purpose') }}</td>
+                    <td>{{ __('legal.cookies.duration_2_hours') }}</td>
                 </tr>
                 <tr>
                     <td><code>locale</code></td>
-                    <td>Remembers the language you chose.</td>
-                    <td>1 year</td>
+                    <td>{{ __('legal.cookies.locale_purpose') }}</td>
+                    <td>{{ __('legal.cookies.duration_1_year') }}</td>
                 </tr>
                 @if (analytics_config()['enabled'])
                     <tr>
                         <td><code>_ga</code>, <code>_ga_*</code></td>
-                        <td>Google Analytics: counts visits and how the site is used. <strong>Only set if you accept</strong> the cookie notice.</td>
-                        <td>Up to 2 years [confirm in Google Analytics settings]</td>
+                        <td>{!! __('legal.cookies.ga_purpose') !!}</td>
+                        <td>{{ __('legal.cookies.duration_ga') }}</td>
                     </tr>
                 @endif
             </tbody>
         </table>
     </div>
     @if (analytics_config()['enabled'])
-        <p>
-            Analytics cookies are optional. Your choice is stored in your browser (localStorage, key
-            <code>zy_cookie_consent</code>). Analytics is not loaded until you accept.
-            Events we measure (for example "WhatsApp button clicked" or "enquiry form sent") do not include your name,
-            email, phone number or message.
-        </p>
+        <p>{!! __('legal.cookies.analytics_text', ['key' => '<code>zy_cookie_consent</code>']) !!}</p>
         <p><button type="button" class="btn btn-outline-primary btn-sm" data-cookie-settings>{{ __('store.consent.change') }}</button></p>
     @else
-        <p>We do not use analytics, advertising or social-media tracking cookies at this time.
-            If that changes, this page will be updated and you will be asked for consent first.</p>
+        <p>{{ __('legal.cookies.no_analytics_text') }}</p>
     @endif
 
-    <h2 class="h4 mt-5">How we use it</h2>
-    <p>These cookies are used only to provide the website you asked for. They are not used for profiling or advertising.</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.how_we_use_it') }}</h2>
+    <p>{{ __('legal.cookies.use_text') }}</p>
 
-    <h2 class="h4 mt-5">Third-party content</h2>
-    <p>
-        To display the site, your browser also loads files (fonts, scripts, icons, flag images) from third-party
-        services such as Google Fonts, jsDelivr, cdnjs, code.jquery.com and flagcdn.com. These services receive your
-        IP address when your browser requests the files. [Confirm whether this needs to be listed under applicable law.]
-    </p>
+    <h2 class="h4 mt-5">{{ __('legal.cookies.third_party_heading') }}</h2>
+    <p>{{ __('legal.cookies.third_party_text') }}</p>
 
-    <h2 class="h4 mt-5">Cookies</h2>
-    <p>You can block or delete cookies in your browser settings. If you block the essential cookies above,
-        forms and language selection may not work.</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.cookies') }}</h2>
+    <p>{{ __('legal.cookies.manage_text') }}</p>
 
-    <h2 class="h4 mt-5">Contact</h2>
-    <p>
-        Questions about cookies:
-        @if ($contactEmail)
-            <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.
-        @else
-            [contact email].
-        @endif
-        See also the <a href="/privacy-policy">Privacy Policy</a>.
-    </p>
+    <h2 class="h4 mt-5">{{ __('legal.common.contact') }}</h2>
+    <p>{!! __('legal.cookies.contact_text', ['email' => $emailHtml, 'link' => $privacyLink]) !!}</p>
 
-    <h2 class="h4 mt-5">Last updated</h2>
-    <p>Draft prepared {{ $draftDate }}. [Replace with the date this policy is approved and published.]</p>
+    <h2 class="h4 mt-5">{{ __('legal.common.last_updated') }}</h2>
+    <p>{{ __('legal.common.draft_prepared', ['date' => $draftDate]) }}</p>
 </div>
 @endsection
