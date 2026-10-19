@@ -391,6 +391,15 @@ return [
         'empty' => 'Your wishlist is empty.',
         'reviews' => 'Reviews',
         'add_to_cart' => 'Add to Cart',
+        'add_to_cart_error' => 'Error adding to cart',
+    ],
+
+    'maintenance' => [
+        'page_title' => 'Maintenance',
+        'heading' => "We'll be back soon",
+        'text' => "We're performing scheduled maintenance on our website. Thank you for your patience — we'll be back online shortly.",
+        'contact' => 'Need assistance? Contact us at',
+        'logo_alt' => 'Logo',
     ],
 
     'register' => [
@@ -427,6 +436,8 @@ return [
     ],
 
     'common' => [
+        'fix_errors' => 'Please fix the errors below.',
+        'something_wrong' => 'Something went wrong. Please try again.',
         'close' => 'Close',
         'cancel' => 'Cancel',
         'save' => 'Save',
@@ -441,6 +452,7 @@ return [
 
     // Accessible names for icon-only controls and hidden section headings
     'a11y' => [
+        'breadcrumb' => 'breadcrumb',
         'skip_to_content' => 'Skip to main content',
         'search' => 'Search',
         'search_products' => 'Search products',

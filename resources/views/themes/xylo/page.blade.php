@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     numberValid = true; // unknown validity: let it through rather than block
                 }
                 if (!numberValid) {
-                    toastr.error('Please enter a valid WhatsApp number.');
+                    toastr.error(@json(__('store.enquiry.validation_phone')));
                     phoneInput.classList.add('is-invalid');
                     return;
                 }
@@ -197,9 +197,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             input.parentNode.appendChild(feedback);
                         }
                     });
-                    toastr.error('Please fix the errors below.');
+                    toastr.error(@json(__('store.common.fix_errors')));
                 } else {
-                    toastr.error(err.message || 'Something went wrong. Please try again.');
+                    toastr.error(err.message || @json(__('store.common.something_wrong')));
                 }
             });
         });

@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
             }
         } else if (selectedGateway === "paypal") {
-            alert("Please complete payment with PayPal button");
+            alert(@json(__('store.checkout.paypal_instructions')));
         } else {
             form.submit();
         }

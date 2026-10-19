@@ -4,7 +4,7 @@
     @php $currency = activeCurrency(); @endphp
     <section class="breadcrumb-section">
         <div class="container">
-            <div class="breadcrumbs" aria-label="breadcrumb">
+            <div class="breadcrumbs" aria-label="{{ __('store.a11y.breadcrumb') }}">
                 <a href="{{ url('/') }}">{{ __('store.cart.breadcrumb_home') }}</a>
                 <i class="fa fa-angle-right"></i>
                 <span>{{ __('store.cart.breadcrumb_cart') }}</span>

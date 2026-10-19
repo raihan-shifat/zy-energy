@@ -30,7 +30,7 @@
 @section('content')
 <section class="breadcrumb-section">
     <div class="container">
-        <div class="breadcrumbs" aria-label="breadcrumb">
+        <div class="breadcrumbs" aria-label="{{ __('store.a11y.breadcrumb') }}">
             <a href="{{ url('/') }}">{{ __('store.product_detail.home') }}</a>
             <i class="fa fa-angle-right"></i>
             @foreach($breadcrumbs as $category)
