@@ -6,19 +6,19 @@
     <div class="container py-3">
         <!-- Row 2: Logo Left / Search Right -->
         <div class="row align-items-center">
-            <div class="col-md-4 col-6">
+            <div class="col-lg-5 col-md-6 col-12">
                 <a href="/" class="navbar-brand">
-                    {{-- Above the fold: not lazy. Height matches the 80px display width so no layout shift. --}}
+                    {{-- Above the fold: not lazy. width/height keep the aspect ratio; CSS sets the display height. --}}
                     @php $headerLogoSize = $siteSettings?->logo ? image_size_attrs($siteSettings->logo, 80) : ''; @endphp
-                    <img src="{{ $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('logo.png') }}" {!! $headerLogoSize !== '' ? trim($headerLogoSize) : 'width="80"' !!} decoding="async" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
+                    <img src="{{ $siteSettings?->logo ? asset('storage/' . $siteSettings->logo) : asset('logo.png') }}" {!! $headerLogoSize !== '' ? trim($headerLogoSize) : 'width="80"' !!} class="brand-logo" decoding="async" alt="{{ $siteSettings->site_name ?? config('app.name') }}" />
                     @if($siteSettings?->header_brand_name_image)
-                        <img src="{{ asset('storage/' . $siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="ms-2 align-middle" decoding="async"{!! image_size_attrs($siteSettings->header_brand_name_image) !!} style="max-height: 40px; max-width: 180px; width: auto; height: auto; object-fit: contain;">
+                        <img src="{{ asset('storage/' . $siteSettings->header_brand_name_image) }}" alt="{{ $siteSettings->site_name ?? config('app.name') }}" class="brand-name" decoding="async"{!! image_size_attrs($siteSettings->header_brand_name_image) !!}>
                     @elseif($siteSettings?->site_name)
-                        <span class="ms-2 align-middle fw-semibold">{{ $siteSettings->site_name }}</span>
+                        <span class="brand-name-text fw-semibold">{{ $siteSettings->site_name }}</span>
                     @endif
                 </a>
             </div>
-            <div class="col-md-8 col-6 text-end">
+            <div class="col-lg-7 col-md-6 col-12 mt-3 mt-md-0 text-end">
                 <form class="d-flex justify-content-end" action="{{ url('/search') }}" method="GET">
                     <div class="input-group search-input-width">
                         <input type="text" class="form-control" id="search-input"  name="q" placeholder="{{ __('store.header.search_placeholder') }}" aria-label="{{ __('store.a11y.search_products') }}">

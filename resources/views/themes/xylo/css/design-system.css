@@ -444,7 +444,39 @@ header {
     padding-bottom: 0;
     text-transform: none;
 }
-header .navbar-brand img { width: 84px; height: auto; }
+/* Logo + brand-name image. Both images carry built-in whitespace, so they are
+   sized by height. On phones the brand row spans the full width (search below). */
+header .navbar-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: 100%;
+    margin-right: 0;
+}
+header .navbar-brand .brand-logo { height: 64px; width: auto; flex-shrink: 0; }
+header .navbar-brand .brand-name {
+    height: 42px;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    object-fit: contain;
+}
+header .navbar-brand .brand-name-text { font-size: 1.25rem; color: var(--ink-900); }
+.search-input-width { width: 100%; max-width: 380px; }
+@media (max-width: 1199.98px) {
+    header .navbar-brand .brand-logo { height: 52px; }
+    header .navbar-brand .brand-name { height: 32px; }
+}
+@media (max-width: 991.98px) {
+    header .navbar-brand .brand-logo { height: 48px; }
+    header .navbar-brand .brand-name { height: 28px; }
+}
+@media (max-width: 575.98px) {
+    header .navbar-brand { gap: 0.5rem; }
+    header .navbar-brand .brand-logo { height: 48px; }
+    header .navbar-brand .brand-name { height: 30px; }
+    .search-input-width { max-width: none; }
+}
 header nav ul li a,
 header .nav-link,
 .menu-text-color {
