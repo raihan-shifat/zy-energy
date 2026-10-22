@@ -99,16 +99,101 @@ class AdminProductCreateTest extends TestCase
         $this->assertNotSame('', $product->slug);
     }
 
-    public function test_product_saves_with_images(): void
+    /** Upload through the gallery endpoint like the admin UI does; returns the storage path. */
+    private function uploadGalleryImage(string $name = 'a.jpg'): string
     {
-        $response = $this->store($this->payload([
-            'images' => [UploadedFile::fake()->image('a.jpg', 600, 600), UploadedFile::fake()->image('b.png', 300, 300)],
-        ]));
+        return $this->actingAs($this->admin)
+            ->post(route('admin.products.upload-image'), ['upload' => UploadedFile::fake()->image($name, 600, 600)])
+            ->assertOk()
+            ->json('path');
+    }
 
-        $response->assertRedirect(route('admin.products.index'));
+    private function galleryPayload(array $paths, int $primary = 0): array
+    {
+        return [
+            'gallery_present' => '1',
+            'gallery' => array_map(fn ($p) => ['path' => $p], $paths),
+            'gallery_primary' => (string) $primary,
+        ];
+    }
+
+    public function test_product_saves_with_ordered_images_and_chosen_cover(): void
+    {
+        $paths = [$this->uploadGalleryImage('a.jpg'), $this->uploadGalleryImage('b.png'), $this->uploadGalleryImage('c.webp')];
+
+        $this->store($this->payload() + $this->galleryPayload($paths, 1))
+            ->assertRedirect(route('admin.products.index'));
+
+        $product = Product::with('images', 'thumbnail')->latest('id')->first();
+        $this->assertSame($paths, $product->images->pluck('image_url')->all());
+        $this->assertSame([0, 1, 2], $product->images->pluck('sort_order')->all());
+        $this->assertSame([false, true, false], $product->images->pluck('is_primary')->all());
+        $this->assertSame($paths[1], $product->thumbnail->image_url);
+        Storage::disk('public')->assertExists($paths[0]);
+    }
+
+    public function test_gallery_upload_accepts_jpg_png_webp_only(): void
+    {
+        $this->assertStringStartsWith('products/', $this->uploadGalleryImage('x.png'));
+
+        $this->actingAs($this->admin)
+            ->postJson(route('admin.products.upload-image'), ['upload' => UploadedFile::fake()->image('anim.gif')])
+            ->assertStatus(422)
+            ->assertJsonPath('error.message', __('cms.products.gallery_bad_type'));
+    }
+
+    public function test_gallery_is_limited_to_eight_images_and_rejects_foreign_paths(): void
+    {
+        $nine = array_map(fn ($i) => 'products/x'.$i.'.jpg', range(1, 9));
+        $this->store($this->payload() + $this->galleryPayload($nine))
+            ->assertSessionHasErrors(['gallery' => __('cms.products.gallery_too_many', ['max' => 8])]);
+
+        $this->store($this->payload() + $this->galleryPayload(['../.env']))
+            ->assertSessionHasErrors('gallery.0.path');
+    }
+
+    public function test_edit_reorders_changes_cover_and_removes_images(): void
+    {
+        $paths = [$this->uploadGalleryImage('a.jpg'), $this->uploadGalleryImage('b.jpg'), $this->uploadGalleryImage('c.jpg')];
+        $this->store($this->payload() + $this->galleryPayload($paths));
         $product = Product::with('images')->latest('id')->first();
-        $this->assertCount(2, $product->images);
-        Storage::disk('public')->assertExists($product->images->first()->image_url);
+        [$a, $b, $c] = $product->images->all();
+
+        // New order: c, a (b removed), plus one new upload; cover = a.
+        $new = $this->uploadGalleryImage('d.jpg');
+        $this->actingAs($this->admin)->put(route('admin.products.update', $product->id), $this->payload() + [
+            'gallery_present' => '1',
+            'gallery' => [['id' => $c->id], ['id' => $a->id], ['path' => $new]],
+            'gallery_primary' => '1',
+        ])->assertRedirect();
+
+        $images = $product->fresh()->images;
+        $this->assertSame([$c->image_url, $a->image_url, $new], $images->pluck('image_url')->all());
+        $this->assertSame($a->id, $product->fresh()->thumbnail->id);
+        $this->assertNull(\App\Models\ProductImage::find($b->id));
+        Storage::disk('public')->assertMissing($b->image_url);
+
+        // A form without the gallery marker (old cached page) must not touch the images.
+        $this->actingAs($this->admin)->put(route('admin.products.update', $product->id), $this->payload())->assertRedirect();
+        $this->assertCount(3, $product->fresh()->images);
+    }
+
+    public function test_storefront_gallery_for_zero_one_and_many_images(): void
+    {
+        $cases = [0 => [], 1 => [$this->uploadGalleryImage('one.jpg')], 3 => [$this->uploadGalleryImage('p.jpg'), $this->uploadGalleryImage('q.jpg'), $this->uploadGalleryImage('r.jpg')]];
+
+        foreach ($cases as $count => $paths) {
+            $this->store($this->payload() + $this->galleryPayload($paths))->assertRedirect();
+            $page = $this->get(route('product.show', Product::latest('id')->value('slug')))->assertOk()->getContent();
+            $this->assertStringContainsString('class="pg"', $page, "gallery for {$count} images");
+            $this->assertStringNotContainsString('class="product-slider"', $page); // old Slick slider markup is gone
+            // Only the gallery markup (other product cards on the page may use the placeholder too).
+            $html = substr($page, strpos($page, 'class="pg"'), strpos($page, '<style>', strpos($page, 'class="pg"')) - strpos($page, 'class="pg"'));
+
+            $this->assertSame($count > 1 ? $count : 0, substr_count($html, 'class="pg-thumb '), "thumbnails for {$count} images");
+            $this->assertSame($count > 1, str_contains($html, 'data-pg-next'), "arrows for {$count} images");
+            $this->assertSame($count === 0, str_contains($html, 'images/product-placeholder.svg'), "placeholder for {$count} images");
+        }
     }
 
     public function test_slug_is_unique_and_never_empty(): void
