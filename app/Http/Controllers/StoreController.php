@@ -11,7 +11,11 @@ class StoreController extends Controller
     public function index()
     {
         $banners = getActiveBanners();
-        $categories = getActiveCategories()->take(7);
+        // All active categories in admin order; optional cap via HOME_CATEGORIES_LIMIT (was a fixed 7).
+        $categories = getActiveCategories();
+        if (($limit = config('storefront.home_categories_limit')) > 0) {
+            $categories = $categories->take($limit);
+        }
         $products = getHomepageProducts();
         $certifications = getActiveCertifications();
         $newsPosts = getHomepageNews();

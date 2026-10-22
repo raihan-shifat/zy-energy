@@ -387,17 +387,18 @@
     @endif
     {{-- Hero Section End --}}
 
-    {{-- Product Categories Grid (7 tiles, admin-managed categories) --}}
+    {{-- Product Categories Grid (all active categories, admin-managed): 4 per row on desktop,
+         2 on tablet and phone; a partial last row is centred so no card is left alone at the edge. --}}
     <section class="cat-slider animate-on-scroll">
         <div class="container">
             <h2 class="text-start pb-3 sec-heading">{{ __('store.home_b2b.categories') }}</h2>
             <p class="text-muted mb-4">{{ __('store.home_b2b.categories_subtitle') }}</p>
-            <div class="row">
+            <div class="row justify-content-center">
                 @foreach($categories as $category)
                     @php
                         $catName = localized_translation_value($category->translations, 'name', $category->slug);
                     @endphp
-                    <div class="col-6 col-md-3 mb-4">
+                    <div class="col-6 col-lg-3 mb-4">
                         <div class="cat-card h-100">
                             <a href="{{ route('category.show', $category->slug) }}" class="text-decoration-none d-block h-100">
                                 @php
