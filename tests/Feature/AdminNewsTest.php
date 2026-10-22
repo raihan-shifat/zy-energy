@@ -101,26 +101,91 @@ class AdminNewsTest extends TestCase
             ->assertSessionHasErrors('translations.en.excerpt');
     }
 
-    public function test_edit_keeps_or_replaces_the_image(): void
+    private function upload(string $name = 'a.jpg'): string
     {
-        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload() + ['image_url' => UploadedFile::fake()->image('a.png')]);
+        return $this->actingAs($this->admin)
+            ->post(route('admin.news.upload-image'), ['upload' => UploadedFile::fake()->image($name, 800, 600)])
+            ->assertOk()->json('path');
+    }
+
+    private function gallery(array $items, int $primary = 0): array
+    {
+        return ['gallery_present' => '1', 'gallery' => $items, 'gallery_primary' => (string) $primary];
+    }
+
+    public function test_news_image_upload_endpoint_checks_type_and_size(): void
+    {
+        $this->assertStringStartsWith('news/', $this->upload('ok.webp'));
+
+        $this->actingAs($this->admin)->postJson(route('admin.news.upload-image'), ['upload' => UploadedFile::fake()->image('anim.gif')])
+            ->assertStatus(422)->assertJsonPath('error.message', __('cms.news.image_bad_type'));
+        $this->actingAs($this->admin)->postJson(route('admin.news.upload-image'), ['upload' => UploadedFile::fake()->image('big.jpg')->size(3000)])
+            ->assertStatus(422)->assertJsonPath('error.message', fn ($m) => str_contains($m, '2 MB'));
+    }
+
+    public function test_multiple_images_cover_reorder_remove_and_keep(): void
+    {
+        [$a, $b, $c] = [$this->upload('a.jpg'), $this->upload('b.png'), $this->upload('c.webp')];
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload() + $this->gallery([['path' => $a], ['path' => $b], ['path' => $c]], 1))
+            ->assertRedirect(route('admin.news.index'));
+
+        $news = News::with('images')->latest('id')->first();
+        $this->assertSame([$a, $b, $c], $news->images->pluck('path')->all());
+        $this->assertSame($b, $news->coverPath());
+        $this->assertSame($b, $news->image_url, 'old column follows the cover');
+
+        // The edit page lists the existing images in the manager.
+        $this->actingAs($this->admin)->get(route('admin.news.edit', $news->id))->assertOk()
+            ->assertSee(json_encode(asset('storage/'.$c)), false);
+
+        // Reorder (c, a), remove b, add d, cover = d.
+        $ids = $news->images->pluck('id', 'path');
+        $d = $this->upload('d.jpg');
+        $this->actingAs($this->admin)->put(route('admin.news.update', $news->id), $this->payload()
+            + $this->gallery([['id' => $ids[$c]], ['id' => $ids[$a]], ['path' => $d]], 2))->assertRedirect();
+        $news = $news->fresh('images');
+        $this->assertSame([$c, $a, $d], $news->images->pluck('path')->all());
+        $this->assertSame($d, $news->coverPath());
+        Storage::disk('public')->assertMissing($b);   // not used anywhere else
+
+        // Saving without the image list (old cached form) keeps every image.
+        $this->actingAs($this->admin)->put(route('admin.news.update', $news->id), $this->payload())->assertRedirect();
+        $this->assertCount(3, $news->fresh()->images);
+
+        // Max 8 images.
+        $nine = array_map(fn ($i) => ['path' => 'news/x'.$i.'.jpg'], range(1, 9));
+        $this->actingAs($this->admin)->put(route('admin.news.update', $news->id), $this->payload() + $this->gallery($nine))
+            ->assertSessionHasErrors(['gallery' => __('cms.news.gallery_too_many', ['max' => 8])]);
+    }
+
+    public function test_removed_image_file_is_kept_when_used_elsewhere(): void
+    {
+        $shared = $this->upload('shared.jpg');
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload() + $this->gallery([['path' => $shared]]));
+        $first = News::latest('id')->first();
+        // Another post still points at the same file through the old column.
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload());
+        News::latest('id')->first()->forceFill(['image_url' => $shared])->save();
+
+        $this->actingAs($this->admin)->put(route('admin.news.update', $first->id), $this->payload() + $this->gallery([]))->assertRedirect();
+        $this->assertCount(0, $first->fresh()->images);
+        Storage::disk('public')->assertExists($shared);
+    }
+
+    public function test_public_gallery_and_list_placeholder(): void
+    {
+        [$a, $b, $c] = [$this->upload('a.jpg'), $this->upload('b.jpg'), $this->upload('c.jpg')];
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload() + $this->gallery([['path' => $a], ['path' => $b], ['path' => $c]]));
         $news = News::latest('id')->first();
-        $original = $news->image_url;
 
-        $this->actingAs($this->admin)->get(route('admin.news.edit', $news->id))
-            ->assertOk()
-            ->assertSee('storage/'.$original, false)
-            ->assertSee(__('cms.news.image_current_hint'));
+        $html = $this->get(route('news.show', $news->slug))->assertOk()->getContent();
+        $this->assertStringContainsString('class="news-cover', $html);
+        $this->assertStringContainsString('storage/'.$a, $html);
+        $this->assertSame(2, substr_count($html, 'class="news-gallery-item"'), 'cover + 2 gallery images');
+        $this->assertMatchesRegularExpression('#storage/'.preg_quote($b, '#').'"[^>]*loading="lazy"#', $html);
 
-        // No new file: the image stays.
-        $this->actingAs($this->admin)->put(route('admin.news.update', $news->id), $this->payload())
-            ->assertRedirect(route('admin.news.index'))->assertSessionHas('success', 'Post updated successfully.');
-        $this->assertSame($original, $news->fresh()->image_url);
-
-        // New file: replaced.
-        $this->actingAs($this->admin)->put(route('admin.news.update', $news->id), $this->payload() + ['image_url' => UploadedFile::fake()->image('b.webp')]);
-        $this->assertNotSame($original, $news->fresh()->image_url);
-        Storage::disk('public')->assertExists($news->fresh()->image_url);
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload(['translations' => ['en' => ['title' => 'No image post '.uniqid()]]]));
+        $this->assertStringContainsString('images/product-placeholder.svg', $this->get(route('news.index'))->getContent());
     }
 
     public function test_slug_is_unique_and_survives_non_latin_titles(): void
