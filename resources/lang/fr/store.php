@@ -18,7 +18,7 @@ return [
         'copyright' => '© 2026 ZY Energy. All Rights Reserved.',
         'maintained_by' => 'Créé et maintenu par',
         'quick_links' => 'Liens rapides',
-        'home' => 'Accueil', 'products' => 'Produits', 'news' => 'Actualités', 'about' => 'À propos', 'contact' => 'Contact',
+        'home' => 'Accueil', 'products' => 'Produits', 'news' => 'Actualités & Blog', 'about' => 'À propos', 'contact' => 'Contact',
         'address' => 'Adresse', 'social_connect' => 'Réseaux sociaux',
         'wechat_qr_title' => 'Scannez notre WeChat', 'wechat_qr_hint' => 'Ouvrez WeChat et scannez pour contacter notre équipe.',
     ],

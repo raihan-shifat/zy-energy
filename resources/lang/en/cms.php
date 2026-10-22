@@ -50,9 +50,9 @@ return [
             'list' => 'List',
         ],
         'news' => [
-            'title' => 'News',
-            'add_new' => 'Add New',
-            'list' => 'List',
+            'title' => 'News & Blog',
+            'add_new' => 'Add Post',
+            'list' => 'All Posts',
         ],
         'enquiries' => [
             'title' => 'Enquiries',
@@ -907,9 +907,9 @@ return [
     ],
 
     'news' => [
-        'heading' => 'News',
-        'add_new' => 'Add News',
-        'edit' => 'Edit News',
+        'heading' => 'News & Blog',
+        'add_new' => 'Add Post',
+        'edit' => 'Edit Post',
         'update' => 'Update',
         'create' => 'Create',
         'id' => 'ID',

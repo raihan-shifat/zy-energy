@@ -17,7 +17,7 @@ return [
         'footer_logo_alt' => 'شعار ذيل صفحة فيلستور',
         'copyright' => '© 2026 ZY Energy. All Rights Reserved.',
         'maintained_by' => 'تم الإنشاء والصيانة بواسطة', 'quick_links' => 'روابط سريعة', 'home' => 'الرئيسية', 'products' => 'المنتجات',
-        'news' => 'الأخبار', 'about' => 'من نحن', 'contact' => 'اتصل بنا', 'address' => 'العنوان', 'social_connect' => 'التواصل الاجتماعي',
+        'news' => 'الأخبار والمدونة', 'about' => 'من نحن', 'contact' => 'اتصل بنا', 'address' => 'العنوان', 'social_connect' => 'التواصل الاجتماعي',
         'wechat_qr_title' => 'امسح رمز WeChat', 'wechat_qr_hint' => 'افتح WeChat وامسح الرمز للتواصل مع فريقنا.',
     ],
 

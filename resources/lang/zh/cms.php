@@ -131,9 +131,9 @@ $translations = [
         ],
 
         'news' => [
-            'title' => '新闻',
-            'add_new' => '新增',
-            'list' => '列表',
+            'title' => '新闻与博客',
+            'add_new' => '发布文章',
+            'list' => '文章列表',
         ],
 
         'enquiries' => [
@@ -957,9 +957,9 @@ return array_replace_recursive($translations, [
     ],
 
     'news' => [
-        'heading' => '新闻',
-        'add_new' => '添加新闻',
-        'edit' => '编辑新闻',
+        'heading' => '新闻与博客',
+        'add_new' => '发布文章',
+        'edit' => '编辑文章',
         'update' => '更新',
         'create' => '创建',
         'id' => 'ID',
