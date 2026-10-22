@@ -24,7 +24,10 @@ class PageController extends Controller
         }
 
         if ($page->slug === 'about') {
-            return view('themes.xylo.about', compact('page', 'translation'))
+            // Content comes from the About Us editor (admin → Pages → About Us), cached until saved.
+            $sections = app(\App\Services\AboutPageService::class)->sections();
+
+            return view('themes.xylo.about', compact('page', 'translation', 'sections'))
                 ->with('siteSettings', getSiteSettings());
         }
 
