@@ -27,7 +27,10 @@
         <small class="text-muted d-block mb-4">{{ \format_date($post->created_at) }}</small>
 
         @if ($post->image_url)
-            <img src="{{ asset('storage/' . $post->image_url) }}" alt="{{ __('store.news.title') }}" class="img-fluid rounded mb-4" style="max-height:400px; object-fit:cover; width:100%;">
+            {{-- Fixed 16:9 box, whole image visible (same sizing approach as the product gallery). --}}
+            <div class="news-cover mb-4">
+                <img src="{{ asset('storage/' . $post->image_url) }}" alt="{{ $postTitle }}" width="1200" height="675" decoding="async" fetchpriority="high">
+            </div>
         @endif
 
         @if ($postExcerpt)
@@ -41,4 +44,13 @@
         <a href="{{ route('news.index') }}" class="btn btn-outline-primary mt-4">← {{ __('store.news.back_to_news') }}</a>
     </article>
 </div>
+
+<style>
+    .news-cover { aspect-ratio: 16 / 9; max-height: 480px; width: 100%; display: flex; align-items: center; justify-content: center;
+        background: var(--surface-2, #f4f7f5); border: 1px solid var(--line, #dfe7e2); border-radius: var(--radius-lg, 16px); overflow: hidden; }
+    .news-cover img { width: 100%; height: 100%; object-fit: contain; }
+    /* Images inserted in the body editor: never wider than the article. */
+    .news-body img { max-width: 100%; height: auto; }
+    .news-body figure.image { margin: 1.5rem auto; max-width: 100%; text-align: center; }
+</style>
 @endsection
