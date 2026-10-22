@@ -42,20 +42,47 @@ class NewsController extends Controller
         return view('admin.news.create', compact('languages'));
     }
 
-    public function store(Request $request)
+    /**
+     * Shared create/update validation. Title and body are required in the default
+     * language (a post without both is never shown on the public site). The cover
+     * image follows the same type/size limit as the other admin image uploads.
+     */
+    private function validateNews(Request $request): void
     {
-        $rules = [
-            'image_url' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10000',
-            'translations' => 'required|array',
-        ];
+        $default = config('app.fallback_locale', 'en');
+        $maxKb = intdiv(\App\Http\Controllers\Admin\EditorImageController::maxBytes(), 1024);
+        $maxLabel = \App\Http\Controllers\Admin\EditorImageController::humanLimit();
 
-        foreach ($request->input('translations', []) as $lang => $data) {
-            $rules["translations.$lang.title"] = 'nullable|string|max:255';
+        $rules = [
+            'image_url' => 'nullable|file|image|mimes:jpeg,png,jpg,webp|max:'.$maxKb,
+            'translations' => 'required|array',
+            "translations.$default.title" => 'required|string|max:255',
+            "translations.$default.body" => 'required|string',
+        ];
+        $attributes = ['image_url' => __('cms.news.image')];
+
+        foreach (array_unique(array_merge([$default], array_keys((array) $request->input('translations', [])))) as $lang) {
+            $rules["translations.$lang.title"] ??= 'nullable|string|max:255';
             // Catch oversized excerpts as a clear validation error instead of a raw SQL truncation crash
             $rules["translations.$lang.excerpt"] = 'nullable|string|max:500';
+            $rules["translations.$lang.body"] ??= 'nullable|string';
+            $attributes["translations.$lang.title"] = __('cms.news.title')." ($lang)";
+            $attributes["translations.$lang.excerpt"] = __('cms.news.excerpt')." ($lang)";
+            $attributes["translations.$lang.body"] = __('cms.news.body')." ($lang)";
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            // PHP refused the file (bigger than upload_max_filesize): say so instead of "failed to upload".
+            'image_url.uploaded' => __('cms.news.image_too_large', ['size' => $maxLabel]),
+            'image_url.max' => __('cms.news.image_too_large', ['size' => $maxLabel]),
+            'image_url.image' => __('cms.news.image_bad_type'),
+            'image_url.mimes' => __('cms.news.image_bad_type'),
+        ], $attributes);
+    }
+
+    public function store(Request $request)
+    {
+        $this->validateNews($request);
 
         $enTitle = $request->translations['en']['title'] ?? $request->translations[config('app.locale')]['title'] ?? 'news';
         $slug = $this->generateUniqueSlug($enTitle);
@@ -75,7 +102,7 @@ class NewsController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.news.index')->with('success', 'News created successfully.');
+        return redirect()->route('admin.news.index')->with('success', __('cms.news.created'));
     }
 
     public function show($id)
@@ -94,18 +121,7 @@ class NewsController extends Controller
     {
         $news = News::findOrFail($id);
 
-        $rules = [
-            'image_url' => 'nullable|file|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10000',
-            'translations' => 'required|array',
-        ];
-
-        foreach ($request->input('translations', []) as $lang => $data) {
-            $rules["translations.$lang.title"] = 'nullable|string|max:255';
-            // Catch oversized excerpts as a clear validation error instead of a raw SQL truncation crash
-            $rules["translations.$lang.excerpt"] = 'nullable|string|max:500';
-        }
-
-        $request->validate($rules);
+        $this->validateNews($request);
 
         $data = ['status' => $request->has('status') ? 1 : 0];
 
@@ -125,7 +141,7 @@ class NewsController extends Controller
             );
         }
 
-        return redirect()->route('admin.news.index')->with('success', 'News updated successfully.');
+        return redirect()->route('admin.news.index')->with('success', __('cms.news.updated'));
     }
 
     public function destroy($id)
