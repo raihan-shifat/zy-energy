@@ -79,7 +79,7 @@
                         <option value="">{{ __('cms.products.select_category') ?? 'Select Category' }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->translation->name ?? '—' }}
+                                {{ localized_translation_value($category->translations, 'name', '—') }}
                             </option>
                         @endforeach
                     </select>
@@ -93,7 +93,7 @@
                         <option value="">{{ __('cms.products.no_brand') }}</option>
                         @foreach($brands as $brand)
                             <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                {{ $brand->translation->name ?? '—' }}
+                                {{ ($brand->translations->firstWhere('locale', app()->getLocale()) ?? $brand->translations->firstWhere('locale', 'en') ?? $brand->translations->first())?->name ?? '—' }}
                             </option>
                         @endforeach
                     </select>
@@ -162,7 +162,7 @@
                             opt.textContent = t;
                             typeSelect.appendChild(opt);
                         });
-                        var oldType = "@php echo old('type', ''); @endphp";
+                        var oldType = @json(old('type', ''));
                         if (oldType) { typeSelect.value = oldType; }
                     }
                 });
@@ -220,7 +220,7 @@
                         </div>
                         <div class="col-md-4 mt-2">
                             <label>{{ __('cms.products.weight') }}</label>
-                            <input type="text" name="variants[__INDEX__][weight]" class="form-control" placeholder="e.g., 1.5 kg" value="__WEIGHT__" />
+                            <input type="text" name="variants[__INDEX__][weight]" class="form-control" placeholder="{{ __('cms.products.weight_placeholder') }}" value="__WEIGHT__" />
                         </div>
                         <div class="col-md-4 mt-2">
                             <label>{{ __('cms.products.dimension') }}</label>
@@ -290,8 +290,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let validationErrors = @json($errors->getMessages());
 
     function updateRemoveButtonState() {
+        // A product needs at least one variant, so the last one cannot be removed.
         const count = $('#variants-wrapper .variant-item').length;
-        $('#remove-variant-btn').prop('disabled', count === 0);
+        $('#remove-variant-btn').prop('disabled', count <= 1);
     }
 
     function addVariant(variant = {}, index = variantIndex) {
@@ -352,7 +353,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#add-variant-btn').click(() => addVariant());
         $('#remove-variant-btn').click(() => {
             const $variants = $('#variants-wrapper .variant-item');
-            if ($variants.length > 0) {
+            if ($variants.length > 1) {
                 $variants.last().remove();
                 variantIndex--;
                 updateRemoveButtonState();
@@ -385,6 +386,9 @@ let selectedFiles = [];
             refreshPreview(document.getElementById('productImages'));
         }
     });
+@else
+    // Fresh form: drop images kept from an earlier product so they are not restored later.
+    try { sessionStorage.removeItem('product_temp_images'); } catch (e) {}
 @endif
 
 function previewMultipleImages(input) {
@@ -459,7 +463,12 @@ function saveTempImages() {
     }));
 
     Promise.all(readers).then(results => {
-        sessionStorage.setItem('product_temp_images', JSON.stringify(results));
+        // Large images can exceed the ~5 MB sessionStorage quota; keeping them is only a convenience.
+        try {
+            sessionStorage.setItem('product_temp_images', JSON.stringify(results));
+        } catch (e) {
+            sessionStorage.removeItem('product_temp_images');
+        }
     });
 }
 

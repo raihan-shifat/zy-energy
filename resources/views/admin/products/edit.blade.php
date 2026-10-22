@@ -52,7 +52,7 @@
                     <label class="form-label">{{ __('cms.products.category') }}</label>
                     <select name="category_id" class="form-control @error('category_id') is-invalid @enderror">
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ $category->id == old('category_id', $product->category_id) ? 'selected' : '' }}>{{ $category->translation->name ?? '—' }}</option>
+                            <option value="{{ $category->id }}" {{ $category->id == old('category_id', $product->category_id) ? 'selected' : '' }}>{{ localized_translation_value($category->translations, 'name', '—') }}</option>
                         @endforeach
                     </select>
                     @error('category_id')
@@ -64,7 +64,7 @@
                     <select name="brand_id" class="form-control @error('brand_id') is-invalid @enderror">
                         <option value="">{{ 'No Brand' }}</option>
                         @foreach($brands as $brand)
-                            <option value="{{ $brand->id }}" {{ $brand->id == old('brand_id', $product->brand_id) ? 'selected' : '' }}>{{ $brand->translation->name ?? '—' }}</option>
+                            <option value="{{ $brand->id }}" {{ $brand->id == old('brand_id', $product->brand_id) ? 'selected' : '' }}>{{ ($brand->translations->firstWhere('locale', app()->getLocale()) ?? $brand->translations->firstWhere('locale', 'en') ?? $brand->translations->first())?->name ?? '—' }}</option>
                         @endforeach
                     </select>
                     @error('brand_id')

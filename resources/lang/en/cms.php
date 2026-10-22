@@ -478,6 +478,9 @@ return [
     ],
 
     'products' => [
+        'variants_required' => 'Add at least one variant.',
+        'save_failed' => 'The product could not be saved. Please try again.',
+        'weight_placeholder' => 'e.g., 1.5',
 
         // Titles
         'title_create' => 'Create Product',

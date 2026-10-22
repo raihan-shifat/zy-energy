@@ -65,16 +65,18 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'nullable|exists:brands,id',
             'vendor_id' => 'required|exists:vendors,id',
+            'series' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'variants' => 'required|array|min:1',
             'variants.*.name' => 'required|string|max:255',
             'variants.*.price' => 'required|numeric|min:0',
             'variants.*.discount_price' => 'nullable|numeric|min:0|lte:variants.*.price',
             'variants.*.stock' => 'required|integer|min:0|max:2147483647',
-            'variants.*.SKU' => 'nullable|string|max:255',
-            'variants.*.barcode' => 'nullable|string|max:255',
+            'variants.*.SKU' => 'nullable|string|max:255|distinct:ignore_case|unique:product_variants,SKU',
+            'variants.*.barcode' => 'nullable|string|max:255|distinct:ignore_case',
             'variants.*.weight' => 'nullable|numeric|min:0',
-            'variants.*.dimensions' => 'nullable|string|max:255',
+            'variants.*.dimension' => 'nullable|string|max:255',
             'variants.*.language_code' => 'nullable|string|size:2',
             'variants.*.attribute_values' => 'nullable|array',
             'variants.*.attribute_values.*' => 'nullable|exists:attribute_values,id',
@@ -91,10 +93,19 @@ class ProductController extends Controller
             $rules["translations.$lang.tags"] = 'nullable|string';
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'variants.required' => __('cms.products.variants_required'),
+            'variants.min' => __('cms.products.variants_required'),
+        ], [
+            // Same labels as the form; validation.attributes.type is another form's "Platform Type".
+            'series' => 'Series',
+            'type' => 'Type',
+            'variants.*.dimension' => __('validation.attributes.variants.*.dimensions'),
+        ]);
 
         $shopId = \App\Models\Shop::where('status', 'active')->value('id') ?? 1;
 
+        try {
         DB::transaction(function () use ($request, $defaultLang, $shopId) {
             $defaultName = $request->translations[$defaultLang]['name'] ?? 'product';
             $slug = $this->generateUniqueSlug($defaultName);
@@ -130,7 +141,7 @@ class ProductController extends Controller
                 }
             }
 
-            foreach ($request->variants as $variantData) {
+            foreach (array_values($request->variants) as $variantPosition => $variantData) {
                 $sku = ! empty($variantData['SKU']) ? $variantData['SKU'] : strtoupper(Str::random(8));
                 $variant = $product->variants()->create([
                     'variant_slug'  => Str::slug($variantData['name']).'-'.uniqid(),
@@ -141,7 +152,8 @@ class ProductController extends Controller
                     'barcode'       => $variantData['barcode'] ?? null,
                     'weight'        => $variantData['weight'] ?? null,
                     'dimensions'    => $variantData['dimension'] ?? null,
-                    'is_primary'    => 1,
+                    // Only the first variant is the primary one (primaryVariant is a hasOne).
+                    'is_primary'    => $variantPosition === 0 ? 1 : 0,
                 ]);
 
                 $variant->translations()->create([
@@ -167,13 +179,19 @@ class ProductController extends Controller
                 }
             }
         });
+        } catch (\Throwable $e) {
+            \Log::error('Product create failed: '.$e->getMessage(), ['exception' => $e]);
+
+            return back()->withInput()->with('error', __('cms.products.save_failed'));
+        }
 
         return redirect()->route('admin.products.index')->with('success', __('cms.products.success_create'));
     }
 
     public function generateUniqueSlug($name)
     {
-        $slug = Str::slug($name);
+        // Names with no Latin letters (e.g. only symbols) slug to "", which would collide.
+        $slug = Str::slug($name) ?: 'product';
         $originalSlug = $slug;
         $count = 1;
         while (Product::where('slug', $slug)->exists()) {

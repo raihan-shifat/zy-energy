@@ -901,6 +901,9 @@ return array_replace_recursive($translations, [
 
     'products' => [
         'select_category' => '选择分类',
+        'variants_required' => '请至少添加一个规格。',
+        'save_failed' => '产品保存失败，请重试。',
+        'weight_placeholder' => '例如：1.5',
     ],
 
     'editor' => [
