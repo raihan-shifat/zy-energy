@@ -148,6 +148,48 @@ class AdminNewsTest extends TestCase
         $this->get(route('news.index'))->assertDontSee($news->slug);
     }
 
+    public function test_unwritable_storage_gives_a_clear_error_and_saves_nothing(): void
+    {
+        $disk = \Mockery::mock(\Illuminate\Contracts\Filesystem\Filesystem::class);
+        $disk->shouldReceive('putFileAs')->andReturn(false);   // what store() gets when the folder is not writable
+        $disk->shouldReceive('path')->andReturn(sys_get_temp_dir());
+        $manager = \Mockery::mock(\Illuminate\Filesystem\FilesystemManager::class);
+        $manager->shouldReceive('disk')->andReturn($disk);
+        $this->app->instance('filesystem', $manager);
+        \Illuminate\Support\Facades\Storage::clearResolvedInstance('filesystem');
+
+        $before = News::count();
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload() + ['image_url' => UploadedFile::fake()->image('cover.jpg')])
+            ->assertSessionHasErrors(['image_url' => __('cms.news.image_save_failed')]);
+        $this->assertSame($before, News::count(), 'no post is created when the image cannot be saved');
+    }
+
+    public function test_legacy_zero_image_value_shows_no_broken_image(): void
+    {
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload());
+        $news = News::latest('id')->first();
+        $news->forceFill(['image_url' => '0'])->save();   // what failed uploads used to store
+
+        $rows = $this->actingAs($this->admin)->postJson(route('admin.news.data'), ['draw' => 1, 'start' => 0, 'length' => 500])->json('data');
+        $row = collect($rows)->firstWhere('id', $news->id);
+        $this->assertNull($row['image_thumb']);
+
+        $html = $this->get(route('news.show', $news->slug))->assertOk()->getContent();
+        $this->assertStringNotContainsString('storage/0"', $html);
+        $this->assertStringNotContainsString('class="news-cover', $html);
+        $this->assertNull($news->coverPath());
+        $this->assertSame('0', $news->fresh()->getRawOriginal('image_url'), 'the stored value is left unchanged');
+    }
+
+    public function test_excerpt_equal_to_body_is_shown_once(): void
+    {
+        $text = 'Zhongshan Zhanyu Xinghua Lighting '.uniqid();
+        $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload(['translations' => ['en' => ['excerpt' => $text, 'body' => '<p>'.$text.'</p>']]]));
+        $html = $this->get(route('news.show', News::latest('id')->value('slug')))->getContent();
+        $this->assertSame(1, substr_count($html, $text.'</'), 'text appears once in the article');
+        $this->assertStringNotContainsString('<p class="lead">', $html);
+    }
+
     public function test_public_post_follows_the_language(): void
     {
         $this->actingAs($this->admin)->post(route('admin.news.store'), $this->payload());
