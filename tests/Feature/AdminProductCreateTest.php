@@ -200,6 +200,34 @@ class AdminProductCreateTest extends TestCase
         Storage::disk('public')->assertExists($path);
     }
 
+    public function test_editor_upload_over_php_limit_returns_a_clear_size_message(): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'big');
+        file_put_contents($tmp, 'x');
+        $tooBig = new UploadedFile($tmp, 'big.jpg', 'image/jpeg', UPLOAD_ERR_INI_SIZE, true);
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.editor.upload-image'), ['upload' => $tooBig])
+            ->assertStatus(413)
+            ->assertJsonPath('error.message', fn ($m) => str_contains($m, 'MB'));
+    }
+
+    public function test_editor_upload_reports_storage_write_failure(): void
+    {
+        $disk = \Mockery::mock(\Illuminate\Contracts\Filesystem\Filesystem::class);
+        $disk->shouldReceive('putFileAs')->andThrow(new \RuntimeException('Permission denied'));
+        $disk->shouldReceive('path')->andReturn(sys_get_temp_dir());
+        $manager = \Mockery::mock(\Illuminate\Filesystem\FilesystemManager::class);
+        $manager->shouldReceive('disk')->andReturn($disk);
+        $this->app->instance('filesystem', $manager);
+        \Illuminate\Support\Facades\Storage::clearResolvedInstance('filesystem');
+
+        $this->actingAs($this->admin)
+            ->post(route('admin.editor.upload-image'), ['upload' => UploadedFile::fake()->image('a.png')])
+            ->assertStatus(500)
+            ->assertJsonPath('error.message', __('cms.editor.upload_storage_failed'));
+    }
+
     public function test_editor_image_upload_rejects_non_images_and_guests(): void
     {
         $this->actingAs($this->admin)
