@@ -21,9 +21,9 @@
             @endphp
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
-                    @if ($post->image_url)
+                    @if ($postCover = $post->coverPath())
                         <div class="card-img-top" style="aspect-ratio: 16 / 9; background: var(--surface-2, #f4f7f5); overflow: hidden;">
-                            <img src="{{ asset('storage/' . $post->image_url) }}" alt="{{ $postTitle }}" loading="lazy" width="640" height="360" style="width:100%; height:100%; object-fit:contain;">
+                            <img src="{{ asset('storage/' . $postCover) }}" alt="{{ $postTitle }}" loading="lazy" width="640" height="360" style="width:100%; height:100%; object-fit:contain;">
                         </div>
                     @endif
                     <div class="card-body">

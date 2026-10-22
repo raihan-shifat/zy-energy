@@ -4,12 +4,16 @@
     $postTitle = localized_translation_value($post->translations, 'title') ?: readable_slug($post->slug);
     $postExcerpt = localized_translation_value($post->translations, 'excerpt');
     $postBody = localized_translation_value($post->translations, 'body', '');
+    $postCover = $post->coverPath();
+    // Do not repeat the excerpt when the body already starts with the same text.
+    $plain = fn ($html) => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES, 'UTF-8')));
+    $showExcerpt = $postExcerpt && ! str_starts_with($plain($postBody), $plain($postExcerpt));
 @endphp
 @section('title', page_title(\Illuminate\Support\Str::limit($postTitle, 60, '', true)))
 @section('meta_description', seo_excerpt($postExcerpt ?: $postBody, 160))
 @section('og_type', 'article')
-@if ($post->image_url)
-    @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$post->image_url)
+@if ($postCover)
+    @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$postCover)
 @endif
 
 @section('content')
@@ -26,14 +30,14 @@
         <h1 class="sec-heading mb-3">{{ $postTitle }}</h1>
         <small class="text-muted d-block mb-4">{{ \format_date($post->created_at) }}</small>
 
-        @if ($post->image_url)
+        @if ($postCover)
             {{-- Fixed 16:9 box, whole image visible (same sizing approach as the product gallery). --}}
             <div class="news-cover mb-4">
-                <img src="{{ asset('storage/' . $post->image_url) }}" alt="{{ $postTitle }}" width="1200" height="675" decoding="async" fetchpriority="high">
+                <img src="{{ asset('storage/' . $postCover) }}" alt="{{ $postTitle }}" width="1200" height="675" decoding="async" fetchpriority="high">
             </div>
         @endif
 
-        @if ($postExcerpt)
+        @if ($showExcerpt)
             <p class="lead">{{ $postExcerpt }}</p>
         @endif
 
