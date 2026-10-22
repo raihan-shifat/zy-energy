@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="col-md-6 mt-3">
-                    @include('admin.news._image-field', ['currentImage' => $news->image_url])
+                    @include('admin.news._image-field', ['currentImage' => $news->coverPath()])
                 </div>
 
                 <div class="col-md-6 mt-3">

@@ -1060,6 +1060,7 @@ return array_replace_recursive($translations, [
         'image_current_hint' => '当前图片。如不选择新文件，将保留此图片。',
         'image_bad_type' => '仅支持 JPG、PNG 和 WebP 格式的图片。',
         'image_too_large' => '图片大小不能超过 :size。',
+        'image_save_failed' => '服务器无法保存图片（上传文件夹不可写），本次未保存任何内容。请联系网站管理员。',
         'update' => '更新',
         'create' => '创建',
         'id' => 'ID',

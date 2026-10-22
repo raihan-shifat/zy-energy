@@ -24,6 +24,21 @@ class News extends Model
     }
 
     /**
+     * Storage path of the cover image, or null when there is no usable image.
+     * Older saves stored "0" when writing the file failed (store() returned false);
+     * that value and missing files count as "no image". The column itself is not changed.
+     */
+    public function coverPath(): ?string
+    {
+        $path = (string) $this->image_url;
+        if ($path === '' || $path === '0') {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->exists($path) ? $path : null;
+    }
+
+    /**
      * Test/placeholder titles that must never appear on public pages.
      */
     const PLACEHOLDER_TITLES = ['title', 'test', 'test news', 'news title', 'lorem ipsum'];

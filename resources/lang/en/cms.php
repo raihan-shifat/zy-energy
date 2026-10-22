@@ -1010,6 +1010,7 @@ return [
         'image_current_hint' => 'Current image. It is kept unless you choose a new file.',
         'image_bad_type' => 'Only JPG, PNG and WebP images are allowed.',
         'image_too_large' => 'The image must not be larger than :size.',
+        'image_save_failed' => 'The image could not be saved on the server (upload folder not writable). Nothing was saved. Please contact the site administrator.',
         'update' => 'Update',
         'create' => 'Create',
         'id' => 'ID',

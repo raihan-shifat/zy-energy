@@ -27,6 +27,8 @@ class NewsController extends Controller
                 $t = $item->translations->firstWhere('language_code', 'en');
                 return $t->title ?? ($item->translations->first()->title ?? '');
             })
+            // Thumbnail URL, or null when there is no usable image (list shows a placeholder).
+            ->addColumn('image_thumb', fn ($item) => ($path = $item->coverPath()) ? asset('storage/'.$path) : null)
         ->addColumn('action', function ($item) {
             $editBtn = '<span class="border border-edit dt-trash rounded-3 d-inline-block"><a href="/admin/news/' . $item->id . '/edit" class=""><i class="bi bi-pencil-fill pencil-edit-color"></i></a></span>';
             $deleteBtn = '<span class="border border-danger dt-trash rounded-3 d-inline-block" onclick="deleteNews(' . $item->id . ')"> <i class="bi bi-trash-fill text-danger"></i> </span>';
@@ -80,6 +82,32 @@ class NewsController extends Controller
         ], $attributes);
     }
 
+    /**
+     * Save the uploaded cover image on the public disk and return its path.
+     * store() returns false when the folder is not writable; this used to be saved
+     * as "0" with no message. Now the admin gets a clear error and it is logged.
+     */
+    private function storeImage(Request $request): string
+    {
+        try {
+            $path = $request->file('image_url')->store('news', 'public');
+        } catch (\Throwable $e) {
+            report($e);
+            $path = false;
+        }
+
+        if (! $path) {
+            $dir = Storage::disk('public')->path('news');
+            \Log::error('News image could not be written', ['dir' => $dir, 'dir_writable' => is_writable($dir)]);
+
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'image_url' => __('cms.news.image_save_failed'),
+            ]);
+        }
+
+        return $path;
+    }
+
     public function store(Request $request)
     {
         $this->validateNews($request);
@@ -87,9 +115,12 @@ class NewsController extends Controller
         $enTitle = $request->translations['en']['title'] ?? $request->translations[config('app.locale')]['title'] ?? 'news';
         $slug = $this->generateUniqueSlug($enTitle);
 
+        // Store the file first: if the server cannot write it, nothing is created.
+        $imagePath = $request->hasFile('image_url') ? $this->storeImage($request) : null;
+
         $news = News::create([
             'slug' => $slug,
-            'image_url' => $request->hasFile('image_url') ? $request->file('image_url')->store('news', 'public') : null,
+            'image_url' => $imagePath,
             'status' => $request->has('status') ? 1 : 0,
         ]);
 
@@ -126,10 +157,12 @@ class NewsController extends Controller
         $data = ['status' => $request->has('status') ? 1 : 0];
 
         if ($request->hasFile('image_url')) {
-            if ($news->image_url) {
-                Storage::disk('public')->delete($news->image_url);
+            $newPath = $this->storeImage($request);
+            // Replace: remove the previous file only once the new one is safely stored.
+            if ($oldPath = $news->coverPath()) {
+                Storage::disk('public')->delete($oldPath);
             }
-            $data['image_url'] = $request->file('image_url')->store('news', 'public');
+            $data['image_url'] = $newPath;
         }
 
         $news->update($data);
