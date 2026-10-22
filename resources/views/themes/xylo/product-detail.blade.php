@@ -179,10 +179,12 @@
             <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description"
                     type="button" role="tab" aria-controls="description" aria-selected="true">{{ __('store.product_detail.description') }}</button>
           </li>
+          {{-- Reviews tab hidden from customers for now. Remove this comment to show it again.
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
                     type="button" role="tab" aria-controls="reviews" aria-selected="false">{{ __('store.product_detail.reviews') }} ({{ $product->reviews_count }})</button>
           </li>
+          --}}
         </ul>
 
         <!-- Tab Content -->
@@ -190,6 +192,7 @@
           <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
             {!! localized_translation_value($product->translations, 'description', '') !!}
           </div>
+          {{-- Reviews tab content hidden from customers for now (B2B site). Remove this comment to show it again.
           <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
            <div class="product-detail-customer-review">
 
@@ -282,6 +285,7 @@
                 </div>
             </div>
           </div>
+          --}}
         </div>
 
       </div>
