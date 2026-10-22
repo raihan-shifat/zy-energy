@@ -64,9 +64,10 @@ class Product extends Model
     }
 
     // One-to-many relationship with ProductImage
+    /** Gallery images in display order (set in the admin). */
     public function images()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
     }
 
     /**
@@ -89,9 +90,14 @@ class Product extends Model
         return $translation ? $translation->$field : null;
     }
 
+    /** Cover image: the one marked primary, else the first in gallery order. */
     public function thumbnail()
     {
-        return $this->hasOne(ProductImage::class)->where('type', 'thumb');
+        return $this->hasOne(ProductImage::class)
+            ->where('type', 'thumb')
+            ->orderByDesc('is_primary')
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     public function reviews()

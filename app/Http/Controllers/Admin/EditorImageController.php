@@ -21,6 +21,20 @@ class EditorImageController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        return $this->handle($request, 'editor/'.date('Y/m'), 'jpeg,png,jpg,gif,webp');
+    }
+
+    /**
+     * Product gallery images (admin create/edit): same pipeline, stored next to the
+     * existing product images. Also returns the storage path the form submits.
+     */
+    public function storeProductImage(Request $request): JsonResponse
+    {
+        return $this->handle($request, 'products', 'jpeg,png,jpg,webp');
+    }
+
+    private function handle(Request $request, string $folder, string $mimes): JsonResponse
+    {
         $file = $request->file('upload');
 
         // PHP rejected the file (e.g. bigger than upload_max_filesize): it is present but not valid.
@@ -34,11 +48,11 @@ class EditorImageController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'upload' => 'required|file|image|mimes:jpeg,png,jpg,gif,webp|max:'.intdiv(self::maxBytes(), 1024),
+            'upload' => 'required|file|image|mimes:'.$mimes.'|max:'.intdiv(self::maxBytes(), 1024),
         ], [
             'upload.required' => __('cms.editor.upload_missing', ['max' => self::humanLimit()]),
-            'upload.image' => __('cms.editor.upload_not_image'),
-            'upload.mimes' => __('cms.editor.upload_not_image'),
+            'upload.image' => __(str_contains($mimes, 'gif') ? 'cms.editor.upload_not_image' : 'cms.products.gallery_bad_type'),
+            'upload.mimes' => __(str_contains($mimes, 'gif') ? 'cms.editor.upload_not_image' : 'cms.products.gallery_bad_type'),
             'upload.max' => __('cms.editor.upload_too_large', ['max' => self::humanLimit()]),
         ]);
 
@@ -47,7 +61,7 @@ class EditorImageController extends Controller
         }
 
         try {
-            $path = $file->store('editor/'.date('Y/m'), 'public');
+            $path = $file->store($folder, 'public');
         } catch (\Throwable $e) {
             $path = false;
             Log::error('Editor image upload could not be written', ['exception' => $e]);
@@ -63,7 +77,7 @@ class EditorImageController extends Controller
             return $this->error(__('cms.editor.upload_storage_failed'), 500);
         }
 
-        return response()->json(['url' => asset('storage/'.$path)]);
+        return response()->json(['url' => asset('storage/'.$path), 'path' => $path]);
     }
 
     /** Smallest of our limit and PHP's upload_max_filesize / post_max_size, in bytes. */
