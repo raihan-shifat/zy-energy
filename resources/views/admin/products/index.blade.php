@@ -66,6 +66,13 @@
 
 <script>
 
+    // List state (page, entries per page, search) is kept in the URL so that
+    // edit -> save -> redirect back returns to the same view.
+    var listState = new URLSearchParams(window.location.search);
+    var startLength = [10, 25, 50, 100].indexOf(parseInt(listState.get('length'), 10)) !== -1
+        ? parseInt(listState.get('length'), 10) : 10;
+    var startPage = Math.max(parseInt(listState.get('page'), 10) || 1, 1);
+
     $(document).ready(function() {
         var table = $('#products-table').DataTable({
             processing: true,
@@ -100,14 +107,34 @@
                     orderable: false, 
                     searchable: false,
                     render: function(data, type, row) {
-                        var editBtn = '<span class="border border-edit dt-trash rounded-3 d-inline-block"><a href="/admin/products/' + row.id + '/edit"><i class="bi bi-pencil-fill pencil-edit-color"></i></a></span>';
+                        var editBtn = '<span class="border border-edit dt-trash rounded-3 d-inline-block"><a class="edit-product-link" data-base="/admin/products/' + row.id + '/edit" href="/admin/products/' + row.id + '/edit"><i class="bi bi-pencil-fill pencil-edit-color"></i></a></span>';
                         var deleteBtn = '<span class="border border-danger dt-trash rounded-3 d-inline-block" onclick="deleteProduct(' + row.id + ')"><i class="bi bi-trash-fill text-danger"></i></span>';
                         return editBtn + ' ' + deleteBtn;
                     }
                 }
             ],
-            pageLength: 10,
-            language: @json($datatableLang) 
+            pageLength: startLength,
+            displayStart: (startPage - 1) * startLength,
+            search: { search: listState.get('search') || '' },
+            language: @json($datatableLang)
+        });
+
+        table.on('draw', function () {
+            var info = table.page.info();
+            // A page past the end (e.g. after deleting the last row on it): show the last page instead.
+            if (info.recordsDisplay > 0 && info.start >= info.recordsDisplay) {
+                table.page('last').draw('page');
+                return;
+            }
+            var state = { page: info.page + 1, length: info.length };
+            if (table.search()) {
+                state.search = table.search();
+            }
+            var query = $.param(state);
+            history.replaceState(null, '', window.location.pathname + '?' + query);
+            $('#products-table .edit-product-link').each(function () {
+                this.href = this.dataset.base + '?' + query;
+            });
         });
 
         $(document).on('change', '.toggle-status', function() {
@@ -134,7 +161,7 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            $('#products-table').DataTable().ajax.reload();
+                            $('#products-table').DataTable().ajax.reload(null, false); // keep the current page
                             toastr.error(response.message, "{{ __('cms.products.success') }}", {
                                 closeButton: true,
                                 progressBar: true,
@@ -176,7 +203,7 @@
             },
             success: function(response) {
                 if (response.success) {
-                    $('#products-table').DataTable().ajax.reload(); 
+                    $('#products-table').DataTable().ajax.reload(null, false); // keep the current page 
                     toastr.success(response.message, "Success", {
                         closeButton: true,
                         progressBar: true,

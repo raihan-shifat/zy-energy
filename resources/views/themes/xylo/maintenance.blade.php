@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>{{ config('app.name', 'ZY Energy') }} — Maintenance</title>
+    <title>{{ config('app.name', 'ZY Energy') }} — {{ __('store.maintenance.page_title') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @if (!App::environment('testing'))
@@ -66,13 +66,13 @@
 <body>
     <div class="maint-card">
         <div class="maint-logo">
-            <img src="{{ asset('logo.png') }}" alt="Logo">
+            <img src="{{ asset('logo.png') }}" alt="{{ __('store.maintenance.logo_alt') }}">
         </div>
         <div class="maint-icon"><i class="fas fa-tools"></i></div>
-        <h1 class="maint-title">We'll be back soon</h1>
-        <p class="maint-sub">We're performing scheduled maintenance on our website. Thank you for your patience — we'll be back online shortly.</p>
+        <h1 class="maint-title">{{ __('store.maintenance.heading') }}</h1>
+        <p class="maint-sub">{{ __('store.maintenance.text') }}</p>
         <p class="maint-contact">
-            Need assistance? Contact us at
+            {{ __('store.maintenance.contact') }}
             <a href="mailto:{{ \App\Models\SiteSetting::query()->first()?->contact_email ?? '' }}">
                 {{ \App\Models\SiteSetting::query()->first()?->contact_email ?? 'info@zyenergy.com' }}
             </a>

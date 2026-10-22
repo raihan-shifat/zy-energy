@@ -470,7 +470,34 @@ return [
         ],
     ],
 
+    'editor' => [
+        'upload_missing' => 'No image was received. It may be larger than the server upload limit (:max).',
+        'upload_not_image' => 'Please choose a JPG, PNG, GIF or WebP image.',
+        'upload_too_large' => 'The image must not be larger than :max.',
+        'upload_failed' => 'The image could not be uploaded. Please try again.',
+        'upload_failed_status' => 'The image could not be uploaded (server error :status). Please try again.',
+        'upload_session_expired' => 'Your session has expired. Reload the page, log in again and re-insert the image.',
+        'upload_storage_failed' => 'The server could not save the image. Ask the administrator to check that storage/app/public is writable.',
+        'upload_wait' => 'An image is still uploading. Please wait until it finishes, then save again.',
+    ],
+
     'products' => [
+        'variants_required' => 'Add at least one variant.',
+        'save_failed' => 'The product could not be saved. Please try again.',
+        'weight_placeholder' => 'e.g., 1.5',
+        'gallery_hint' => 'Up to :max images, JPG, PNG or WebP, max :size each. Drag to reorder. The cover image is shown first and on product cards.',
+        'gallery_cover' => 'Cover',
+        'gallery_set_cover' => 'Set as cover',
+        'gallery_move_left' => 'Move left',
+        'gallery_move_right' => 'Move right',
+        'gallery_remove' => 'Remove image',
+        'gallery_uploading' => 'Uploading…',
+        'gallery_empty' => 'No images yet.',
+        'gallery_image_n' => 'Image :n',
+        'gallery_too_many' => 'A product can have at most :max images.',
+        'gallery_bad_type' => 'Only JPG, PNG and WebP images are allowed.',
+        'gallery_bad_path' => 'One of the images is invalid. Please remove it and upload it again.',
+        'gallery_wait' => 'Images are still uploading. Please wait until they finish, then save again.',
 
         // Titles
         'title_create' => 'Create Product',

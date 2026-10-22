@@ -101,7 +101,7 @@ function addToCart(productId) {
             }
         },
         error: function() {
-            toastr.error("Error adding to cart");
+            toastr.error(@json(__('store.wishlist.add_to_cart_error')));
         }
     });
 }

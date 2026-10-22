@@ -129,6 +129,14 @@ class ImageOptimizationService
 
         $alt = $options['alt'] ?? '';
         $class = $options['class'] ?? '';
+
+        // Products saved without an image pass 'default.jpg', which does not exist: show a placeholder.
+        if (!Storage::disk('public')->exists($originalPath)) {
+            return '<img src="' . asset('images/product-placeholder.svg') . '" alt="' . e($alt) . '"'
+                . ($class ? ' class="' . e($class) . '"' : '')
+                . ' width="800" height="600" loading="' . e($options['loading'] ?? 'lazy') . '" decoding="async">';
+        }
+
         $sizes = $options['sizes'] ?? '(max-width: 480px) 300px, (max-width: 768px) 480px, (max-width: 1200px) 768px, 1200px';
         $loading = $options['loading'] ?? 'lazy';
         $decoding = $options['decoding'] ?? 'async';

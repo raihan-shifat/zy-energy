@@ -79,7 +79,7 @@
                         <option value="">{{ __('cms.products.select_category') ?? 'Select Category' }}</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->translation->name ?? '—' }}
+                                {{ localized_translation_value($category->translations, 'name', '—') }}
                             </option>
                         @endforeach
                     </select>
@@ -93,7 +93,7 @@
                         <option value="">{{ __('cms.products.no_brand') }}</option>
                         @foreach($brands as $brand)
                             <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                {{ $brand->translation->name ?? '—' }}
+                                {{ ($brand->translations->firstWhere('locale', app()->getLocale()) ?? $brand->translations->firstWhere('locale', 'en') ?? $brand->translations->first())?->name ?? '—' }}
                             </option>
                         @endforeach
                     </select>
@@ -162,7 +162,7 @@
                             opt.textContent = t;
                             typeSelect.appendChild(opt);
                         });
-                        var oldType = "@php echo old('type', ''); @endphp";
+                        var oldType = @json(old('type', ''));
                         if (oldType) { typeSelect.value = oldType; }
                     }
                 });
@@ -220,7 +220,7 @@
                         </div>
                         <div class="col-md-4 mt-2">
                             <label>{{ __('cms.products.weight') }}</label>
-                            <input type="text" name="variants[__INDEX__][weight]" class="form-control" placeholder="e.g., 1.5 kg" value="__WEIGHT__" />
+                            <input type="text" name="variants[__INDEX__][weight]" class="form-control" placeholder="{{ __('cms.products.weight_placeholder') }}" value="__WEIGHT__" />
                         </div>
                         <div class="col-md-4 mt-2">
                             <label>{{ __('cms.products.dimension') }}</label>
@@ -245,15 +245,7 @@
                 </div>
             </template>
             {{-- Images --}}
-            <div class="mt-3">
-                <label class="form-label">{{ __('cms.products.images') }}</label>
-                <div class="custom-file">
-                    <label class="btn btn-primary" for="productImages">{{ __('cms.products.choose_file') }}</label>
-                    <input type="file" name="images[]" class="form-control d-none" id="productImages" multiple onchange="previewMultipleImages(this)">
-                </div>
-
-                <div id="productImagesPreview" class="mt-2 d-flex flex-wrap"></div>
-            </div>  
+            @include('admin.partials.product-gallery-manager', ['existingImages' => collect()])
          
             {{-- Submit --}}
             <div class="mt-4 text-start">
@@ -290,8 +282,9 @@ document.addEventListener("DOMContentLoaded", function () {
     let validationErrors = @json($errors->getMessages());
 
     function updateRemoveButtonState() {
+        // A product needs at least one variant, so the last one cannot be removed.
         const count = $('#variants-wrapper .variant-item').length;
-        $('#remove-variant-btn').prop('disabled', count === 0);
+        $('#remove-variant-btn').prop('disabled', count <= 1);
     }
 
     function addVariant(variant = {}, index = variantIndex) {
@@ -352,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
         $('#add-variant-btn').click(() => addVariant());
         $('#remove-variant-btn').click(() => {
             const $variants = $('#variants-wrapper .variant-item');
-            if ($variants.length > 0) {
+            if ($variants.length > 1) {
                 $variants.last().remove();
                 variantIndex--;
                 updateRemoveButtonState();
@@ -369,115 +362,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 </script>
 
-{{-- Image Preview --}}
-<script>
-let selectedFiles = [];
-
-@if (session()->has('_old_input'))
-    window.addEventListener('load', () => {
-        const oldFiles = sessionStorage.getItem('product_temp_images');
-        if (oldFiles) {
-            selectedFiles = JSON.parse(oldFiles).map(b64 => {
-                const file = dataURLtoFile(b64.data, b64.name);
-                file.uniqueId = b64.name + '_' + file.size;
-                return file;
-            });
-            refreshPreview(document.getElementById('productImages'));
-        }
-    });
-@endif
-
-function previewMultipleImages(input) {
-    const files = Array.from(input.files);
-
-    files.forEach(file => {
-        const uniqueId = file.name + '_' + file.size;
-        if (!selectedFiles.some(f => f.uniqueId === uniqueId)) {
-            file.uniqueId = uniqueId;
-            selectedFiles.push(file);
-        }
-    });
-
-    refreshPreview(input);
-}
-
-function refreshPreview(input) {
-    const previewContainer = document.getElementById('productImagesPreview');
-    previewContainer.innerHTML = '';
-
-    selectedFiles.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'position-relative m-1';
-
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'img-thumbnail';
-            img.style.maxWidth = '150px';
-
-           const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.className = 'btn btn-light rounded-circle shadow-sm border-0 position-absolute d-flex align-items-center justify-content-center';
-            removeBtn.style.width = '32px';
-            removeBtn.style.height = '32px';
-            removeBtn.style.top = '8px';
-            removeBtn.style.right = '8px';
-            removeBtn.style.opacity = '0.9';
-            removeBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
-            removeBtn.style.transition = 'all 0.2s ease';
-            removeBtn.innerHTML = '<i class="fa-solid fa-circle-xmark text-danger fs-6"></i>';
-            removeBtn.title = "{{ __('cms.products.remove') }}";
-            removeBtn.onclick = function() {
-                selectedFiles = selectedFiles.filter(f => f.uniqueId !== file.uniqueId);
-                updateFileInput(input);
-                refreshPreview(input);
-            };
-
-            wrapper.appendChild(img);
-            wrapper.appendChild(removeBtn);
-            previewContainer.appendChild(wrapper);
-        };
-        reader.readAsDataURL(file);
-    });
-
-    updateFileInput(input);
-    saveTempImages();
-}
-
-function updateFileInput(input) {
-    const dataTransfer = new DataTransfer();
-    selectedFiles.forEach(file => dataTransfer.items.add(file));
-    input.files = dataTransfer.files;
-}
-
-function saveTempImages() {
-    const readers = selectedFiles.map(file => new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => resolve({ name: file.name, data: e.target.result });
-        reader.readAsDataURL(file);
-    }));
-
-    Promise.all(readers).then(results => {
-        sessionStorage.setItem('product_temp_images', JSON.stringify(results));
-    });
-}
-
-function dataURLtoFile(dataurl, filename) {
-    const arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-          bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    for (let i = 0; i < n; i++) u8arr[i] = bstr.charCodeAt(i);
-    return new File([u8arr], filename, {type:mime});
-}
-</script>
-
 {{-- CKEditor --}}
 <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+@include('admin.partials.ckeditor-upload-adapter')
 <script>
     if (typeof ClassicEditor !== 'undefined') {
         document.querySelectorAll('.ck-editor-multi-languages').forEach((element) => {
             ClassicEditor
-                .create(element)
+                .create(element, { extraPlugins: [ZyEditorUploadPlugin] })
                 .catch(error => {
                     console.error(error);
                 });

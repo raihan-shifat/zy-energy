@@ -10,7 +10,7 @@
 <div class="container py-4">
 
     {{-- Breadcrumbs --}}
-    <nav aria-label="breadcrumb">
+    <nav aria-label="{{ __('store.a11y.breadcrumb') }}">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('xylo.home') }}">{{ __('store.category.home') }}</a></li>
             @foreach($breadcrumbs as $crumb)

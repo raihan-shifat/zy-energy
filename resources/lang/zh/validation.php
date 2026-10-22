@@ -1,5 +1,9 @@
 <?php
 
+// Machine-drafted (2026-10-19): the size rules (max, min, size, between, gt, gte, lt, lte)
+// and attributes.languages.Pl.name were added by Claude to match en/validation.php.
+// Please have a native speaker review them.
+
 return [
 
     /*
@@ -10,14 +14,59 @@ return [
 
     'required' => ':attribute 字段是必填项。',
     'string' => ':attribute 必须是字符串。',
-    'max' => ':attribute 不能超过 :max 个字符。',
-    'min' => ':attribute 至少需要 :min 个字符。',
+    'max' => [
+        'numeric' => ':attribute 不能大于 :max。',
+        'file' => ':attribute 不能大于 :max KB。',
+        'string' => ':attribute 不能超过 :max 个字符。',
+        'array' => ':attribute 最多只能有 :max 项。',
+    ],
+    'min' => [
+        'numeric' => ':attribute 必须至少为 :min。',
+        'file' => ':attribute 必须至少为 :min KB。',
+        'string' => ':attribute 至少需要 :min 个字符。',
+        'array' => ':attribute 至少需要 :min 项。',
+    ],
+    'size' => [
+        'numeric' => ':attribute 必须为 :size。',
+        'file' => ':attribute 必须为 :size KB。',
+        'string' => ':attribute 必须为 :size 个字符。',
+        'array' => ':attribute 必须包含 :size 项。',
+    ],
+    'between' => [
+        'numeric' => ':attribute 必须介于 :min 和 :max 之间。',
+        'file' => ':attribute 必须介于 :min 和 :max KB 之间。',
+        'string' => ':attribute 必须介于 :min 和 :max 个字符之间。',
+        'array' => ':attribute 必须包含 :min 到 :max 项。',
+    ],
+    'gt' => [
+        'numeric' => ':attribute 必须大于 :value。',
+        'file' => ':attribute 必须大于 :value KB。',
+        'string' => ':attribute 必须多于 :value 个字符。',
+        'array' => ':attribute 必须多于 :value 项。',
+    ],
+    'gte' => [
+        'numeric' => ':attribute 必须大于或等于 :value。',
+        'file' => ':attribute 必须大于或等于 :value KB。',
+        'string' => ':attribute 必须至少为 :value 个字符。',
+        'array' => ':attribute 必须至少包含 :value 项。',
+    ],
+    'lt' => [
+        'numeric' => ':attribute 必须小于 :value。',
+        'file' => ':attribute 必须小于 :value KB。',
+        'string' => ':attribute 必须少于 :value 个字符。',
+        'array' => ':attribute 必须少于 :value 项。',
+    ],
     'image' => ':attribute 必须是一张图片。',
     'mimes' => ':attribute 必须是以下类型的文件: :values。',
     'array' => ':attribute 必须是一个数组。',
     'numeric' => ':attribute 必须是数字。',
     'integer' => ':attribute 必须是整数。',
-    'lte' => ':attribute 必须小于或等于 :value。',
+    'lte' => [
+        'numeric' => ':attribute 必须小于或等于 :value。',
+        'file' => ':attribute 必须小于或等于 :value KB。',
+        'string' => ':attribute 不能超过 :value 个字符。',
+        'array' => ':attribute 不能超过 :value 项。',
+    ],
     'regex' => ':attribute 格式无效。',
     'confirmed' => ':attribute 确认不匹配。',
     'incorrect_current_password' => '当前密码不正确。',
@@ -455,5 +504,7 @@ return [
         'languages.zh.image' => '横幅图片 (中文)',
         'languages.zh.name' => '平台名称 (中文)',
         'title.zh' => '标题 (中文)',
+        // en/validation.php has this capitalised "Pl" key; kept for parity.
+        'languages.Pl.name' => '平台名称 (波兰语)',
     ],
 ];

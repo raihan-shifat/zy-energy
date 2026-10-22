@@ -49,9 +49,9 @@
                         @endforeach
 
                         {{-- Series filter — commented out, restore later if needed.
-                        <h5 class="mb-3">Series</h5>
+                        <h5 class="mb-3">{{ __('store.shop.series') }}</h5>
                         <select name="series" class="form-select mb-3">
-                            <option value="all">All Series</option>
+                            <option value="all">{{ __('store.shop.all_series') }}</option>
                             @foreach($seriesValues as $series)
                                 <option value="{{ $series }}" {{ request('series') == $series ? 'selected' : '' }}>{{ $series }}</option>
                             @endforeach

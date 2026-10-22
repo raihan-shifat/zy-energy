@@ -18,6 +18,13 @@ class ProductImage extends Model
         'image_url',
         'type',
         'product_id',
+        'sort_order',
+        'is_primary',
+    ];
+
+    protected $casts = [
+        'sort_order' => 'integer',
+        'is_primary' => 'boolean',
     ];
 
     // Define the relationship with the Product model

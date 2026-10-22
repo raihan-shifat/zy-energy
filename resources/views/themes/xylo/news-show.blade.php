@@ -14,7 +14,7 @@
 
 @section('content')
 <div class="container py-5">
-    <nav aria-label="breadcrumb">
+    <nav aria-label="{{ __('store.a11y.breadcrumb') }}">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('/') }}">{{ __('store.product_detail.home') }}</a></li>
             <li class="breadcrumb-item"><a href="{{ route('news.index') }}">{{ __('store.news.title') }}</a></li>
