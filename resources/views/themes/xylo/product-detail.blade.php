@@ -37,10 +37,11 @@
 <div class="main-detail pt-5 pb-5">
     <div class="container">
         <div class="row">
-            <div class="col-md-6 position-relative">
+            {{-- Gallery ~42% on desktop; stacked (gallery centred, max 560px) below lg. --}}
+            <div class="col-12 col-lg-5 position-relative">
                 @include('themes.xylo.partials.product-gallery', ['product' => $product, 'galleryName' => $seoName])
             </div>
-            <div class="col-md-6 pro-textarea">
+            <div class="col-12 col-lg-7 pro-textarea">
                 @php
                     $productName = localized_translation_value($product->translations, 'name', __('store.category.product_name_not_available'));
                     $productShortDesc = localized_translation_value($product->translations, 'short_description', '');
