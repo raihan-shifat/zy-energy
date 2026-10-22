@@ -475,6 +475,10 @@ return [
         'upload_not_image' => 'Please choose a JPG, PNG, GIF or WebP image.',
         'upload_too_large' => 'The image must not be larger than :max.',
         'upload_failed' => 'The image could not be uploaded. Please try again.',
+        'upload_failed_status' => 'The image could not be uploaded (server error :status). Please try again.',
+        'upload_session_expired' => 'Your session has expired. Reload the page, log in again and re-insert the image.',
+        'upload_storage_failed' => 'The server could not save the image. Ask the administrator to check that storage/app/public is writable.',
+        'upload_wait' => 'An image is still uploading. Please wait until it finishes, then save again.',
     ],
 
     'products' => [

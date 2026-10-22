@@ -911,6 +911,10 @@ return array_replace_recursive($translations, [
         'upload_not_image' => '请选择 JPG、PNG、GIF 或 WebP 格式的图片。',
         'upload_too_large' => '图片大小不能超过 :max。',
         'upload_failed' => '图片上传失败，请重试。',
+        'upload_failed_status' => '图片上传失败（服务器错误 :status），请重试。',
+        'upload_session_expired' => '登录已过期。请刷新页面并重新登录，然后重新插入图片。',
+        'upload_storage_failed' => '服务器无法保存图片。请联系管理员检查 storage/app/public 是否可写。',
+        'upload_wait' => '图片仍在上传中，请等待上传完成后再保存。',
     ],
 
     'social_media_links' => [
