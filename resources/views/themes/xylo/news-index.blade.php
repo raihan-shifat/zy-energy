@@ -21,11 +21,11 @@
             @endphp
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
-                    @if ($postCover = $post->coverPath())
-                        <div class="card-img-top" style="aspect-ratio: 16 / 9; background: var(--surface-2, #f4f7f5); overflow: hidden;">
-                            <img src="{{ asset('storage/' . $postCover) }}" alt="{{ $postTitle }}" loading="lazy" width="640" height="360" style="width:100%; height:100%; object-fit:contain;">
-                        </div>
-                    @endif
+                    {{-- Cover in a fixed 16:9 box; a placeholder when the post has no image. --}}
+                    @php $postCover = $post->coverPath(); @endphp
+                    <div class="card-img-top" style="aspect-ratio: 16 / 9; background: var(--surface-2, #f4f7f5); overflow: hidden;">
+                        <img src="{{ $postCover ? asset('storage/' . $postCover) : asset('images/product-placeholder.svg') }}" alt="{{ $postCover ? $postTitle : '' }}" loading="lazy" width="640" height="360" style="width:100%; height:100%; object-fit:{{ $postCover ? 'contain' : 'cover' }};">
+                    </div>
                     <div class="card-body">
                         <small class="text-muted">{{ \format_date($post->created_at) }}</small>
                         <h5 class="card-title mt-1">{{ $postTitle }}</h5>

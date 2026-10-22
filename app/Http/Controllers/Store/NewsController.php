@@ -12,7 +12,7 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $posts = News::with('translations')
+        $posts = News::with(['translations', 'images'])
             ->public()
             ->orderBy('id', 'desc')
             ->paginate(9);
@@ -25,7 +25,7 @@ class NewsController extends Controller
      */
     public function show($slug)
     {
-        $post = News::with('translations')
+        $post = News::with(['translations', 'images'])
             ->where('slug', $slug)
             ->public()
             ->firstOrFail();

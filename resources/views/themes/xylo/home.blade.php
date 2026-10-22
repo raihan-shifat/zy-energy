@@ -555,8 +555,8 @@
                     @endphp
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 shadow-sm">
-                            @if ($newsPost->image_url)
-                                <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsPost->image_url) !!} style="height:180px; width:100%; object-fit:cover;">
+                            @if ($newsCover = $newsPost->coverPath())
+                                <img src="{{ asset('storage/' . $newsCover) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsCover) !!} style="height:180px; width:100%; object-fit:cover;">
                             @endif
                             <div class="card-body">
                                 <h3 class="card-title">{{ $newsTitle }}</h3>
