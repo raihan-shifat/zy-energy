@@ -96,6 +96,13 @@ return [
     ],
 
     'product_detail' => [
+        'gallery_label' => ':name images',
+        'gallery_image_n' => 'Image :n of :total',
+        'gallery_open' => 'Open image :n in full screen',
+        'gallery_show' => 'Show image :n',
+        'gallery_prev' => 'Previous image',
+        'gallery_next' => 'Next image',
+        'gallery_close' => 'Close',
         'color' => 'Color',
         'size' => 'Size',
         'home' => 'Home',

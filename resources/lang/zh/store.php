@@ -406,6 +406,13 @@ return array_replace_recursive($translations, [
     'product_detail' => [
         'quote_text' => '本产品按询价报价。请联系我们的出口团队获取价格和规格。',
         'specifications' => '技术参数',
+        'gallery_label' => ':name 图片',
+        'gallery_image_n' => '第 :n 张，共 :total 张',
+        'gallery_open' => '全屏查看第 :n 张图片',
+        'gallery_show' => '显示第 :n 张图片',
+        'gallery_prev' => '上一张',
+        'gallery_next' => '下一张',
+        'gallery_close' => '关闭',
     ],
 
     'shop' => [

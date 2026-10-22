@@ -18,15 +18,6 @@
     @section('og_image', rtrim(config('seo.canonical_domain'), '/').'/storage/'.$seoImagePath)
 @endif
 
-@section('css')
-    @vite(['resources/views/themes/xylo/css/slick.css'])
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.css">
-@endsection
-
-@section('js')
-    @vite(['resources/views/themes/xylo/js/slick.min.js'])
-@endsection
-
 @section('content')
 <section class="breadcrumb-section">
     <div class="container">
@@ -47,29 +38,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 position-relative">
-                <div class="product-slider">
-                    @forelse ($product->images as $image)
-                        <div>
-                            {!! getResponsiveImageHtml($image['image_url'], [
-                                'alt' => $seoName ?: ($image['name'] ?? ''),
-                                'class' => 'img-fluid',
-                                'sizes' => '(max-width: 768px) 100vw, 50vw',
-                                // First gallery image is above the fold (LCP): load it right away.
-                                'loading' => $loop->first ? 'eager' : 'lazy',
-                                'fetchpriority' => $loop->first ? 'high' : null,
-                            ]) !!}
-                        </div>
-                    @empty
-                        <div>
-                            {!! getResponsiveImageHtml('default.jpg', [
-                                'alt' => $seoName ?: __('store.category.product_name_not_available'),
-                                'class' => 'img-fluid w-100',
-                                'sizes' => '(max-width: 768px) 100vw, 50vw',
-                                'loading' => 'eager',
-                            ]) !!}
-                        </div>
-                    @endforelse
-                </div>
+                @include('themes.xylo.partials.product-gallery', ['product' => $product, 'galleryName' => $seoName])
             </div>
             <div class="col-md-6 pro-textarea">
                 @php
@@ -384,17 +353,4 @@
     @endif
     </script>
 
-    <script>
-        $(document).ready(function() {
-            $('.product-slider').slick({
-                arrows: true,
-                dots: false,
-                infinite: true,
-                slidesToShow: 1,
-                slidesToScroll: 1,
-                prevArrow: '<button type="button" class="slick-prev">←</button>',
-                nextArrow: '<button type="button" class="slick-next">→</button>',
-            });
-        });
-    </script>
 @endsection
