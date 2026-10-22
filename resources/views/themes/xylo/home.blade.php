@@ -70,6 +70,15 @@
         background: var(--brand-700, #0e7a4f);
         transform: scale(1.06);
     }
+    /* Latest News cards: the whole card opens the post (stretched title link). */
+    .news-card { transition: box-shadow .2s ease; cursor: pointer; }
+    .news-card:hover { box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .12) !important; }
+    .news-card:hover .card-title, .news-card-link:hover { color: var(--brand-700, #0b6b3c); }
+    .news-card-link { color: inherit; text-decoration: none; }
+    .news-card-link:focus-visible { outline: none; }
+    .news-card:has(.news-card-link:focus-visible) { outline: 3px solid var(--brand-600, #12894f); outline-offset: 3px; }
+    .news-card:hover .news-card-more { text-decoration: underline; }
+    @media (prefers-reduced-motion: reduce) { .news-card { transition: none; } }
 </style>
 @endsection
 
@@ -554,14 +563,15 @@
                         $newsExcerpt = localized_translation_value($newsPost->translations, 'excerpt', '');
                     @endphp
                     <div class="col-md-4 mb-4">
-                        <div class="card h-100 shadow-sm">
+                        {{-- Whole card is one link: the title link is stretched over the card (see .news-card styles above). --}}
+                        <div class="card h-100 shadow-sm news-card">
                             @if ($newsCover = $newsPost->coverPath())
-                                <img src="{{ asset('storage/' . $newsCover) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsCover) !!} style="height:180px; width:100%; object-fit:cover;">
+                                <img src="{{ asset('storage/' . $newsCover) }}" class="card-img-top" alt="" loading="lazy" decoding="async"{!! image_size_attrs($newsCover) !!} style="height:180px; width:100%; object-fit:cover;">
                             @endif
                             <div class="card-body">
-                                <h3 class="card-title">{{ $newsTitle }}</h3>
+                                <h3 class="card-title"><a href="{{ route('news.show', $newsPost->slug) }}" class="news-card-link stretched-link">{{ $newsTitle }}</a></h3>
                                 <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($newsExcerpt, 90) }}</p>
-                                <a href="{{ route('news.show', $newsPost->slug) }}" class="btn btn-link p-0">{{ __('store.news.read_more') }}</a>
+                                <span class="btn btn-link p-0 news-card-more" aria-hidden="true">{{ __('store.news.read_more') }}</span>
                             </div>
                         </div>
                     </div>
