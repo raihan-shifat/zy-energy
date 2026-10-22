@@ -470,6 +470,13 @@ return [
         ],
     ],
 
+    'editor' => [
+        'upload_missing' => 'No image was received. It may be larger than the server upload limit (:max).',
+        'upload_not_image' => 'Please choose a JPG, PNG, GIF or WebP image.',
+        'upload_too_large' => 'The image must not be larger than :max.',
+        'upload_failed' => 'The image could not be uploaded. Please try again.',
+    ],
+
     'products' => [
 
         // Titles

@@ -72,6 +72,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(fun
 
     /* Products */
     Route::resource('products', ProductController::class);
+    Route::post('editor/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'store'])->name('editor.upload-image');
     Route::post('products/data', [ProductController::class, 'getProducts'])->name('products.data');
     Route::post('admin/products/updateStatus', [ProductController::class, 'updateStatus'])->name('products.updateStatus');
 

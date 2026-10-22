@@ -903,6 +903,13 @@ return array_replace_recursive($translations, [
         'select_category' => '选择分类',
     ],
 
+    'editor' => [
+        'upload_missing' => '未收到图片，文件可能超过服务器上传限制（:max）。',
+        'upload_not_image' => '请选择 JPG、PNG、GIF 或 WebP 格式的图片。',
+        'upload_too_large' => '图片大小不能超过 :max。',
+        'upload_failed' => '图片上传失败，请重试。',
+    ],
+
     'social_media_links' => [
         'types' => [
             'wechat' => '微信',

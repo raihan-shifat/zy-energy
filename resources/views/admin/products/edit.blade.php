@@ -470,11 +470,12 @@
 </script>
 
 <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+@include('admin.partials.ckeditor-upload-adapter')
 <script>
     if (typeof ClassicEditor !== 'undefined') {
         document.querySelectorAll('.ck-editor-multi-languages').forEach((element) => {
             ClassicEditor
-                .create(element)
+                .create(element, { extraPlugins: [ZyEditorUploadPlugin] })
                 .catch(error => {
                     console.error(error);
                 });
