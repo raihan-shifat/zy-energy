@@ -200,6 +200,31 @@ class AdminProductCreateTest extends TestCase
         Storage::disk('public')->assertExists($path);
     }
 
+    public function test_update_returns_to_the_same_list_page_length_and_search(): void
+    {
+        $this->store($this->payload())->assertRedirect(route('admin.products.index'));
+        $product = Product::latest('id')->first();
+
+        $edit = $this->actingAs($this->admin)->get(route('admin.products.edit', $product->id).'?page=3&length=25&search=battery');
+        $edit->assertOk();
+        $edit->assertSee('name="list_page" value="3"', false);
+        $edit->assertSee('name="list_length" value="25"', false);
+        $edit->assertSee('name="list_search" value="battery"', false);
+
+        $update = $this->payload(['translations' => ['en' => ['name' => 'Renamed '.uniqid()]]]);
+        $update += ['list_page' => '3', 'list_length' => '25', 'list_search' => 'battery'];
+
+        $this->actingAs($this->admin)
+            ->put(route('admin.products.update', $product->id), $update)
+            ->assertRedirect(route('admin.products.index', ['page' => 3, 'length' => 25, 'search' => 'battery']))
+            ->assertSessionHas('success');
+
+        // No list state (opened from page 1) -> plain list URL; junk values are ignored.
+        $this->actingAs($this->admin)
+            ->put(route('admin.products.update', $product->id), $this->payload() + ['list_page' => '1', 'list_length' => '999'])
+            ->assertRedirect(route('admin.products.index'));
+    }
+
     public function test_editor_upload_over_php_limit_returns_a_clear_size_message(): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'big');

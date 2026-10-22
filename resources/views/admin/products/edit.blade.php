@@ -9,6 +9,12 @@
         <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            {{-- Product list state (page, entries per page, search) to return to after saving --}}
+            @foreach (['page', 'length', 'search'] as $listParam)
+                @if (request()->filled($listParam))
+                    <input type="hidden" name="list_{{ $listParam }}" value="{{ request($listParam) }}">
+                @endif
+            @endforeach
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <strong>Please fix the following errors:</strong>

@@ -283,7 +283,30 @@ class ProductController extends Controller
             }
         });
 
-        return redirect()->route('admin.products.index')->with('success', __('cms.products.success_update'));
+        return redirect()->route('admin.products.index', $this->listState($request))->with('success', __('cms.products.success_update'));
+    }
+
+    /**
+     * Product list state sent back from the edit form (page, entries per page, search),
+     * so the list reopens where the admin left it.
+     */
+    private function listState(Request $request): array
+    {
+        $state = [];
+        $page = (int) $request->input('list_page');
+        if ($page > 1) {
+            $state['page'] = $page;
+        }
+        $length = (int) $request->input('list_length');
+        if (in_array($length, [10, 25, 50, 100], true)) {
+            $state['length'] = $length;
+        }
+        $search = trim((string) $request->input('list_search'));
+        if ($search !== '') {
+            $state['search'] = mb_substr($search, 0, 255);
+        }
+
+        return $state;
     }
 
     public function destroy($id)
