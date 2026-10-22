@@ -1,4 +1,5 @@
-document.getElementById('sidebarToggle').addEventListener('click', function () {
+// The admin login layout loads this bundle too but has no sidebar toggle.
+document.getElementById('sidebarToggle')?.addEventListener('click', function () {
     document.getElementById('sidebar').classList.toggle('collapsed');
     document.getElementById('content').classList.toggle('collapsed');
 });
