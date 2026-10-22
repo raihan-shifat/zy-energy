@@ -13,6 +13,10 @@ use Illuminate\Support\Str;
 class NewsController extends Controller
 {
     use PreventsManagerDelete;
+
+    /** Most images one news post can have. */
+    public const GALLERY_MAX = 8;
+
     public function index()
     {
         return view('admin.news.index');
@@ -20,7 +24,7 @@ class NewsController extends Controller
 
     public function getData(Request $request)
     {
-        $news = News::with('translations');
+        $news = News::with(['translations', 'images']);
 
         return datatables()->of($news)
             ->addColumn('title', function ($item) {
@@ -73,7 +77,17 @@ class NewsController extends Controller
             $attributes["translations.$lang.body"] = __('cms.news.body')." ($lang)";
         }
 
+        // Image list from the multi-image manager (files are uploaded one by one to admin.news.upload-image).
+        $rules += [
+            'gallery' => 'nullable|array|max:'.self::GALLERY_MAX,
+            'gallery.*.id' => 'nullable|integer',
+            'gallery.*.path' => ['nullable', 'string', 'max:255', 'regex:#^news/[A-Za-z0-9._-]+$#'],
+            'gallery_primary' => 'nullable|integer|min:0',
+        ];
+
         $request->validate($rules, [
+            'gallery.max' => __('cms.news.gallery_too_many', ['max' => self::GALLERY_MAX]),
+            'gallery.*.path.regex' => __('cms.products.gallery_bad_path'),
             // PHP refused the file (bigger than upload_max_filesize): say so instead of "failed to upload".
             'image_url.uploaded' => __('cms.news.image_too_large', ['size' => $maxLabel]),
             'image_url.max' => __('cms.news.image_too_large', ['size' => $maxLabel]),
@@ -108,6 +122,70 @@ class NewsController extends Controller
         return $path;
     }
 
+    /**
+     * Apply the submitted image list: order, cover, new uploads and removals; then keep
+     * news.image_url (old single-image column) pointing at the cover for older code.
+     * Without the gallery_present marker (old cached form) the list is left as it is.
+     * A removed image loses its row; its file is deleted only when no other news row uses it.
+     */
+    private function syncImages(News $news, Request $request, ?string $legacyPath = null): void
+    {
+        $existing = $news->images()->get()->keyBy('id');
+        $kept = [];
+        $removed = collect();
+
+        if ($request->boolean('gallery_present')) {
+            $items = array_values(array_slice((array) $request->input('gallery', []), 0, self::GALLERY_MAX));
+            $primary = (int) $request->input('gallery_primary', 0);
+            $primaryId = null;
+
+            foreach ($items as $position => $item) {
+                $image = null;
+                if (! empty($item['id']) && $existing->has((int) $item['id'])) {
+                    $image = $existing->get((int) $item['id']);
+                    $image->update(['sort_order' => $position, 'is_primary' => false]);
+                } elseif (! empty($item['path']) && Storage::disk('public')->exists($item['path'])
+                    && ! \App\Models\NewsImage::where('path', $item['path'])->exists()) {
+                    $image = $news->images()->create(['path' => $item['path'], 'sort_order' => $position, 'is_primary' => false]);
+                }
+                if ($image) {
+                    $kept[] = $image->id;
+                    $primaryId = $position === $primary ? $image->id : $primaryId;
+                }
+            }
+
+            $removed = $existing->except($kept);
+            $removed->each->delete();
+            $coverId = $primaryId ?? ($kept[0] ?? null);
+            if ($coverId) {
+                $news->images()->whereKey($coverId)->update(['is_primary' => true]);
+            }
+        }
+
+        if ($legacyPath) {
+            $hasCover = $news->images()->where('is_primary', true)->exists();
+            $news->images()->create([
+                'path' => $legacyPath,
+                'sort_order' => (int) $news->images()->max('sort_order') + 1,
+                'is_primary' => ! $hasCover,
+            ]);
+        }
+
+        $news->unsetRelation('images');
+        $cover = $news->images()->where('is_primary', true)->value('path') ?? $news->images()->value('path');
+        if ($request->boolean('gallery_present') || $legacyPath) {
+            $news->update(['image_url' => $cover]);
+        }
+
+        foreach ($removed as $image) {
+            $stillUsed = \App\Models\NewsImage::where('path', $image->path)->exists()
+                || News::where('image_url', $image->path)->exists();
+            if (! $stillUsed) {
+                Storage::disk('public')->delete($image->path);
+            }
+        }
+    }
+
     public function store(Request $request)
     {
         $this->validateNews($request);
@@ -115,14 +193,15 @@ class NewsController extends Controller
         $enTitle = $request->translations['en']['title'] ?? $request->translations[config('app.locale')]['title'] ?? 'news';
         $slug = $this->generateUniqueSlug($enTitle);
 
-        // Store the file first: if the server cannot write it, nothing is created.
-        $imagePath = $request->hasFile('image_url') ? $this->storeImage($request) : null;
+        // A single file from an older cached form: store it first, so nothing is created if the server cannot write it.
+        $legacyPath = $request->hasFile('image_url') ? $this->storeImage($request) : null;
 
         $news = News::create([
             'slug' => $slug,
-            'image_url' => $imagePath,
+            'image_url' => null,
             'status' => $request->has('status') ? 1 : 0,
         ]);
+        $this->syncImages($news, $request, $legacyPath);
 
         foreach (clean_translations($request->input('translations', [])) as $lang => $data) {
             $news->translations()->create([
@@ -132,6 +211,8 @@ class NewsController extends Controller
                 'body' => $data['body'] ?? null,
             ]);
         }
+
+        forgetHomepageNewsCache();
 
         return redirect()->route('admin.news.index')->with('success', __('cms.news.created'));
     }
@@ -143,7 +224,7 @@ class NewsController extends Controller
 
     public function edit($id)
     {
-        $news = News::with('translations')->findOrFail($id);
+        $news = News::with(['translations', 'images'])->findOrFail($id);
         $languages = Language::active()->get();
         return view('admin.news.edit', compact('news', 'languages'));
     }
@@ -156,16 +237,10 @@ class NewsController extends Controller
 
         $data = ['status' => $request->has('status') ? 1 : 0];
 
-        if ($request->hasFile('image_url')) {
-            $newPath = $this->storeImage($request);
-            // Replace: remove the previous file only once the new one is safely stored.
-            if ($oldPath = $news->coverPath()) {
-                Storage::disk('public')->delete($oldPath);
-            }
-            $data['image_url'] = $newPath;
-        }
+        $legacyPath = $request->hasFile('image_url') ? $this->storeImage($request) : null;
 
         $news->update($data);
+        $this->syncImages($news, $request, $legacyPath);
 
         foreach (clean_translations($request->input('translations', [])) as $lang => $data) {
             $news->translations()->updateOrCreate(
@@ -173,6 +248,8 @@ class NewsController extends Controller
                 ['title' => $data['title'] ?? null, 'excerpt' => $data['excerpt'] ?? null, 'body' => $data['body'] ?? null]
             );
         }
+
+        forgetHomepageNewsCache();
 
         return redirect()->route('admin.news.index')->with('success', __('cms.news.updated'));
     }
@@ -189,6 +266,7 @@ class NewsController extends Controller
                 Storage::disk('public')->delete($news->image_url);
             }
             $news->delete();
+            forgetHomepageNewsCache();
             return response()->json(['success' => true, 'message' => 'News deleted successfully.']);
         }
 
@@ -205,6 +283,8 @@ class NewsController extends Controller
         $news = News::find($request->id);
         $news->status = $request->status;
         $news->save();
+
+        forgetHomepageNewsCache();
 
         return response()->json(['success' => true, 'message' => 'Status updated.']);
     }

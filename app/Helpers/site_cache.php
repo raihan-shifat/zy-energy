@@ -189,11 +189,23 @@ if (! function_exists('getHomepageNews')) {
     {
         return Cache::remember('homepage:news:' . app()->getLocale(), now()->addMinutes(10), function () {
             return News::public()
-                ->with(['translation', 'translations'])
+                ->with(['translation', 'translations', 'images'])
                 ->orderByDesc('id')
                 ->limit(3)
                 ->get();
         });
+    }
+}
+
+if (! function_exists('forgetHomepageNewsCache')) {
+    /**
+     * Invalidate the homepage "Latest News" cache (all languages); called when news is saved.
+     */
+    function forgetHomepageNewsCache()
+    {
+        foreach (glob(resource_path('lang/*'), GLOB_ONLYDIR) as $path) {
+            Cache::forget('homepage:news:' . basename($path));
+        }
     }
 }
 

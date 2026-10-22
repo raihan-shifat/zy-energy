@@ -167,6 +167,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(fun
     Route::resource('news', NewsController::class);
     Route::post('news/data', [NewsController::class, 'getData'])->name('news.data');
     Route::post('news/update-status', [NewsController::class, 'updateStatus'])->name('news.updateStatus');
+    Route::post('news/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'storeNewsImage'])->name('news.upload-image');
 
     /* Refunds */
     Route::get('refunds', [RefundController::class, 'index'])->name('refunds.index');

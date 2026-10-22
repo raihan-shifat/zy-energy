@@ -38,6 +38,14 @@ class EditorImageController extends Controller
         return $this->handle($request, 'products', 'image|mimes:jpeg,png,jpg,webp', self::MAX_BYTES, __('cms.products.gallery_bad_type'));
     }
 
+    public const NEWS_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+
+    /** News & Blog images (multi-image form): stored in news/, like product images in products/. */
+    public function storeNewsImage(Request $request): JsonResponse
+    {
+        return $this->handle($request, 'news', 'image|mimes:jpeg,png,jpg,webp', self::NEWS_IMAGE_MAX_BYTES, __('cms.news.image_bad_type'));
+    }
+
     /** About Us images: resized to max 1920px wide, plus the site's usual WebP variants. */
     public function storeAboutImage(Request $request, ImageOptimizationService $images): JsonResponse
     {

@@ -68,8 +68,18 @@
                     @endforeach
                 </div>
 
-                <div class="col-md-6 mt-3">
-                    @include('admin.news._image-field', ['currentImage' => $news->coverPath()])
+                <div class="col-12 mt-3">
+                    @include('admin.partials.product-gallery-manager', [
+                        'existingImages' => $news->images,
+                        'galleryMax' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX,
+                        'galleryUploadUrl' => route('admin.news.upload-image'),
+                        'galleryFolder' => 'news',
+                        'galleryPathField' => 'path',
+                        'galleryCap' => \App\Http\Controllers\Admin\EditorImageController::NEWS_IMAGE_MAX_BYTES,
+                        'galleryLabel' => __('cms.news.images'),
+                        'galleryHint' => __('cms.news.images_hint', ['max' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX, 'size' => \App\Http\Controllers\Admin\EditorImageController::humanLimit(\App\Http\Controllers\Admin\EditorImageController::NEWS_IMAGE_MAX_BYTES)]),
+                        'galleryTooMany' => __('cms.news.gallery_too_many', ['max' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX]),
+                    ])
                 </div>
 
                 <div class="col-md-6 mt-3">
