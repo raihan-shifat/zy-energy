@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attribute;
-use App\Models\AttributeTranslation;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
