@@ -270,11 +270,11 @@
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Notes</label>
-                    <textarea name="notes" class="form-control" rows="5">{!! old('notes', $quotation->notes) !!}</textarea>
+                    <textarea name="notes" class="form-control" rows="5">{{ old('notes', $quotation->notes) }}</textarea>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Remarks</label>
-                    <textarea name="remarks" class="form-control" rows="5">{!! old('remarks', $quotation->remarks) !!}</textarea>
+                    <textarea name="remarks" class="form-control" rows="5">{{ old('remarks', $quotation->remarks) }}</textarea>
                 </div>
             </div>
 

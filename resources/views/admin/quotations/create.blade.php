@@ -251,11 +251,11 @@
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Notes</label>
-                    <textarea name="notes" class="form-control" rows="5">{!! old('notes', $defaultNotes) !!}</textarea>
+                    <textarea name="notes" class="form-control" rows="5">{{ old('notes', $defaultNotes) }}</textarea>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Remarks</label>
-                    <textarea name="remarks" class="form-control" rows="5">{!! old('remarks', $defaultRemarks) !!}</textarea>
+                    <textarea name="remarks" class="form-control" rows="5">{{ old('remarks', $defaultRemarks) }}</textarea>
                 </div>
             </div>
 
