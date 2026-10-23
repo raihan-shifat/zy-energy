@@ -190,7 +190,7 @@
         <!-- Tab Content -->
         <div class="tab-content pt-3" id="myTabContent">
           <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
-            {!! localized_translation_value($product->translations, 'description', '') !!}
+            {!! safe_html(localized_translation_value($product->translations, 'description', '')) !!}
           </div>
           {{-- Reviews tab content hidden from customers for now (B2B site). Remove this comment to show it again.
           <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">

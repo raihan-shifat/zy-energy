@@ -303,7 +303,7 @@
                     <tr>
                         <td class="c-sl">{{ $loop->iteration }}</td>
                         <td class="c-model cell-model">{{ $lineItem->model_name ?? '—' }}</td>
-                        <td class="c-desc">{!! $lineItem->description ?? '' !!}</td>
+                        <td class="c-desc">{!! safe_html($lineItem->description) !!}</td>
                         <td class="c-img">
                             @if($itemImageMap[$lineItem->id] ?? null)
                                 <img src="{{ $itemImageMap[$lineItem->id] }}" class="ref-img" alt="Ref">
@@ -345,14 +345,14 @@
         @if($quotation->notes)
             <div class="section">
                 <h4>{{ $labels['notes'] ?? 'Notes' }}</h4>
-                <div class="body">{!! $quotation->notes !!}</div>
+                <div class="body">{!! safe_html($quotation->notes) !!}</div>
             </div>
         @endif
 
         @if($quotation->remarks)
             <div class="section">
                 <h4>{{ $labels['remarks'] ?? 'Remarks' }}</h4>
-                <div class="body">{!! $quotation->remarks !!}</div>
+                <div class="body">{!! safe_html($quotation->remarks) !!}</div>
             </div>
         @endif
 

@@ -42,7 +42,7 @@
         @endif
 
         <div class="news-body">
-            {!! $postBody !!}
+            {!! safe_html($postBody) !!}
         </div>
 
         @php $galleryImages = $post->galleryImages(); @endphp

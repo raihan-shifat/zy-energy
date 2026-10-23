@@ -53,7 +53,7 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-9 {{ $section->setting('align', 'center') === 'center' ? 'text-center' : '' }}">
                             @if ($t?->title)<h2 class="sec-heading mb-4">{{ $t->title }}</h2>@endif
-                            <div class="ab-narrative-text ab-rich">{!! $t?->body !!}</div>
+                            <div class="ab-narrative-text ab-rich">{!! safe_html($t?->body) !!}</div>
                         </div>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                         @endif
                         <div class="{{ $image ? 'col-lg-6' : 'col-lg-9 mx-auto' }}">
                             @if ($t?->title)<h2 class="sec-heading mb-3">{{ $t->title }}</h2>@endif
-                            <div class="ab-rich">{!! $t?->body !!}</div>
+                            <div class="ab-rich">{!! safe_html($t?->body) !!}</div>
                         </div>
                     </div>
                 </div>

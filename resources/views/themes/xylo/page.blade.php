@@ -5,7 +5,7 @@
             <div class="col-md-10">
                 <h1 class="mb-4">{{ $translation->title }}</h1>
                 <div class="page-content">
-                    {!! $translation->content !!}
+                    {!! safe_html($translation->content) !!}
                 </div>
             </div>
         </div>

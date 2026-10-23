@@ -151,9 +151,9 @@
                     {{-- One H1 per page: the slide shown on load. Hidden slides are plain text styled the same,
                          so they do not appear as headings before the H1. --}}
                     @if ($idx === $initialIndex)
-                        <h1 class="mt-0 hero-title"><span>{!! $slide['title'] !!}</span></h1>
+                        <h1 class="mt-0 hero-title"><span>{!! safe_html($slide['title']) !!}</span></h1>
                     @else
-                        <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></p>
+                        <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! safe_html($slide['title']) !!}</span></p>
                     @endif
                     <p class="hero-subtext">{{ $slide['subtitle'] }}</p>
                     <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}<i class="fa-solid fa-arrow-right hero-cta-arrow" aria-hidden="true"></i></a>
