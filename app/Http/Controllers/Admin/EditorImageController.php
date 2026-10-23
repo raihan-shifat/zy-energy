@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\ImageOptimizationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -10,18 +11,22 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 /**
- * Image uploads from the CKEditor "Insert image" button in admin rich-text fields.
- * Responds in the shape the editor's upload adapter expects:
- * {"url": "..."} on success, {"error": {"message": "..."}} on failure.
+ * Admin file uploads (one file per request): the CKEditor "Insert image" button,
+ * product gallery images and About Us page images/videos.
+ * Responds {"url": "...", "path": "..."} on success, {"error": {"message": "..."}} on failure.
  */
 class EditorImageController extends Controller
 {
-    /** Our own limit; the effective one is lowered to PHP's upload limits. */
+    /** Default image limit; the effective one is lowered to PHP's upload limits. */
     private const MAX_BYTES = 5 * 1024 * 1024;
+
+    public const ABOUT_IMAGE_MAX_BYTES = 3 * 1024 * 1024;
+
+    public const ABOUT_VIDEO_MAX_BYTES = 50 * 1024 * 1024;
 
     public function store(Request $request): JsonResponse
     {
-        return $this->handle($request, 'editor/'.date('Y/m'), 'jpeg,png,jpg,gif,webp');
+        return $this->handle($request, 'editor/'.date('Y/m'), 'image|mimes:jpeg,png,jpg,gif,webp', self::MAX_BYTES, __('cms.editor.upload_not_image'));
     }
 
     /**
@@ -30,30 +35,57 @@ class EditorImageController extends Controller
      */
     public function storeProductImage(Request $request): JsonResponse
     {
-        return $this->handle($request, 'products', 'jpeg,png,jpg,webp');
+        return $this->handle($request, 'products', 'image|mimes:jpeg,png,jpg,webp', self::MAX_BYTES, __('cms.products.gallery_bad_type'));
     }
 
-    private function handle(Request $request, string $folder, string $mimes): JsonResponse
+    public const NEWS_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+
+    /** News & Blog images (multi-image form): stored in news/, like product images in products/. */
+    public function storeNewsImage(Request $request): JsonResponse
+    {
+        return $this->handle($request, 'news', 'image|mimes:jpeg,png,jpg,webp', self::NEWS_IMAGE_MAX_BYTES, __('cms.news.image_bad_type'));
+    }
+
+    /** About Us images: resized to max 1920px wide, plus the site's usual WebP variants. */
+    public function storeAboutImage(Request $request, ImageOptimizationService $images): JsonResponse
+    {
+        return $this->handle($request, 'about', 'image|mimes:jpeg,png,jpg,webp', self::ABOUT_IMAGE_MAX_BYTES,
+            __('cms.about_editor.image_bad_type'), function (string $path) use ($images) {
+                $images->limitWidth($path, 1920);
+                $images->generateResponsiveImages($path);
+            });
+    }
+
+    /** About Us video files (MP4/WebM); the content type is checked on the server. */
+    public function storeAboutVideo(Request $request): JsonResponse
+    {
+        return $this->handle($request, 'about/videos', 'mimetypes:video/mp4,application/mp4,video/webm|mimes:mp4,webm', self::ABOUT_VIDEO_MAX_BYTES,
+            __('cms.about_editor.video_bad_type'));
+    }
+
+    private function handle(Request $request, string $folder, string $typeRules, int $cap, string $badType, ?callable $after = null): JsonResponse
     {
         $file = $request->file('upload');
+        $limit = self::humanLimit($cap);
 
         // PHP rejected the file (e.g. bigger than upload_max_filesize): it is present but not valid.
         if ($file && ! $file->isValid()) {
             $tooLarge = in_array($file->getError(), [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true);
-            Log::warning('Editor image upload rejected by PHP', ['error' => $file->getErrorMessage()]);
+            Log::warning('Admin upload rejected by PHP', ['error' => $file->getErrorMessage()]);
 
             return $this->error($tooLarge
-                ? __('cms.editor.upload_too_large', ['max' => self::humanLimit()])
+                ? __('cms.editor.upload_too_large', ['max' => $limit])
                 : __('cms.editor.upload_failed'), $tooLarge ? 413 : 422);
         }
 
         $validator = Validator::make($request->all(), [
-            'upload' => 'required|file|image|mimes:'.$mimes.'|max:'.intdiv(self::maxBytes(), 1024),
+            'upload' => 'required|file|'.$typeRules.'|max:'.intdiv(self::maxBytes($cap), 1024),
         ], [
-            'upload.required' => __('cms.editor.upload_missing', ['max' => self::humanLimit()]),
-            'upload.image' => __(str_contains($mimes, 'gif') ? 'cms.editor.upload_not_image' : 'cms.products.gallery_bad_type'),
-            'upload.mimes' => __(str_contains($mimes, 'gif') ? 'cms.editor.upload_not_image' : 'cms.products.gallery_bad_type'),
-            'upload.max' => __('cms.editor.upload_too_large', ['max' => self::humanLimit()]),
+            'upload.required' => __('cms.editor.upload_missing', ['max' => $limit]),
+            'upload.image' => $badType,
+            'upload.mimes' => $badType,
+            'upload.mimetypes' => $badType,
+            'upload.max' => __('cms.editor.upload_too_large', ['max' => $limit]),
         ]);
 
         if ($validator->fails()) {
@@ -64,12 +96,12 @@ class EditorImageController extends Controller
             $path = $file->store($folder, 'public');
         } catch (\Throwable $e) {
             $path = false;
-            Log::error('Editor image upload could not be written', ['exception' => $e]);
+            Log::error('Admin upload could not be written', ['exception' => $e]);
         }
 
         if (! $path) {
             $root = Storage::disk('public')->path('');
-            Log::error('Editor image upload failed: storage not writable?', [
+            Log::error('Admin upload failed: storage not writable?', [
                 'disk_root' => $root,
                 'disk_root_writable' => is_writable($root),
             ]);
@@ -77,13 +109,17 @@ class EditorImageController extends Controller
             return $this->error(__('cms.editor.upload_storage_failed'), 500);
         }
 
+        if ($after) {
+            $after($path);
+        }
+
         return response()->json(['url' => asset('storage/'.$path), 'path' => $path]);
     }
 
-    /** Smallest of our limit and PHP's upload_max_filesize / post_max_size, in bytes. */
-    public static function maxBytes(): int
+    /** Smallest of $cap and PHP's upload_max_filesize / post_max_size, in bytes. */
+    public static function maxBytes(int $cap = self::MAX_BYTES): int
     {
-        $limits = [self::MAX_BYTES];
+        $limits = [$cap];
         foreach (['upload_max_filesize', 'post_max_size'] as $key) {
             $bytes = self::iniBytes((string) ini_get($key));
             if ($bytes > 0) {
@@ -94,9 +130,9 @@ class EditorImageController extends Controller
         return min($limits);
     }
 
-    public static function humanLimit(): string
+    public static function humanLimit(int $cap = self::MAX_BYTES): string
     {
-        return rtrim(rtrim(number_format(self::maxBytes() / 1048576, 1), '0'), '.').' MB';
+        return rtrim(rtrim(number_format(self::maxBytes($cap) / 1048576, 1), '0'), '.').' MB';
     }
 
     private static function iniBytes(string $value): int

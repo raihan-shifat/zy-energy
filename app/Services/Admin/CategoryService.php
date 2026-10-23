@@ -78,17 +78,6 @@ class CategoryService
     }
 
     /**
-     * Uploads an image and returns the full storage URL.
-     */
-    private function uploadImage($image)
-    {
-        $fileName = time().'_'.$image->getClientOriginalName();
-        $path = $image->storeAs('categories', $fileName, 'public');
-
-        return 'storage/'.$path; // Ensure it's publicly accessible
-    }
-
-    /**
      * Update an existing category.
      */
     public function update($request, $id)

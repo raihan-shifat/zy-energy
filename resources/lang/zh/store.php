@@ -26,7 +26,7 @@ $translations = [
         'cookie_policy' => 'Cookie 政策',
         'legal' => '法律信息',
         'maintained_by' => '构建与维护者', 'quick_links' => '快速链接', 'home' => '首页', 'products' => '产品',
-        'news' => '新闻', 'about' => '关于我们', 'contact' => '联系我们', 'address' => '地址', 'social_connect' => '社交媒体',
+        'news' => '新闻与博客', 'about' => '关于我们', 'contact' => '联系我们', 'address' => '地址', 'social_connect' => '社交媒体',
         'wechat_qr_title' => '扫描我们的微信', 'wechat_qr_hint' => '打开微信并扫描二维码联系我们。',
     ],
 
@@ -309,7 +309,7 @@ $translations = [
 
     // Only keys added for SEO / consent; other keys in these groups fall back to English.
     'news' => [
-        'meta_description' => ':site 的新闻与动态。',
+        'meta_description' => ':site 的新闻、行业洞察与项目动态。',
     ],
     'certification' => [
         'empty' => '认证信息即将发布。',
@@ -481,10 +481,10 @@ return array_replace_recursive($translations, [
     ],
 
     'news' => [
-        'title' => '新闻',
+        'title' => '新闻与博客',
         'read_more' => '阅读全文',
-        'back_to_news' => '返回新闻',
-        'no_posts' => '暂无新闻。',
+        'back_to_news' => '返回新闻与博客',
+        'no_posts' => '暂无文章。',
         'posted_on' => '发布于',
     ],
 

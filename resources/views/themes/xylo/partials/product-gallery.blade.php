@@ -10,7 +10,7 @@
     $galleryName = $galleryName ?: __('store.category.product_name_not_available');
 @endphp
 
-<div class="pg" data-pg data-count="{{ $galleryCount }}">
+<div class="pg" data-pg data-count="{{ $galleryCount }}" @if ($galleryCount > 1) data-multi @endif>
     <div class="pg-stage">
         <div class="pg-track" @if ($galleryCount > 1) tabindex="0" role="region" aria-roledescription="carousel" aria-label="{{ __('store.product_detail.gallery_label', ['name' => $galleryName]) }}" @endif>
             @forelse ($galleryImages as $image)
@@ -74,51 +74,62 @@
 </div>
 
 <style>
-    .pg { --pg-gap: 12px; width: 100%; }
+    /* Size: a 1:1 box that follows the column width. Desktop column is col-lg-5, the box is
+       capped at 520px; below lg the gallery is centred at max 560px; phones use the full width. */
+    .pg { --pg-gap: 12px; --pg-nav: 40px; --pg-nav-inset: 8px; width: 100%; max-width: 560px; margin-inline: auto; }
+    /* With arrows, keep the photo clear of them: side padding = arrow + inset on both sides. */
+    .pg[data-multi] .pg-open { padding-inline: calc(var(--pg-nav) + var(--pg-nav-inset) * 2); }
     .pg-stage { position: relative; }
     .pg-track {
         display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth;
         scrollbar-width: none; border: 1px solid var(--line, #dfe7e2); border-radius: var(--radius-lg, 16px);
-        background: var(--surface, #fff);
+        background: var(--surface-2, #f4f7f5);
     }
     .pg-track::-webkit-scrollbar { display: none; }
-    .pg-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1 / 1; display: flex; }
+    .pg-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; aspect-ratio: 1 / 1; display: flex; overflow: hidden; }
+    @media (min-width: 992px) { .pg-slide { max-height: 520px; } }
+    /* Stacked below lg: space before the title that follows. */
+    @media (max-width: 991.98px) { .pg { margin-bottom: 24px; } }
     .pg-open { all: unset; box-sizing: border-box; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 16px; cursor: zoom-in; }
-    .pg-slide picture, .pg-slide > img { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .pg-slide picture, .pg-slide > img { width: 100%; height: 100%; min-height: 0; display: flex; align-items: center; justify-content: center; }
     .pg-slide > img { padding: 16px; box-sizing: border-box; }
-    .pg-img { width: 100%; height: 100%; object-fit: contain; }
+    .pg-img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
     .pg-track:focus-visible, .pg-open:focus-visible, .pg-thumb:focus-visible, .pg-nav:focus-visible, .pg-lb-close:focus-visible {
         outline: 3px solid var(--brand-600, #0e7a4f); outline-offset: 2px;
     }
     .pg-nav {
-        position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%;
+        position: absolute; top: 50%; transform: translateY(-50%); width: var(--pg-nav); height: var(--pg-nav); border-radius: 50%;
         border: 1px solid var(--line, #dfe7e2); background: var(--surface, #fff); color: var(--brand-700, #0e7a4f);
         box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.08)); display: flex; align-items: center; justify-content: center;
-        font-size: 22px; cursor: pointer; z-index: 2; transition: background .15s, color .15s;
+        font-size: 20px; cursor: pointer; z-index: 2; transition: background .15s, color .15s;
     }
     .pg-nav:hover { background: var(--brand-700, #0e7a4f); color: #fff; }
-    .pg-prev { left: 12px; }
-    .pg-next { right: 12px; }
+    .pg-stage > .pg-prev { left: var(--pg-nav-inset); }
+    .pg-stage > .pg-next { right: var(--pg-nav-inset); }
+    .pg-lightbox .pg-prev { left: 12px; }
+    .pg-lightbox .pg-next { right: 12px; }
+    .pg-lightbox .pg-nav { width: 44px; height: 44px; }
     .pg-dots { display: none; justify-content: center; gap: 6px; margin-top: 10px; }
     .pg-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line, #dfe7e2); transition: background .2s, transform .2s; }
     .pg-dot.is-active { background: var(--brand-700, #0e7a4f); transform: scale(1.25); }
-    .pg-thumbs { display: flex; gap: var(--pg-gap); margin-top: var(--pg-gap); overflow-x: auto; padding: 4px 2px; }
+    .pg-thumbs { display: flex; gap: 10px; margin-top: var(--pg-gap); overflow-x: auto; padding: 3px 2px; }
     .pg-thumb {
-        flex: 0 0 auto; width: 84px; height: 84px; padding: 6px; border-radius: var(--radius, 10px);
-        border: 2px solid var(--line, #dfe7e2); background: var(--surface, #fff); cursor: pointer; opacity: .75; transition: border-color .15s, opacity .15s;
+        flex: 0 0 auto; width: 72px; height: 72px; padding: 0; overflow: hidden; border-radius: var(--radius, 10px);
+        border: 2px solid var(--line, #dfe7e2); background: var(--surface-2, #f4f7f5); cursor: pointer; opacity: .8; transition: border-color .15s, opacity .15s;
     }
     .pg-thumb:hover { opacity: 1; }
     .pg-thumb.is-active { border-color: var(--brand-700, #0e7a4f); opacity: 1; }
-    .pg-thumb img { width: 100%; height: 100%; object-fit: contain; }
+    .pg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .pg-lightbox { position: fixed; inset: 0; z-index: 2000; background: rgba(10, 20, 15, .92); display: flex; align-items: center; justify-content: center; padding: 56px 16px; }
     .pg-lightbox[hidden] { display: none; }
     .pg-lb-img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; touch-action: pan-y; }
     .pg-lb-close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 22px; cursor: pointer; }
     .pg-lb-count { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; color: #fff; margin: 0; font-size: var(--fs-small, 14px); }
     @media (max-width: 767.98px) {
-        .pg-thumbs { display: none; }
+        .pg { --pg-nav: 32px; --pg-nav-inset: 6px; max-width: none; }
+        .pg-stage > .pg-nav { font-size: 16px; }
         .pg-dots { display: flex; }
-        .pg-stage > .pg-nav { width: 36px; height: 36px; font-size: 18px; }
+        .pg-thumb { width: 56px; height: 56px; }
     }
     @media (prefers-reduced-motion: reduce) { .pg-track { scroll-behavior: auto; } }
 </style>

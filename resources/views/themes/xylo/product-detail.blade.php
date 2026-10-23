@@ -37,10 +37,11 @@
 <div class="main-detail pt-5 pb-5">
     <div class="container">
         <div class="row">
-            <div class="col-md-6 position-relative">
+            {{-- Gallery ~42% on desktop; stacked (gallery centred, max 560px) below lg. --}}
+            <div class="col-12 col-lg-5 position-relative">
                 @include('themes.xylo.partials.product-gallery', ['product' => $product, 'galleryName' => $seoName])
             </div>
-            <div class="col-md-6 pro-textarea">
+            <div class="col-12 col-lg-7 pro-textarea">
                 @php
                     $productName = localized_translation_value($product->translations, 'name', __('store.category.product_name_not_available'));
                     $productShortDesc = localized_translation_value($product->translations, 'short_description', '');
@@ -178,17 +179,20 @@
             <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description"
                     type="button" role="tab" aria-controls="description" aria-selected="true">{{ __('store.product_detail.description') }}</button>
           </li>
+          {{-- Reviews tab hidden from customers for now. Remove this comment to show it again.
           <li class="nav-item" role="presentation">
             <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
                     type="button" role="tab" aria-controls="reviews" aria-selected="false">{{ __('store.product_detail.reviews') }} ({{ $product->reviews_count }})</button>
           </li>
+          --}}
         </ul>
 
         <!-- Tab Content -->
         <div class="tab-content pt-3" id="myTabContent">
           <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
-            {!! localized_translation_value($product->translations, 'description', '') !!}
+            {!! safe_html(localized_translation_value($product->translations, 'description', '')) !!}
           </div>
+          {{-- Reviews tab content hidden from customers for now (B2B site). Remove this comment to show it again.
           <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
            <div class="product-detail-customer-review">
 
@@ -281,6 +285,7 @@
                 </div>
             </div>
           </div>
+          --}}
         </div>
 
       </div>

@@ -77,13 +77,15 @@
                     { data: 'title', name: 'title' },
                     { data: 'slug', name: 'slug' },
                     {
-                        data: 'image_url',
-                        render: function(data) {
-                            if (data) {
-                                var path = data.startsWith('http') ? data : '/storage/' + data;
-                                return '<img src="' + path + '" alt="News" width="50">';
-                            }
-                            return '-';
+                        // Server-checked thumbnail URL (null = no usable image) with a placeholder
+                        // instead of a broken image; the placeholder also covers a file that fails to load.
+                        data: 'image_thumb',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            var placeholder = @json(asset('images/product-placeholder.svg'));
+                            var alt = $('<div>').text(row.title || '').html();
+                            return '<img src="' + (data || placeholder) + '" alt="' + alt + '" width="64" height="48" style="object-fit:cover;border-radius:4px;background:#f4f7f5" loading="lazy" onerror="this.onerror=null;this.src=\'' + placeholder + '\'">';
                         }
                     },
                     {

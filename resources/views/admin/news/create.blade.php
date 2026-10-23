@@ -22,13 +22,14 @@
             @endif
 
             <div class="row">
+                {{-- Tabs are keyed by language code (names can contain spaces, which break the tab selector). --}}
                 <ul class="nav nav-tabs" id="languageTabs" role="tablist">
                     @foreach($activeLanguages as $language)
                         <li class="nav-item" role="presentation">
                             <button class="nav-link {{ $loop->first ? 'active' : '' }}"
-                                    id="{{ $language->name }}-tab"
+                                    id="lang-{{ $language->code }}-tab"
                                     data-bs-toggle="tab"
-                                    data-bs-target="#{{ $language->name }}"
+                                    data-bs-target="#lang-{{ $language->code }}"
                                     type="button"
                                     role="tab">
                                 {{ ucwords($language->name) }}
@@ -39,39 +40,49 @@
 
                 <div class="tab-content mt-3" id="languageTabContent">
                     @foreach($activeLanguages as $language)
-                        <div class="tab-pane fade show {{ $loop->first ? 'active' : '' }}" id="{{ $language->name }}" role="tabpanel">
+                        <div class="tab-pane fade show {{ $loop->first ? 'active' : '' }}" id="lang-{{ $language->code }}" role="tabpanel">
                             <label class="form-label">{{ __('cms.news.title') }} ({{ $language->code }})</label>
                             <input type="text"
                                    name="translations[{{ $language->code }}][title]"
-                                   class="form-control"
+                                   class="form-control @error("translations.{$language->code}.title") is-invalid @enderror"
+                                   maxlength="255"
                                    value="{{ old("translations.{$language->code}.title") }}">
+                            @error("translations.{$language->code}.title")
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
 
                             <label class="form-label mt-3">{{ __('cms.news.excerpt') }} ({{ $language->code }})</label>
-                            <textarea name="translations[{{ $language->code }}][excerpt]" rows="2" class="form-control @error("translations.{$language->code}.excerpt") is-invalid @enderror">{{ old("translations.{$language->code}.excerpt") }}</textarea>
+                            <textarea name="translations[{{ $language->code }}][excerpt]" rows="2" maxlength="500" class="form-control @error("translations.{$language->code}.excerpt") is-invalid @enderror">{{ old("translations.{$language->code}.excerpt") }}</textarea>
                             @error("translations.{$language->code}.excerpt")
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
 
                             <label class="form-label mt-3">{{ __('cms.news.body') }} ({{ $language->code }})</label>
                             <textarea name="translations[{{ $language->code }}][body]" class="form-control ck-editor-multi-languages" rows="6">{{ old("translations.{$language->code}.body") }}</textarea>
+                            @error("translations.{$language->code}.body")
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
                         </div>
                     @endforeach
                 </div>
 
-                <div class="col-md-6 mt-3">
-                    <div class="form-group">
-                        <label for="image_file">{{ __('cms.news.image') }}</label>
-                        <label class="btn btn-primary" for="image_file">{{ __('cms.news.choose_file') }}</label>
-                        <input type="file" name="image_url" accept="image/*" class="form-control d-none" id="image_file">
-                        <div class="mt-2 d-none" id="image_preview">
-                            <img id="image_preview_img" class="img-thumbnail" width="100">
-                        </div>
-                    </div>
+                <div class="col-12 mt-3">
+                    @include('admin.partials.product-gallery-manager', [
+                        'existingImages' => collect(),
+                        'galleryMax' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX,
+                        'galleryUploadUrl' => route('admin.news.upload-image'),
+                        'galleryFolder' => 'news',
+                        'galleryPathField' => 'path',
+                        'galleryCap' => \App\Http\Controllers\Admin\EditorImageController::NEWS_IMAGE_MAX_BYTES,
+                        'galleryLabel' => __('cms.news.images'),
+                        'galleryHint' => __('cms.news.images_hint', ['max' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX, 'size' => \App\Http\Controllers\Admin\EditorImageController::humanLimit(\App\Http\Controllers\Admin\EditorImageController::NEWS_IMAGE_MAX_BYTES)]),
+                        'galleryTooMany' => __('cms.news.gallery_too_many', ['max' => \App\Http\Controllers\Admin\NewsController::GALLERY_MAX]),
+                    ])
                 </div>
 
                 <div class="col-md-6 mt-3">
                     <div class="form-check form-switch">
-                        <input type="checkbox" class="form-check-input" name="status" id="status" checked>
+                        <input type="checkbox" class="form-check-input" name="status" id="status" {{ old('_token') ? (old('status') ? 'checked' : '') : 'checked' }}>
                         <label class="form-check-label" for="status">{{ __('cms.news.status') }}</label>
                     </div>
                 </div>
@@ -85,41 +96,12 @@
 
 @section('js')
 <script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+{{-- Same upload pipeline as the product description editor. --}}
+@include('admin.partials.ckeditor-upload-adapter')
 <script>
 document.querySelectorAll('.ck-editor-multi-languages').forEach((element) => {
-    ClassicEditor.create(element).catch(error => console.error(error));
-});
-document.getElementById('image_file').addEventListener('change', function(event) {
-    var file = event.target.files[0];
-    var previewElement = document.getElementById('image_preview');
-    var previewImage = document.getElementById('image_preview_img');
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            previewElement.classList.remove('d-none');
-            previewImage.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
+    ClassicEditor.create(element, { extraPlugins: [ZyEditorUploadPlugin] }).catch(error => console.error(error));
 });
 </script>
-<script>
-    {{-- Excerpt character counter: shows usage vs the 500-char validation limit --}}
-    document.addEventListener('DOMContentLoaded', function () {
-        var EXCERPT_LIMIT = 500;
-        document.querySelectorAll('textarea[name*=""[excerpt]""]'.replace(/""/g, '"')).forEach(function (ta) {
-            var counter = document.createElement('small');
-            counter.className = 'excerpt-counter d-block mt-1 text-muted';
-            ta.insertAdjacentElement('afterend', counter);
-
-            function update() {
-                var len = ta.value.length;
-                counter.textContent = len + ' / ' + EXCERPT_LIMIT + ' characters';
-                counter.classList.toggle('text-danger', len > EXCERPT_LIMIT);
-            }
-            ta.addEventListener('input', update);
-            update();
-        });
-    });
-</script>
+@include('admin.news._form-scripts')
 @endsection

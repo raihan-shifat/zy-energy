@@ -229,14 +229,14 @@
         @if($quotation->notes)
         <div class="mt-4">
             <h6 class="fw-bold">Notes:</h6>
-            <div class="p-3 bg-light rounded">{!! $quotation->notes !!}</div>
+            <div class="p-3 bg-light rounded">{!! safe_html($quotation->notes) !!}</div>
         </div>
         @endif
 
         @if($quotation->remarks)
         <div class="mt-3">
             <h6 class="fw-bold">Remarks:</h6>
-            <div class="p-3 bg-light rounded">{!! $quotation->remarks !!}</div>
+            <div class="p-3 bg-light rounded">{!! safe_html($quotation->remarks) !!}</div>
         </div>
         @endif
     </div>

@@ -30,6 +30,38 @@ class ImageOptimizationService
     public const JPEG_QUALITY = 85;
 
     /**
+     * Scale an uploaded image down (never up) to at most $maxWidth pixels wide, in place,
+     * keeping its format. Returns false when nothing was changed (small image, no GD, error).
+     */
+    public function limitWidth(string $storedPath, int $maxWidth = 1920, string $disk = 'public'): bool
+    {
+        if (! extension_loaded('gd') || ! Storage::disk($disk)->exists($storedPath)) {
+            return false;
+        }
+
+        try {
+            $fullPath = Storage::disk($disk)->path($storedPath);
+            $manager = new ImageManager(new GdDriver());
+            $img = $manager->read($fullPath);
+            if ($img->width() <= $maxWidth) {
+                return false;
+            }
+            $img->scaleDown(width: $maxWidth);
+            match (strtolower(pathinfo($storedPath, PATHINFO_EXTENSION))) {
+                'png' => $img->toPng()->save($fullPath),
+                'webp' => $img->toWebp(self::WEBP_QUALITY)->save($fullPath),
+                default => $img->toJpeg(self::JPEG_QUALITY)->save($fullPath),
+            };
+
+            return true;
+        } catch (\Throwable $e) {
+            \Log::warning("Could not resize {$storedPath}: ".$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
      * Generate all responsive sizes + WebP for an uploaded image
      *
      * @param string $storedPath Path relative to storage disk (e.g., 'products/abc.jpg')

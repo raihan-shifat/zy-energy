@@ -206,7 +206,7 @@
             <span><i class="fas fa-file-alt me-2"></i> <span>{{ __('cms.sidebar.pages.title') }}</span></span>
             <i class="fas fa-chevron-down"></i>
         </a>
-        <div class="collapse {{ Route::currentRouteName() == 'admin.pages.create' || Route::currentRouteName() == 'admin.pages.index' ? 'show' : '' }}" id="pageMenu">
+        <div class="collapse {{ in_array(Route::currentRouteName(), ['admin.pages.create', 'admin.pages.index', 'admin.about.edit']) ? 'show' : '' }}" id="pageMenu">
             <ul class="nav flex-column ms-3">
                 <li>
                     <a class="nav-link {{ Route::currentRouteName() == 'admin.pages.create' ? 'active' : '' }}" href="{{ route('admin.pages.create') }}">
@@ -216,6 +216,11 @@
                 <li>
                     <a class="nav-link {{ Route::currentRouteName() == 'admin.pages.index' ? 'active' : '' }}" href="{{ route('admin.pages.index') }}">
                     {{ __('cms.sidebar.pages.list') }}
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link {{ Route::currentRouteName() == 'admin.about.edit' ? 'active' : '' }}" href="{{ route('admin.about.edit') }}">
+                    {{ __('cms.sidebar.pages.about') }}
                     </a>
                 </li>
             </ul>

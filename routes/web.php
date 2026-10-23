@@ -61,6 +61,7 @@ Route::post('password/confirm', [ConfirmPasswordController::class, 'confirm']);
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(function () {
 
     /* Dashboard */
+    Route::redirect('/', '/admin/dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     /* Categiries */
@@ -74,6 +75,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(fun
     Route::resource('products', ProductController::class);
     Route::post('editor/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'store'])->name('editor.upload-image');
     Route::post('products/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'storeProductImage'])->name('products.upload-image');
+
+    /* About Us page editor */
+    Route::get('about', [\App\Http\Controllers\Admin\AboutPageController::class, 'edit'])->name('about.edit');
+    Route::put('about', [\App\Http\Controllers\Admin\AboutPageController::class, 'update'])->name('about.update');
+    Route::post('about/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'storeAboutImage'])->name('about.upload-image');
+    Route::post('about/upload-video', [\App\Http\Controllers\Admin\EditorImageController::class, 'storeAboutVideo'])->name('about.upload-video');
     Route::post('products/data', [ProductController::class, 'getProducts'])->name('products.data');
     Route::post('admin/products/updateStatus', [ProductController::class, 'updateStatus'])->name('products.updateStatus');
 
@@ -161,6 +168,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(fun
     Route::resource('news', NewsController::class);
     Route::post('news/data', [NewsController::class, 'getData'])->name('news.data');
     Route::post('news/update-status', [NewsController::class, 'updateStatus'])->name('news.updateStatus');
+    Route::post('news/upload-image', [\App\Http\Controllers\Admin\EditorImageController::class, 'storeNewsImage'])->name('news.upload-image');
 
     /* Refunds */
     Route::get('refunds', [RefundController::class, 'index'])->name('refunds.index');

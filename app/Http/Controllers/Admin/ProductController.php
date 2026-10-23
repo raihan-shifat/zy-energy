@@ -34,7 +34,7 @@ class ProductController extends Controller
     private const GALLERY_RULES = [
         'gallery' => 'nullable|array|max:'.self::GALLERY_MAX,
         'gallery.*.id' => 'nullable|integer',
-        'gallery.*.path' => ['nullable', 'string', 'max:255', 'regex:/^products\/[A-Za-z0-9._-]+$/'],
+        'gallery.*.path' => ['nullable', 'string', 'max:255', 'regex:/^products\/[A-Za-z0-9._-]+$/', 'not_regex:/\.\./'],
         'gallery_primary' => 'nullable|integer|min:0',
     ];
 
@@ -287,6 +287,7 @@ class ProductController extends Controller
         return [
             'gallery.max' => __('cms.products.gallery_too_many', ['max' => self::GALLERY_MAX]),
             'gallery.*.path.regex' => __('cms.products.gallery_bad_path'),
+            'gallery.*.path.not_regex' => __('cms.products.gallery_bad_path'),
         ];
     }
 

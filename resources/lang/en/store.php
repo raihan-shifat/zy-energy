@@ -32,7 +32,7 @@ return [
         'home' => 'Home',
         'products' => 'Products',
         'certification' => 'Certification',
-        'news' => 'News',
+        'news' => 'News & Blog',
         'about' => 'About Us',
         'contact' => 'Contact Us',
     ],
@@ -366,11 +366,11 @@ return [
     ],
 
     'news' => [
-        'title' => 'News',
+        'title' => 'News & Blog',
         'read_more' => 'Read More',
-        'back_to_news' => 'Back to News',
-        'no_posts' => 'No news posts yet.',
-        'meta_description' => 'News and updates from :site.',
+        'back_to_news' => 'Back to News & Blog',
+        'no_posts' => 'No posts yet.',
+        'meta_description' => 'News, insights and project updates from :site.',
         'posted_on' => 'Posted on',
     ],
 

@@ -44,9 +44,12 @@
                                     $menuItemTitle = localized_translation_value($menuItem->translations, 'title', $menuItem->slug);
                                 @endphp
                                 @if (!$skipHeaderItem && $menuItem->slug === 'products')
-                                    {{-- Products mega-menu: 7 top-level categories, DB-driven (cached) --}}
+                                    {{-- Products mega-menu: all active categories, DB-driven (cached); optional cap via MENU_CATEGORIES_LIMIT --}}
                                     @php
-                                        $megaCategories = getActiveCategories()->take(7);
+                                        $megaCategories = getActiveCategories();
+                                        if (($megaLimit = config('storefront.menu_categories_limit')) > 0) {
+                                            $megaCategories = $megaCategories->take($megaLimit);
+                                        }
                                     @endphp
                                     <li class="nav-item dropdown position-static">
                                         <a class="nav-link menu-text-color dropdown-toggle" href="{{ route('shop.index') }}" data-bs-toggle="dropdown">

@@ -70,6 +70,46 @@
         background: var(--brand-700, #0e7a4f);
         transform: scale(1.06);
     }
+    /* Latest News cards: the whole card opens the post (stretched title link). */
+    .news-card { transition: box-shadow .2s ease; cursor: pointer; }
+    .news-card:hover { box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .12) !important; }
+    .news-card:hover .card-title, .news-card-link:hover { color: var(--brand-700, #0b6b3c); }
+    .news-card-link { color: inherit; text-decoration: none; }
+    .news-card-link:focus-visible { outline: none; }
+    .news-card:has(.news-card-link:focus-visible) { outline: 3px solid var(--brand-600, #12894f); outline-offset: 3px; }
+    .news-card:hover .news-card-more { text-decoration: underline; }
+    @media (prefers-reduced-motion: reduce) { .news-card { transition: none; } }
+
+    /* Hero entrance. Hidden start states apply only under .hero-anim, which the script after the
+       hero adds, so without JS the content shows immediately. Fill mode "backwards" hands control
+       back to the normal styles at the end, so the button hover lift still works afterwards. */
+    @keyframes zyHeroUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    /* The card starts at 0.4 opacity, not 0, so the LCP image counts as painted right away. */
+    @keyframes zyHeroCard { from { opacity: .4; transform: scale(.97); } to { opacity: 1; transform: none; } }
+    @keyframes zyHeroZoom { from { transform: scale(1); } to { transform: scale(1.03); } }
+    .banner-area.hero-anim .hero-slide > .hero-eyebrow,
+    .banner-area.hero-anim .hero-slide > .hero-title,
+    .banner-area.hero-anim .hero-slide > .hero-subtext,
+    .banner-area.hero-anim .hero-slide > .btn { animation: zyHeroUp .6s ease-out backwards; }
+    .banner-area.hero-anim .hero-slide > .hero-title { animation-delay: .1s; }
+    .banner-area.hero-anim .hero-slide > .hero-subtext { animation-delay: .2s; }
+    .banner-area.hero-anim .hero-slide > .btn { animation-delay: .3s; }
+    .banner-area.hero-anim .hero-media { animation: zyHeroCard .6s ease-out backwards; }
+    /* Slow zoom on the image only (not the video layer); .hero-media clips the overflow. */
+    .banner-area .hero-img-slide img { animation: zyHeroZoom 12s ease-in-out infinite alternate; }
+    .banner-area .hero-slide > .btn { transition: transform .2s ease, box-shadow .2s ease; }
+    .banner-area .hero-slide > .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(14, 122, 79, .28); }
+    /* Keep Bootstrap's focus ring and add the lift shadow under it. */
+    .banner-area .hero-slide > .btn:focus-visible { transform: translateY(-2px); box-shadow: var(--bs-btn-focus-box-shadow), 0 8px 18px rgba(14, 122, 79, .28); }
+    .banner-area .hero-cta-arrow { margin-left: .5rem; transition: transform .2s ease; }
+    .banner-area .hero-slide > .btn:hover .hero-cta-arrow,
+    .banner-area .hero-slide > .btn:focus-visible .hero-cta-arrow { transform: translateX(4px); }
+    @media (prefers-reduced-motion: reduce) {
+        .banner-area .hero-slide > *, .banner-area .hero-media, .banner-area .hero-img-slide img { animation: none !important; }
+        .banner-area .hero-slide > .btn, .banner-area .hero-cta-arrow { transition: none; }
+        .banner-area .hero-slide > .btn:hover, .banner-area .hero-slide > .btn:focus-visible,
+        .banner-area .hero-slide > .btn:hover .hero-cta-arrow, .banner-area .hero-slide > .btn:focus-visible .hero-cta-arrow { transform: none; }
+    }
 </style>
 @endsection
 
@@ -111,12 +151,12 @@
                     {{-- One H1 per page: the slide shown on load. Hidden slides are plain text styled the same,
                          so they do not appear as headings before the H1. --}}
                     @if ($idx === $initialIndex)
-                        <h1 class="mt-0 hero-title"><span>{!! $slide['title'] !!}</span></h1>
+                        <h1 class="mt-0 hero-title"><span>{!! safe_html($slide['title']) !!}</span></h1>
                     @else
-                        <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></p>
+                        <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! safe_html($slide['title']) !!}</span></p>
                     @endif
                     <p class="hero-subtext">{{ $slide['subtitle'] }}</p>
-                    <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}</a>
+                    <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}<i class="fa-solid fa-arrow-right hero-cta-arrow" aria-hidden="true"></i></a>
                 </div>
                 @endforeach
                 <div class="col-md-6">
@@ -160,6 +200,8 @@
             </div>
         </div>
     </section>
+    {{-- Turn on the hero entrance animation (CSS above). Without JS the hero simply shows. --}}
+    <script>document.getElementById('hero-rotation').closest('section').classList.add('hero-anim');</script>
     @if (collect($bannerData)->contains(fn ($s) => ! empty($s['video'])))
     {{-- Inline hero video: autoplays (muted, looping) inside the image box of the visible slide.
          The round button pauses / resumes it. No popup, no player controls, title or subtitles.
@@ -387,17 +429,18 @@
     @endif
     {{-- Hero Section End --}}
 
-    {{-- Product Categories Grid (7 tiles, admin-managed categories) --}}
+    {{-- Product Categories Grid (all active categories, admin-managed): 4 per row on desktop,
+         2 on tablet and phone; a partial last row is centred so no card is left alone at the edge. --}}
     <section class="cat-slider animate-on-scroll">
         <div class="container">
             <h2 class="text-start pb-3 sec-heading">{{ __('store.home_b2b.categories') }}</h2>
             <p class="text-muted mb-4">{{ __('store.home_b2b.categories_subtitle') }}</p>
-            <div class="row">
+            <div class="row justify-content-center">
                 @foreach($categories as $category)
                     @php
                         $catName = localized_translation_value($category->translations, 'name', $category->slug);
                     @endphp
-                    <div class="col-6 col-md-3 mb-4">
+                    <div class="col-6 col-lg-3 mb-4">
                         <div class="cat-card h-100">
                             <a href="{{ route('category.show', $category->slug) }}" class="text-decoration-none d-block h-100">
                                 @php
@@ -553,14 +596,15 @@
                         $newsExcerpt = localized_translation_value($newsPost->translations, 'excerpt', '');
                     @endphp
                     <div class="col-md-4 mb-4">
-                        <div class="card h-100 shadow-sm">
-                            @if ($newsPost->image_url)
-                                <img src="{{ asset('storage/' . $newsPost->image_url) }}" class="card-img-top" alt="{{ $newsTitle }}" loading="lazy" decoding="async"{!! image_size_attrs($newsPost->image_url) !!} style="height:180px; width:100%; object-fit:cover;">
+                        {{-- Whole card is one link: the title link is stretched over the card (see .news-card styles above). --}}
+                        <div class="card h-100 shadow-sm news-card">
+                            @if ($newsCover = $newsPost->coverPath())
+                                <img src="{{ asset('storage/' . $newsCover) }}" class="card-img-top" alt="" loading="lazy" decoding="async"{!! image_size_attrs($newsCover) !!} style="height:180px; width:100%; object-fit:cover;">
                             @endif
                             <div class="card-body">
-                                <h3 class="card-title">{{ $newsTitle }}</h3>
+                                <h3 class="card-title"><a href="{{ route('news.show', $newsPost->slug) }}" class="news-card-link stretched-link">{{ $newsTitle }}</a></h3>
                                 <p class="card-text text-muted small">{{ \Illuminate\Support\Str::limit($newsExcerpt, 90) }}</p>
-                                <a href="{{ route('news.show', $newsPost->slug) }}" class="btn btn-link p-0">{{ __('store.news.read_more') }}</a>
+                                <span class="btn btn-link p-0 news-card-more" aria-hidden="true">{{ __('store.news.read_more') }}</span>
                             </div>
                         </div>
                     </div>

@@ -20,13 +20,13 @@
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Default Notes</label>
-                <textarea name="default_notes" class="form-control summernote" rows="6">{!! $defaultNotes !!}</textarea>
+                <textarea name="default_notes" class="form-control summernote" rows="6">{{ $defaultNotes }}</textarea>
                 <small class="text-muted">Pre-filled when creating new quotations. Can be overridden per quotation.</small>
             </div>
 
             <div class="mb-3">
                 <label class="form-label fw-bold">Default Remarks</label>
-                <textarea name="default_remarks" class="form-control summernote" rows="6">{!! $defaultRemarks !!}</textarea>
+                <textarea name="default_remarks" class="form-control summernote" rows="6">{{ $defaultRemarks }}</textarea>
                 <small class="text-muted">Pre-filled when creating new quotations. Can be overridden per quotation.</small>
             </div>
 

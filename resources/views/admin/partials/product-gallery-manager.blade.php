@@ -1,11 +1,20 @@
 {{-- Product image gallery manager (admin create + edit).
-     Each picked file is uploaded on its own to admin.products.upload-image (same pipeline
+     Each picked file is uploaded on its own (products: admin.products.upload-image; same pipeline
      as the description editor), so one big form POST never hits the server upload limit.
      The form then submits the list in display order: gallery[i][id] for existing images,
      gallery[i][path] for new uploads, gallery_primary = index of the cover image.
      Expects $existingImages (collection of ProductImage, may be empty). --}}
 @php
-    $galleryMax = \App\Http\Controllers\Admin\ProductController::GALLERY_MAX;
+    // Defaults are the product settings; the news form passes its own.
+    $galleryMax = $galleryMax ?? \App\Http\Controllers\Admin\ProductController::GALLERY_MAX;
+    $galleryUploadUrl = $galleryUploadUrl ?? route('admin.products.upload-image');
+    $galleryFolder = $galleryFolder ?? 'products';
+    $galleryPathField = $galleryPathField ?? 'image_url';
+    $galleryCap = $galleryCap ?? 5 * 1024 * 1024;
+    $galleryMaxBytes = \App\Http\Controllers\Admin\EditorImageController::maxBytes($galleryCap);
+    $galleryLimit = \App\Http\Controllers\Admin\EditorImageController::humanLimit($galleryCap);
+    $galleryLabel = $galleryLabel ?? __('cms.products.images');
+    $galleryHint = $galleryHint ?? __('cms.products.gallery_hint', ['max' => $galleryMax, 'size' => $galleryLimit]);
     $existingImages = collect($existingImages ?? []);
     $galleryItems = [];
     $galleryPrimary = 0;
@@ -14,15 +23,15 @@
         // Back from a validation error: rebuild what the admin had.
         foreach (old('gallery') as $item) {
             if (! empty($item['id']) && ($image = $existingImages->firstWhere('id', (int) $item['id']))) {
-                $galleryItems[] = ['id' => $image->id, 'url' => asset('storage/'.$image->image_url)];
-            } elseif (! empty($item['path']) && preg_match('/^products\/[A-Za-z0-9._-]+$/', $item['path'])) {
+                $galleryItems[] = ['id' => $image->id, 'url' => asset('storage/'.$image->{$galleryPathField})];
+            } elseif (! empty($item['path']) && preg_match('#^'.preg_quote($galleryFolder, '#').'/[A-Za-z0-9._-]+$#', $item['path'])) {
                 $galleryItems[] = ['path' => $item['path'], 'url' => asset('storage/'.$item['path'])];
             }
         }
         $galleryPrimary = (int) old('gallery_primary', 0);
     } else {
         foreach ($existingImages as $index => $image) {
-            $galleryItems[] = ['id' => $image->id, 'url' => asset('storage/'.$image->image_url)];
+            $galleryItems[] = ['id' => $image->id, 'url' => asset('storage/'.$image->{$galleryPathField})];
             if ($image->is_primary) {
                 $galleryPrimary = count($galleryItems) - 1;
             }
@@ -31,10 +40,10 @@
 @endphp
 
 <div class="mt-4 pgm" id="productGalleryManager">
-    <label class="form-label d-block" for="pgmFile">{{ __('cms.products.images') }}</label>
-    <p class="text-muted small mb-2">{{ __('cms.products.gallery_hint', ['max' => $galleryMax, 'size' => \App\Http\Controllers\Admin\EditorImageController::humanLimit()]) }}</p>
+    <label class="form-label d-block" for="pgmFile">{{ $galleryLabel }}</label>
+    <p class="text-muted small mb-2">{{ $galleryHint }}</p>
 
-    <ul class="pgm-grid list-unstyled" id="pgmGrid" aria-label="{{ __('cms.products.images') }}"></ul>
+    <ul class="pgm-grid list-unstyled" id="pgmGrid" aria-label="{{ $galleryLabel }}"></ul>
     <p class="text-muted small pgm-empty" id="pgmEmpty">{{ __('cms.products.gallery_empty') }}</p>
 
     <label class="btn btn-primary mt-2" for="pgmFile" id="pgmAddLabel">{{ __('cms.products.choose_file') }}</label>
@@ -68,10 +77,10 @@
 <script>
 (function () {
     const cfg = {
-        uploadUrl: @json(route('admin.products.upload-image')),
+        uploadUrl: @json($galleryUploadUrl),
         token: @json(csrf_token()),
         max: @json($galleryMax),
-        maxBytes: @json(\App\Http\Controllers\Admin\EditorImageController::maxBytes()),
+        maxBytes: @json($galleryMaxBytes),
         types: ['image/jpeg', 'image/png', 'image/webp'],
         t: {
             cover: @json(__('cms.products.gallery_cover')),
@@ -81,9 +90,9 @@
             remove: @json(__('cms.products.gallery_remove')),
             uploading: @json(__('cms.products.gallery_uploading')),
             imageN: @json(__('cms.products.gallery_image_n')),
-            tooMany: @json(__('cms.products.gallery_too_many', ['max' => $galleryMax])),
+            tooMany: @json($galleryTooMany ?? __('cms.products.gallery_too_many', ['max' => $galleryMax])),
             badType: @json(__('cms.products.gallery_bad_type')),
-            tooLarge: @json(__('cms.editor.upload_too_large', ['max' => \App\Http\Controllers\Admin\EditorImageController::humanLimit()])),
+            tooLarge: @json(__('cms.editor.upload_too_large', ['max' => $galleryLimit])),
             sessionExpired: @json(__('cms.editor.upload_session_expired')),
             failed: @json(__('cms.editor.upload_failed_status')),
             wait: @json(__('cms.products.gallery_wait')),

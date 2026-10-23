@@ -24,7 +24,7 @@
                 @endforeach
             </div>
 
-            {{ $products->links() }}
+            {{ $products->links('pagination::bootstrap-5') }}
         @else
             <div class="text-center py-5">
                 <i class="fa-solid fa-search fa-3x text-muted mb-3"></i>
