@@ -79,6 +79,37 @@
     .news-card:has(.news-card-link:focus-visible) { outline: 3px solid var(--brand-600, #12894f); outline-offset: 3px; }
     .news-card:hover .news-card-more { text-decoration: underline; }
     @media (prefers-reduced-motion: reduce) { .news-card { transition: none; } }
+
+    /* Hero entrance. Hidden start states apply only under .hero-anim, which the script after the
+       hero adds, so without JS the content shows immediately. Fill mode "backwards" hands control
+       back to the normal styles at the end, so the button hover lift still works afterwards. */
+    @keyframes zyHeroUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    /* The card starts at 0.4 opacity, not 0, so the LCP image counts as painted right away. */
+    @keyframes zyHeroCard { from { opacity: .4; transform: scale(.97); } to { opacity: 1; transform: none; } }
+    @keyframes zyHeroZoom { from { transform: scale(1); } to { transform: scale(1.03); } }
+    .banner-area.hero-anim .hero-slide > .hero-eyebrow,
+    .banner-area.hero-anim .hero-slide > .hero-title,
+    .banner-area.hero-anim .hero-slide > .hero-subtext,
+    .banner-area.hero-anim .hero-slide > .btn { animation: zyHeroUp .6s ease-out backwards; }
+    .banner-area.hero-anim .hero-slide > .hero-title { animation-delay: .1s; }
+    .banner-area.hero-anim .hero-slide > .hero-subtext { animation-delay: .2s; }
+    .banner-area.hero-anim .hero-slide > .btn { animation-delay: .3s; }
+    .banner-area.hero-anim .hero-media { animation: zyHeroCard .6s ease-out backwards; }
+    /* Slow zoom on the image only (not the video layer); .hero-media clips the overflow. */
+    .banner-area .hero-img-slide img { animation: zyHeroZoom 12s ease-in-out infinite alternate; }
+    .banner-area .hero-slide > .btn { transition: transform .2s ease, box-shadow .2s ease; }
+    .banner-area .hero-slide > .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(14, 122, 79, .28); }
+    /* Keep Bootstrap's focus ring and add the lift shadow under it. */
+    .banner-area .hero-slide > .btn:focus-visible { transform: translateY(-2px); box-shadow: var(--bs-btn-focus-box-shadow), 0 8px 18px rgba(14, 122, 79, .28); }
+    .banner-area .hero-cta-arrow { margin-left: .5rem; transition: transform .2s ease; }
+    .banner-area .hero-slide > .btn:hover .hero-cta-arrow,
+    .banner-area .hero-slide > .btn:focus-visible .hero-cta-arrow { transform: translateX(4px); }
+    @media (prefers-reduced-motion: reduce) {
+        .banner-area .hero-slide > *, .banner-area .hero-media, .banner-area .hero-img-slide img { animation: none !important; }
+        .banner-area .hero-slide > .btn, .banner-area .hero-cta-arrow { transition: none; }
+        .banner-area .hero-slide > .btn:hover, .banner-area .hero-slide > .btn:focus-visible,
+        .banner-area .hero-slide > .btn:hover .hero-cta-arrow, .banner-area .hero-slide > .btn:focus-visible .hero-cta-arrow { transform: none; }
+    }
 </style>
 @endsection
 
@@ -125,7 +156,7 @@
                         <p class="mt-0 hero-title"><span style="color: var(--brand-700);">{!! $slide['title'] !!}</span></p>
                     @endif
                     <p class="hero-subtext">{{ $slide['subtitle'] }}</p>
-                    <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}</a>
+                    <a href="{{ $slide['cta_link'] }}" class="btn btn-primary btn-lg">{{ $slide['cta_text'] }}<i class="fa-solid fa-arrow-right hero-cta-arrow" aria-hidden="true"></i></a>
                 </div>
                 @endforeach
                 <div class="col-md-6">
@@ -169,6 +200,8 @@
             </div>
         </div>
     </section>
+    {{-- Turn on the hero entrance animation (CSS above). Without JS the hero simply shows. --}}
+    <script>document.getElementById('hero-rotation').closest('section').classList.add('hero-anim');</script>
     @if (collect($bannerData)->contains(fn ($s) => ! empty($s['video'])))
     {{-- Inline hero video: autoplays (muted, looping) inside the image box of the visible slide.
          The round button pauses / resumes it. No popup, no player controls, title or subtitles.
