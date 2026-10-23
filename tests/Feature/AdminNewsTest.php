@@ -123,6 +123,21 @@ class AdminNewsTest extends TestCase
             ->assertStatus(422)->assertJsonPath('error.message', fn ($m) => str_contains($m, '2 MB'));
     }
 
+    public function test_news_image_upload_returns_public_url_for_jpg_and_rejects_txt(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->postJson(route('admin.news.upload-image'), ['upload' => UploadedFile::fake()->image('photo.jpg', 800, 600)])
+            ->assertOk();
+        $path = $response->json('path');
+        $this->assertMatchesRegularExpression('#^news/[A-Za-z0-9._-]+\.jpe?g$#', $path);
+        $this->assertSame(asset('storage/'.$path), $response->json('url'));
+        Storage::disk('public')->assertExists($path);
+
+        $this->actingAs($this->admin)
+            ->postJson(route('admin.news.upload-image'), ['upload' => UploadedFile::fake()->create('notes.txt', 1, 'text/plain')])
+            ->assertStatus(422)->assertJsonPath('error.message', __('cms.news.image_bad_type'));
+    }
+
     public function test_multiple_images_cover_reorder_remove_and_keep(): void
     {
         [$a, $b, $c] = [$this->upload('a.jpg'), $this->upload('b.png'), $this->upload('c.webp')];
