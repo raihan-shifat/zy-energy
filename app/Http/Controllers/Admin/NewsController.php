@@ -81,13 +81,14 @@ class NewsController extends Controller
         $rules += [
             'gallery' => 'nullable|array|max:'.self::GALLERY_MAX,
             'gallery.*.id' => 'nullable|integer',
-            'gallery.*.path' => ['nullable', 'string', 'max:255', 'regex:#^news/[A-Za-z0-9._-]+$#'],
+            'gallery.*.path' => ['nullable', 'string', 'max:255', 'regex:#^news/[A-Za-z0-9._-]+$#', 'not_regex:#\.\.#'],
             'gallery_primary' => 'nullable|integer|min:0',
         ];
 
         $request->validate($rules, [
             'gallery.max' => __('cms.news.gallery_too_many', ['max' => self::GALLERY_MAX]),
             'gallery.*.path.regex' => __('cms.products.gallery_bad_path'),
+            'gallery.*.path.not_regex' => __('cms.products.gallery_bad_path'),
             // PHP refused the file (bigger than upload_max_filesize): say so instead of "failed to upload".
             'image_url.uploaded' => __('cms.news.image_too_large', ['size' => $maxLabel]),
             'image_url.max' => __('cms.news.image_too_large', ['size' => $maxLabel]),
