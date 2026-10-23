@@ -61,6 +61,7 @@ Route::post('password/confirm', [ConfirmPasswordController::class, 'confirm']);
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'staff'])->group(function () {
 
     /* Dashboard */
+    Route::redirect('/', '/admin/dashboard');
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     /* Categiries */
